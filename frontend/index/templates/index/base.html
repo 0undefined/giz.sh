@@ -1,0 +1,81 @@
+{# Base template #}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="Git-hosting server">
+  <meta name="keywords" content="git,hosting,free">
+  <meta name="author" content="John Doe">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+      background-color: #eaeaea;
+      color: #222;
+    }
+    footer,
+    nav {
+      background-color: #333;
+      width: 100%;
+      padding: 4pt 0pt;
+      text-align: center;
+    }
+    nav a, nav input {
+      font-size: 16pt;
+      padding: 6pt;
+      display: inline-block;
+      color: #fff;
+      text-decoration: none;
+    }
+    nav input {
+      color: #333;
+      font-size: 14pt;
+    }
+    nav input[type="text"] {
+      background-color: #888;
+      border: 1pt solid #7e4798;
+      border-radius: 4pt;
+      padding: 4pt 8pt;
+    }
+    nav input[type="text"]:focus {
+      background-color: #eaeaea;
+    }
+    nav a:hover {
+      color: #7e4798;
+    }
+    .content {
+      height: 100%;
+      width: 90%;
+      max-width: 40pc;
+      display: block;
+      background-color: #fff;
+      /*box-shadow: 0pt 0pt 4pt rgba(0,0,0,0.5);*/
+      margin: 0 auto;
+      padding: 4pc;
+    }
+    {% block STYLE %}{% endblock %}
+  </style>
+  <title>{% block TITLE %}index{% endblock %}</title>
+</head>
+<body>
+  <nav>
+    <a href="{% url 'index' %}">Index</a>
+    <a href="{% url 'index' %}">Explore</a>
+    <a href="{% url 'index' %}">Docs</a>
+    <input type="text" placeholder="Search"></input>
+    {% if user.is_authenticated %}
+    <a href="{% url 'logout' %}">Logout</a>
+    <span class="user_options">
+      {{ user.get_username }}
+    </span>
+    {% else %}
+    <a href="{% url 'login' %}">Sign in</a>
+    <a href="{% url 'signup' %}">Sign up</a>
+    {% endif %}
+  </nav>
+  <div class="content">
+  {% block CONTENT %}{% endblock %}
+  </div>
+</body>
+</html>
