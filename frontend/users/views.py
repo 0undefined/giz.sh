@@ -2,9 +2,10 @@ import re
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
 from . import forms
+User = get_user_model()
 
 
 def Userlogin(request):

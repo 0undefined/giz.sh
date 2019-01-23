@@ -1,4 +1,51 @@
 {% extends 'index/base.html' %}
 {% block CONTENT %}
-  Hello world!
+
+<h2>To do:</h2>
+
+<ul>
+<li>[ ] Make markdown script for checkboxes in readmes</li>
+<li>[ ] Create DB entries for gitolite</li>
+<li>[ ] Reflect upon those entries</li>
+<li>[ ] Add key support</li>
+<li>[ ] Edit key-repository and commit and push</li>
+<li>[ ] Profile page</li>
+<li>[ ] Upload files, profile pictures, etc.</li>
+<li>[ ] Migrate from other platforms (fork, kind of)</li>
+</ul>
+
+  {% if git_response %}
+  <table>
+    <tr>
+      <th>
+        Permissions
+      </th>
+      <th>
+        Owner
+      </th>
+      <th>
+        Repository
+      </th>
+      <th>
+        Description
+      </th>
+    </tr>
+  {% for response in git_response %}
+    <tr>
+      <td>
+        {{ response|first }}
+      </td><td>
+        <a href="">{{ response|last|first }}</a>
+      </td><td>
+        {{ response|last|last }}
+      </td> <td>
+        --
+      </td>
+    </tr>
+  {% endfor %}
+  </table>
+  {% else %}
+  Unable to connect to git server!
+  {{ git_error|safe }}
+  {% endif %}
 {% endblock %}
