@@ -35,6 +35,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         blank=True)
     first_name = ""
     last_name = ""
+    summary = models.CharField(max_length=1024, default="", blank=True)
 
     objects = UserManager()
 

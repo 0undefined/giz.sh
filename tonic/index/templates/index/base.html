@@ -134,7 +134,7 @@
     }
     footer {
       position: absolute;
-      margin-top: calc(100vh - 3pc);
+      margin-top: calc(90vh - 13pc);
     }
     /*****************************************
       COMMON STYLING
@@ -164,18 +164,18 @@
     <a href="{% url 'index' %}"><i class="fas fa-book"></i></a>
     <a href="{% url 'index' %}"><i class="fas fa-store"></i></a>
     <input type="text" placeholder="Search"></input>
-    {% if user.is_authenticated %}
+    {% if request.user.is_authenticated %}
     <span class="user_options">
-      <a href="#">
-        {% if user.is_superuser %}
+      <a href="{% url 'users:user' request.user.username %}">
+        {% if request.user.is_superuser %}
         <i class="is_admin fas fa-star"></i>
-        {% endif %}<span class="username">{{ user.get_username }}</span>
+        {% endif %}<span class="username">{{ request.user.get_username }}</span>
       </a>
       <div class="dropdown">
         <input id="user_menu" type="checkbox" name="menu" />
         <label for="user_menu"><i class= "expand fas fa-caret-down"></i></label>
         <ul class="dropdown-content">
-          <li><a href="{% url 'users:user' request.user.username %}">Profile</a></li>
+          <li><a href="{% url 'users:edit' request.user.username %}">Settings</a></li>
           <li><a href="#">Repositories</a></li>
           <li><a href="#">Bookmarks</a></li>
           <hr/>
@@ -193,8 +193,5 @@
   {% block CONTENT %}{% endblock %}
   </div>
   <span style="margin:0 auto;width:8pc;display:block;color:#99a;">existence is pain</span>
-  <footer>
-    stuff and info
-  </footer>
 </body>
 </html>

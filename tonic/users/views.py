@@ -20,6 +20,16 @@ def UserView(request, user=None):
     return render(request, 'users/profile.html', context=context)
 
 
+def EditUser(request, user=None):
+    userobj = get_object_or_404(User, username=user)
+    if userobj.username == request.user.username:
+        context = {'user': userobj,}
+                # Associates/friends
+        return render(request, 'users/edit.html', context=context)
+    # TODO: return permission denied
+    return render(request, 'index/index.html')
+
+
 def Userlogin(request):
     context = {}
     if request.user.is_authenticated:
