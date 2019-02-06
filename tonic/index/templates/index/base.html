@@ -20,7 +20,7 @@
     }
     footer,
     nav {
-      background-color: #000;
+      background-color: #141414;
       width: 100%;
       padding: 0pt;
       text-align: center;
@@ -66,7 +66,7 @@
     .content {
       height: 100%;
       width: 90%;
-      max-width: 40pc;
+      max-width: 70pc;
       display: block;
       background-color: #fff;
       box-shadow: 0pt 0pt 8pt #000;
@@ -99,7 +99,7 @@
       cursor: pointer;
       position: relative;
       display: inline-block;
-      background-color: #000;
+      background-color: #141414;
       border: none;
     }
     .dropdown {
@@ -129,9 +129,12 @@
       background-color: #62a9d1;
       color: #000;
     }
-
     input[type="checkbox"]:checked~ul.dropdown-content {
       display: block;
+    }
+    footer {
+      position: absolute;
+      margin-top: calc(100vh - 3pc);
     }
     /*****************************************
       COMMON STYLING
@@ -148,11 +151,11 @@
       background-color: #eaeaf6;
     }
     td, th {
-      border: 1px solid #aaa;
+      border: 1px solid #dadada;
       padding: 3pt;
     }
-    {% block STYLE %}{% endblock %}
   </style>
+  {% block STYLE %}{% endblock %}
   <title>{% block TITLE %}index{% endblock %}</title>
 </head>
 <body>
@@ -172,23 +175,26 @@
         <input id="user_menu" type="checkbox" name="menu" />
         <label for="user_menu"><i class= "expand fas fa-caret-down"></i></label>
         <ul class="dropdown-content">
-          <li><a href="#">Profile</a></li>
+          <li><a href="{% url 'users:user' request.user.username %}">Profile</a></li>
           <li><a href="#">Repositories</a></li>
           <li><a href="#">Bookmarks</a></li>
           <hr/>
           <li><a href="#">Documentation</a></li>
-          <li><a href="{% url 'logout' %}">Logout</a></li>
+          <li><a href="{% url 'users:logout' %}">Logout</a></li>
         </ul>
       </div>
     </span>
     {% else %}
-    <a href="{% url 'login' %}">Sign in</a>
-    <a href="{% url 'signup' %}">Sign up</a>
+    <a href="{% url 'users:login' %}">Sign in</a>
+    <a href="{% url 'users:signup' %}">Sign up</a>
     {% endif %}
   </nav>
   <div class="content">
   {% block CONTENT %}{% endblock %}
   </div>
   <span style="margin:0 auto;width:8pc;display:block;color:#99a;">existence is pain</span>
+  <footer>
+    stuff and info
+  </footer>
 </body>
 </html>

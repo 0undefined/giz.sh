@@ -1,11 +1,23 @@
 import re
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
 from . import forms
 User = get_user_model()
+
+
+def Users(request):
+    context = {'users': User.objects.all()}
+    return render(request, 'users/index.html', context=context)
+
+
+def UserView(request, user=None):
+    userobj = get_object_or_404(User, username=user)
+    context = {'user': userobj,}
+            # Associates/friends
+    return render(request, 'users/profile.html', context=context)
 
 
 def Userlogin(request):
@@ -31,7 +43,7 @@ def Userlogout(request):
     return HttpResponseRedirect('/')
 
 
-def signup(request):
+def Signup(request):
     context = {
         'signupform': forms.SignupForm
     }

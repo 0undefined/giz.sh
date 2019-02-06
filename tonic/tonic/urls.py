@@ -5,7 +5,5 @@ from users import views
 urlpatterns = [
     path('', include('index.urls')),
     path('admin/', admin.site.urls),
-    path('login/', views.Userlogin, name='login'),
-    path('logout/', views.Userlogout, name='logout'),
-    path('signup/', views.signup, name='signup'),
+    path('u/', include('users.urls')),
 ]
