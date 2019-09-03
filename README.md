@@ -28,3 +28,6 @@
 * Possible to buy more space
 * Tokens for external bots/scripts
 * CI bots (for profit ofc.)
+* Chatting/issues
+* Projects, planning, deadlines
+* GPG verification
