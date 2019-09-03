@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render
 from django.http import HttpResponse
 
@@ -7,7 +9,7 @@ def index(request):
     context = {}
     ssh = paramiko.SSHClient()
     ssh.load_system_host_keys()
-    ssh.connect('localhost', 22, 'git', '', key_filename="/home/oscar/.ssh/id_rsa")
+    ssh.connect('localhost', 22, 'git', '', key_filename=os.environ['HOME'] + "/.ssh/id_rsa")
     _, stdout, stderr = ssh.exec_command('info')
 
     res = stdout.readlines()

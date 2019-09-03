@@ -17,6 +17,7 @@
       margin: 0;
       background-color: #8a8f94;
       color: #222;
+      background-image: url("{% static 'index/background.png' %}");
     }
     footer,
     nav {
@@ -33,7 +34,7 @@
       line-height: 2.4pc !important;
       height: 100%;
     }
-    nav a, nav input {
+    nav a, nav form {
       padding: 3pt;
       display: inline-block;
       color: #fff;
@@ -46,7 +47,7 @@
       width: 2pc;
       height: 100%;
     }
-    nav input {
+    nav form input {
       color: #666;
       font-size: 14pt;
       height: 1.6pc;
@@ -163,7 +164,10 @@
     <a href="{% url 'index' %}"><img src="{% static 'index/git.svg' %}" alt="gitlogo"></a>
     <a href="{% url 'index' %}"><i class="fas fa-book"></i></a>
     <a href="{% url 'index' %}"><i class="fas fa-store"></i></a>
-    <input type="text" placeholder="Search"></input>
+    <a href="{% url 'index' %}"><i class="fas fa-search"></i></a>
+    <form post="/" name="search">
+    <input type="text" name="search" placeholder="Search"></input>
+    </form>
     {% if request.user.is_authenticated %}
     <span class="user_options">
       <a href="{% url 'users:user' request.user.username %}">
