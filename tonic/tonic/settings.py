@@ -19,7 +19,7 @@ SECRET_KEY = '42adozyr@jx8p_$fx#2z__&wfp59d*n$f7brnn-=y+x@=#_85_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -27,12 +27,14 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'index',
     'users',
+    'git',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -118,3 +120,10 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 STATIC_URL = '/static/'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+GITOLITE_HOST = 'gitolite'
+GITOLITE_PORT = 22
+GITOLITE_KEY = os.environ['HOME'] + "/.ssh/id_rsa"
+# TODO: Create a key for tonic, to view gitolite repositories

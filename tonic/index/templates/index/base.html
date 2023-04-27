@@ -12,134 +12,153 @@
   <meta name="author" content="John Doe">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <style>
+    :root {
+      --padding: 4pt;
+      --color-bg: #080808;
+      --color-content-bg: #323437;
+      --color-fg: #eeeeee;
+    }
     body {
       padding: 0;
       margin: 0;
-      background-color: #8a8f94;
-      color: #222;
-      background-image: url("{% static 'index/background.png' %}");
+      background-color: var(--color-bg);
+      color: var(--color-fg);
     }
-    footer,
+
     nav {
-      background-color: #141414;
+      background: rgb(255,84,84);
+      background: linear-gradient(42deg, rgba(255,84,84,1) 0%, rgba(207,135,232,1) 53%, rgba(128,160,255,1) 100%);
       width: 100%;
-      padding: 0pt;
+      padding: 0pc;
       text-align: center;
-      height: 3pc;
       font-size: 13pt;
       z-index: 3;
     }
-    nav a i {
-      font-size: 20pt;
-      line-height: 2.4pc !important;
-      height: 100%;
+    nav {
+      display:flex;
+      flex-flow: row;
+      justify-content: space-between;
+      flex-wrap: nowrap;
+      align-items: stretch;
+      color: #080808;
     }
-    nav a, nav form {
-      padding: 3pt;
-      display: inline-block;
-      color: #fff;
-      text-decoration: none;
-      height: calc(100% - 6pt);
-      line-height: 2pc;
-      vertical-align: middle;
+    .navcontainer {
+      display:flex;
+      flex-flow: row;
+      /*align-items: stretch;*/
+      align-items: center;
+      margin: var(--padding);
+      gap: var(--padding);
     }
-    nav img {
+    .navcontainer > img {
       width: 2pc;
-      height: 100%;
+      height: 2pc;
     }
-    nav form input {
-      color: #666;
-      font-size: 14pt;
-      height: 1.6pc;
+
+    .searchbar {
+      flex-shrink: 1;
+      flex-grow: 1;
+      -webkit-border-radius: var(--padding);
+      -moz-border-radius: var(--padding);
+      border-radius: var(--padding);
     }
-    nav input[type="text"] {
-      background-color: #333;
-      border: 1pt solid #545; /* #7e4798 */
-      border-radius: 0pt;
-      padding: 4pt 8pt;
-    }
-    nav input[type="text"]:focus {
-      background-color: #eaeaea;
-    }
-    nav a:hover {
-      color: #7e4798;
-    }
-    .content {
-      height: 100%;
-      width: 90%;
-      max-width: 70pc;
-      display: block;
-      background-color: #fff;
-      box-shadow: 0pt 0pt 8pt #000;
-      margin: 0 auto;
-      padding: 4pc;
-      z-index: 1;
+    .searchbar > input {
+      width: calc(100% - 2 * var(--padding));
+      height: calc(100% - 2 * var(--padding));
+      padding: var(--padding);
+      margin: 0;
+      border: none;
+      border-radius: var(--padding);
     }
     .user_options {
-      float: right;
-      padding-right: 8pt;
+      display:flex;
+      flex-flow: row;
+      margin: var(--padding);
+      gap: calc(2 * var(--padding));
+      align-items: center;
     }
-    .is_admin {
-      color: #ff0;
-      font-size: 14pt;
-      vertical-align: middle;
-    }
-    .username {
-      /*color: #f0f;*/
-      color: #fff;
-      font-weight: 700;
-      vertical-align: middle;
-    }
-    .expand {
-      color: #aaa;
-    }
-    .dropdown > input {
-      display: none;
-    }
-    .dropdown > label:nth-child(2) {
-      cursor: pointer;
-      position: relative;
-      display: inline-block;
-      background-color: #141414;
-      border: none;
-    }
-    .dropdown {
-      position: relative;
-      display: inline-block;
-    }
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      right: 0;
-      background-color: #fff;
-      min-width: 6pc;
-      box-shadow: 0px 0px 8px #000;
-      z-index: 4;
-      list-style: none;
-      margin-left: 0;
-      padding-left: 0;
-
-    }
-    .dropdown-content a {
-      color: black;
-      padding: 4pt 8pt;
+    .user_options a {
+      color: #020202;
       text-decoration: none;
+      font-weight: 400;
+    }
+    .user_options details summary:hover {
+      cursor:pointer;
+    }
+    .user_options details summary::-webkit-details-marker,
+    .user_options details summary::marker {
+      display:none;
+      content:"";
+    }
+    .user_options details ul {
+      list-style: none;
+      padding:calc(2 * var(--padding));
       display: block;
+      position: fixed;
+      background: #323437;
+      border-radius: var(--padding);
+      border: 1pt solid #b2b2b2;
     }
-    .dropdown-content a:hover {
-      background-color: #62a9d1;
-      color: #000;
+    .user_options details ul li * {
+      float:left;
     }
-    input[type="checkbox"]:checked~ul.dropdown-content {
-      display: block;
+    .usersettings > ul {
+      right: 1pc;
     }
-    footer {
-      position: absolute;
-      margin-top: calc(90vh - 13pc);
+    .user_options .login {
+      border: 1pt solid #b2b2b2;
+      border-radius: var(--padding);
+      color: #b2b2b2;
+      background-color: var(--color-content-bg);
     }
+    .user_options a.login,
+    .user_options a.logout {
+      padding: var(--padding);
+    }
+
+    .contentcontainer {
+      display: flex;
+      flex-flow: row;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: center;
+      /*width: 90%;*/
+      overflow: scroll;
+      max-width: 100vw;
+      min-width: 8cm;
+      margin: 0 auto;
+    }
+
+    .contentcontainer > * {
+      margin: var(--padding);
+      padding: var(--padding);
+      border: 1pt solid #9e9e9e;
+      border-radius: var(--padding);
+      background: var(--color-content-bg);
+    }
+    .contentcontainer .maincontent {
+      /*min-width: 12cm;*/
+      flex-shrink: 1;
+      flex-grow: 3;
+      max-width: 24cm;
+    }
+    .contentcontainer .rightcontent,
+    .contentcontainer .leftcontent {
+      flex-grow: 1;
+      flex-shrink: 1;
+      max-width: 8cm;
+      /*
+      flex-shrink: 1;
+      flex-grow: 1;
+      min-width: 8cm;
+      max-width: 12cm;
+      */
+    }
+
     /*****************************************
       COMMON STYLING
      ****************************************/
+    /*
     table {
       border-collapse: collapse;
       width: 100%;
@@ -155,47 +174,51 @@
       border: 1px solid #dadada;
       padding: 3pt;
     }
+    */
   </style>
   {% block STYLE %}{% endblock %}
   <title>{% block TITLE %}index{% endblock %}</title>
 </head>
 <body>
   <nav>
-    <a href="{% url 'index' %}"><img src="{% static 'index/git.svg' %}" alt="gitlogo"></a>
-    <a href="{% url 'index' %}"><i class="fas fa-book"></i></a>
-    <a href="{% url 'index' %}"><i class="fas fa-store"></i></a>
-    <a href="{% url 'index' %}"><i class="fas fa-search"></i></a>
-    <form post="/" name="search">
-    <input type="text" name="search" placeholder="Search"></input>
-    </form>
+    <span class="navcontainer">
+      <img src="{% static 'index/favicon.png' %}">
+    <form post="/" class="searchbar" name="search"><input type="text" name="search" placeholder="Search"></input></form>
+    </span>
     {% if request.user.is_authenticated %}
     <span class="user_options">
+      <details class="useradd"><summary>+</summary>
+        <ul>
+          <li><a href="">new repo</a></li>
+          <li><a href="">new group</a></li>
+        </ul>
+      </details>
+      [ProfilePic]
       <a href="{% url 'users:user' request.user.username %}">
         {% if request.user.is_superuser %}
         <i class="is_admin fas fa-star"></i>
         {% endif %}<span class="username">{{ request.user.get_username }}</span>
       </a>
-      <div class="dropdown">
-        <input id="user_menu" type="checkbox" name="menu" />
-        <label for="user_menu"><i class= "expand fas fa-caret-down"></i></label>
-        <ul class="dropdown-content">
+      <details class="usersettings">
+        <summary><div class="fas fa-wheelchair"></div></summary>
+        <ul>
           <li><a href="{% url 'users:edit' request.user.username %}">Settings</a></li>
           <li><a href="#">Repositories</a></li>
           <li><a href="#">Bookmarks</a></li>
-          <hr/>
           <li><a href="#">Documentation</a></li>
           <li><a href="{% url 'users:logout' %}">Logout</a></li>
         </ul>
-      </div>
+      </details>
     </span>
     {% else %}
-    <a href="{% url 'users:login' %}">Sign in</a>
-    <a href="{% url 'users:signup' %}">Sign up</a>
+    <span class="user_options">
+    <a class="login" href="{% url 'users:login' %}">Sign in</a>
+    <a class="logout" href="{% url 'users:signup' %}">Sign up</a>
+    </span>
     {% endif %}
   </nav>
-  <div class="content">
+  <div class="contentcontainer">
   {% block CONTENT %}{% endblock %}
   </div>
-  <span style="margin:0 auto;width:8pc;display:block;color:#99a;">existence is pain</span>
 </body>
 </html>

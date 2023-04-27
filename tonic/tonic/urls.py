@@ -5,5 +5,7 @@ from users import views
 urlpatterns = [
     path('', include('index.urls')),
     path('admin/', admin.site.urls),
-    path('u/', include('users.urls')),
+    path('', include('users.urls')),
+    #path(r'^\w+/', include('users.urls')),
+    path('', include('git.urls')),
 ]

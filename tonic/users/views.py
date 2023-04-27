@@ -7,6 +7,8 @@ from django.contrib.auth import authenticate, login, logout
 from . import forms
 User = get_user_model()
 
+from git.models import Repository
+
 
 def Users(request):
     context = {'users': User.objects.all()}
@@ -15,9 +17,9 @@ def Users(request):
 
 def UserView(request, user=None):
     userobj = get_object_or_404(User, username=user)
-    context = {'user': userobj,}
+    context = {'user': userobj, 'repositories': Repository.objects.filter(owner=userobj)}
             # Associates/friends
-    return render(request, 'users/profile.html', context=context)
+    return render(request, 'users/user.html', context=context)
 
 
 def EditUser(request, user=None):

@@ -1,0 +1,16 @@
+{% extends 'index/base.html' %}
+{% block CONTENT  %}
+<div class="leftcontent">
+  [ProfilePic]
+  <h4>{{ user.username }}</h4>
+</div>
+<div class="maincontent">
+  <h2>Repositories</h2>
+  {% for r in repositories %}
+  <a href="{% url 'repo' owner=user.username name=r.name %}">{{ r.name }}</a><br>
+  {% endfor %}
+</div>
+<div class="rightcontent">
+  right content
+</div>
+{% endblock %}

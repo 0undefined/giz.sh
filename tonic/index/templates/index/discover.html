@@ -1,0 +1,15 @@
+{% extends 'index/base.html' %}
+{% block CONTENT  %}
+
+Number of repositories {{ repositories.count }}<br>
+<table>
+{% for r in repositories %}
+<tr>
+  <td>{{ r.owner.username }}</td>
+  <td><a href="{{ r.get_absolute_url }}">{{ r.name }}</td>
+  <td>{{ r.description }}</td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}
