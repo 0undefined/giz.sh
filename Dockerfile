@@ -4,7 +4,7 @@ RUN apk upgrade -U
 RUN apk add bash py3-pip git musl openssh
 
 RUN pip install --no-input \
-  paramiko tzdata django django-extensions ipython GitPython
+  paramiko tzdata django django-extensions ipython GitPython umarkdown
 RUN rm -rf /var/cache/apk/*
 
 RUN adduser -D --shell /bin/bash django
