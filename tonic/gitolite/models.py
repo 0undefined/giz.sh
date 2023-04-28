@@ -2,6 +2,7 @@ from django.core.validators import RegexValidator
 from django.conf import settings
 from django.db import models
 from users.models import User
+from gitolite.apps import git_update_userrepos
 
 
 class Repository(models.Model):
@@ -30,6 +31,9 @@ class Repository(models.Model):
     def get_absolute_url(self):
         return '/' + self.__str__()
 
+    def visibility_str(self):
+        return Repository.Visibility.choices[self.visibility][1]
+
     def get_remote_url(self):
         return 'git@' + settings.GITOLITE_HOST + ':' + self.__str__() + '.git'
 
@@ -40,10 +44,11 @@ class Repository(models.Model):
         username = self.owner.username
         conf = "repo %s/%s\n\tRW+\t=\t%s" % (username, self.name, username)
         # TODO: apply more repo-specific settings
+        if self.visibility == Repository.Visibility.PUBLIC:
+            conf +=  "\n\t" + Collaborator.Permissions.choices[Collaborator.Permissions.READ][1] + "\t=\t@all"
         collabs = Collaborator.objects.filter(repo=self)
         for c in collabs:
-            conf += "\n\t" + Collaborator.Permissions.choices[c.perm][1] \
-                    + "\t=\t" + c.user.username
+            conf += "\n\t" + c.permission_str() + "\t=\t" + c.user.username
 
         return conf
 
@@ -55,6 +60,11 @@ class Repository(models.Model):
         conf = [r.get_config() for r in rr]
 
         return '\n\n'.join(conf)
+
+    def save(self, *args, **kwargs):
+        git_update_userrepos(self.owner)
+
+        return super(Repository, self).save(*args, **kwargs)
 
 class Collaborator(models.Model):
     class Permissions(models.IntegerChoices):
@@ -71,9 +81,16 @@ class Collaborator(models.Model):
     class Meta:
         unique_together = ('user', 'repo')
 
+    def permission_str(self):
+        return self.Permissions.choices[self.perm][1]
+
     def __str__(self):
         return self.Permissions.choices[self.perm][1] + " = " + self.user.username + '  ' + self.repo.get_remote_url()
 
+    def save(self, *args, **kwargs):
+        git_update_userrepos(self.repo.owner)
+
+        return super(Collaborator, self).save(*args, **kwargs)
     # TODO: override save() to commit permissions to repository in gitolite beforehand
     # TODO: override save() to check if collaboration permissions already exists
 

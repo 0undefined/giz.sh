@@ -4,7 +4,8 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, Permis
 from django.core.validators import RegexValidator
 import os
 
-from gitolite.apps import init_git
+
+from gitolite.apps import git_add_key_file
 
 
 class UserManager(BaseUserManager):
@@ -30,13 +31,14 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['name', 'initials', 'email']
+    #REQUIRED_FIELDS = ['name', 'initials', 'email']
     username = models.CharField(
             unique=True,
             max_length=48,
             db_index=True,
-            validators=[RegexValidator(r'^[a-z][a-z0-9_]+$', "Username must comply with the following regex: [a-z][a-z0-9_]+")])
+            validators=[RegexValidator(r'^[a-z0-9_]{4,48}$', "Username must comply with the following regex: [a-z0-9_]{4,48}$")])
     password = models.CharField(blank=True, max_length=128)
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -55,9 +57,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         # We do not need to update any gitolite related stuffs yet, as we cannot
         # commit an empty directory
 
-        userdir = os.path.join(settings.GITOLITE_ADMIN_PATH, 'keydir', self.username)
+        #userdir = os.path.join(settings.GITOLITE_ADMIN_PATH, 'keydir', self.username)
 
-        os.makedirs(userdir)
+        #os.makedirs(userdir)
 
         return super(User, self).save(*args, **kwargs)
     #def create(cls, username, displayname, pswd, email):
@@ -68,24 +70,21 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class RSA_Key(models.Model):
-    public = models.TextField(max_length=16384, blank=False)
+    public = models.TextField(max_length=16384, blank=False, unique=True)
     name = models.CharField(blank=False, max_length=128)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    class Meta:
-        unique_together = ('user', 'public')
+    def __str__(self):
+        return self.name + ':' + self.user.username + '.pub'
+
 
     # TODO: Overwrite save method to add key to gitolite keydir
     def save(self, *args, **kwargs):
-        repo = init_git()
-        userdir = os.path.join(settings.GITOLITE_ADMIN_PATH, 'keydir', self.user.username)
+        # Adding potentially missing newline
+        public = self.public.strip()
+        public += '\n'
+        self.public = public
 
-        if not os.path.exists(userdir):
-            os.makedirs(userdir)
-
-        keypath = os.path.join(userdir, self.name + '.pub')
-        keyfile = open(keypath, 'w')
-        keyfile.write(self.public)
-        keyfile.close()
+        git_add_key_file(self)
 
         return super(RSA_Key, self).save(*args, **kwargs)

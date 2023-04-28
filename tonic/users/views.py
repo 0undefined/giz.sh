@@ -82,9 +82,9 @@ def Signup(request):
         form = forms.SignupForm(request.POST)
         if form.is_valid():
             if re.match(r'[\w-]+$', form.data['username']) is not None:
-                username = form.data['username']
-                password = form.data['password']
-                User.objects.create_user(username=username, password=password)
+                #username = form.data['username']
+                #password = form.data['password']
+                form.save()  #User.objects.create_user(username=username, password=password)
                 return HttpResponseRedirect('/')
             else:
                 context.update({'error': "Invalid username. Please stick to alphanumeric characters"})

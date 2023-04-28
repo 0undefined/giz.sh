@@ -1,9 +1,20 @@
 {% extends 'index/base.html' %}
 {% block STYLE %}
 <style>
+.visibility {
+  font-size: 9pt;
+  font-weight: 100;
+  color: var(--white);
+  float:right;
+  padding: var(--padding);
+  border: var(--border-sz) solid var(--white);
+  border-radius: var(--padding);
+}
 .remote {
   font-family: Courier New;
-  border: 1pt solid var(--color-fg);
+  background-color: var(--green-light);
+  color: var(--color-bg);
+  border: var(--border-sz) solid var(--green);
   border-radius: var(--padding);
   padding: var(--padding);
   font-size: 9pt;
@@ -13,25 +24,46 @@
 {% block CONTENT %}
 <div class="maincontent">
 
-<h3>{{ repository.name }}</h3>
+  <h3>{{ repository.name }}<span class="visibility">{{ visibility }}</span></h3>
 
-{% if collaborators %}
-<h4>Collaborators:</h4>
-{% for c in collaborators %}
-<a href="{% url 'users:user' c.user %}">{{ c.user }}</a><br>
-{% endfor %}
-{% endif %}
-{% if repository.description %}
-<p>{{ repository.description }}</p>
-{% endif %}
-
-&lt;README.md&gt;
+  {% if files %}
+  <hr>
+  Files
+  <ul>
+    {% for dir in files.trees %}
+    <li>[d] {{ dir.name }}
+      {% if dir.trees|length == 1 and dir.blobs|length == 0 %}
+      / {{ dir.trees.pop.name }} {# extend with recursion #}
+      {% endif %}
+    </li>
+    {% endfor %}
+    {% for file in files.blobs %}
+    <li>[f] {{ file.name }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if readme %}
+  <hr>
+  [...] README.md<br>
+  {{ readme|safe }}
+  {% endif %}
 </div>
 <div class="rightcontent">
-  {{ visibility }}<br>
+{% if repository.description %}
+<h4>About</h4>
+<p>{{ repository.description }}</p>
+{% endif %}
   <div class="remote">{{ repository.get_remote_url }}</div><br>
   {% if repository.owner == request.user %}
   <a href="">Settings</a>
+  {% endif %}
+  {% if collaborators %}
+  <h4>Collaborators:</h4>
+  <ul>
+    {% for c in collaborators %}
+    <li><a href="{% url 'users:user' c.user.username %}">{{ c.user.username }}</a></li>
+    {% endfor %}
+  </ul>
   {% endif %}
 </div>
 {% endblock %}

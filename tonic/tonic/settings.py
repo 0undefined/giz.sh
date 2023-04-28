@@ -26,8 +26,6 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'users',
-    'index',
-    'gitolite',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -35,6 +33,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+
+    # Apps
+    'index',
+    'gitolite',
 ]
 
 MIDDLEWARE = [

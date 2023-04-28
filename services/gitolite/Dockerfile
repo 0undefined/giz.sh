@@ -1,16 +1,16 @@
 FROM alpine:latest
 
 RUN apk upgrade -U
-RUN apk add bash git musl openssh perl
+RUN apk add --no-cache gitolite openssh
+RUN passwd -u git
 
-RUN pip install --no-input django paramiko tzdata
+VOLUME /etc/ssh/keys
+VOLUME /var/lib/git
 
-RUN adduser -D git
+COPY docker-entrypoint.sh /usr/bin
+RUN chmod +x /usr/bin/docker-entrypoint.sh
+ENTRYPOINT ["/usr/bin/docker-entrypoint.sh"]
 
-ADD ssh /home/git/.ssh
+EXPOSE 22
 
-EXPOSE 2222:2222
-
-USER git
-
-ENTRYPOINT ["/usr/bin/sshd", "-D", "-p", "2222"]
+CMD ["sshd"]
