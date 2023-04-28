@@ -1,13 +1,16 @@
 import re
 
+from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect
-from django.contrib.auth import get_user_model
-from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponseRedirect, JsonResponse
+from django.urls import reverse
+
+from .models import RSA_Key
+from .forms import RSA_KeyForm
 from . import forms
 User = get_user_model()
 
-from git.models import Repository
+from gitolite.models import Repository
 
 
 def Users(request):
@@ -25,11 +28,25 @@ def UserView(request, user=None):
 def EditUser(request, user=None):
     userobj = get_object_or_404(User, username=user)
     if userobj.username == request.user.username:
-        context = {'user': userobj,}
+        form_rsa = RSA_KeyForm()
+        context = {'user': userobj, 'keys': RSA_Key.objects.filter(user=userobj), 'form_rsa': form_rsa}
                 # Associates/friends
         return render(request, 'users/edit.html', context=context)
     # TODO: return permission denied
     return render(request, 'index/index.html')
+
+
+def AddUserKey(request, user=None):
+    userobj = get_object_or_404(User, username=user)
+    form = RSA_KeyForm(request.POST.copy() or None)
+    form.data['user'] = userobj
+
+    if (form.is_valid()):
+        form.save()
+    else:
+        return JsonResponse(form.errors)
+
+    return HttpResponseRedirect(reverse('users:edit', kwargs={'user':user}))
 
 
 def Userlogin(request):

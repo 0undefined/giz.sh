@@ -1,4 +1,15 @@
 {% extends 'index/base.html' %}
+{% block STYLE %}
+<style>
+ul li {
+      list-style: none;
+}
+a {
+  color: var(--color-fg);
+}
+</style>
+{% endblock %}
+
 {% block CONTENT %}
 
 {% if request.user.is_authenticated %}
@@ -9,16 +20,13 @@
         <i class="is_admin fas fa-star"></i>
         {% endif %}<span class="username">{{ request.user.get_username }}</span>
       </a>
-      <details class="usersettings">
-        <summary><div class="fas fa-wheelchair"></div></summary>
-        <ul>
-          <li><a href="{% url 'users:edit' request.user.username %}">Settings</a></li>
-          <li><a href="#">Repositories</a></li>
-          <li><a href="#">Bookmarks</a></li>
-          <li><a href="#">Documentation</a></li>
-          <li><a href="{% url 'users:logout' %}">Logout</a></li>
-        </ul>
-      </details>
+      <ul>
+        <li><a href="{% url 'users:edit' request.user.username %}">Settings</a></li>
+        <li><a href="#">Repositories</a></li>
+        <li><a href="#">Bookmarks</a></li>
+        <li><a href="#">Documentation</a></li>
+        <li><a href="{% url 'users:logout' %}">Logout</a></li>
+      </ul>
       <hr>
   <h4>Some shortcuts</h4>
   <ul>

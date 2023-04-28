@@ -8,7 +8,7 @@ from users.models import User
 
 import paramiko
 
-from git.models import Repository
+from gitolite.models import Repository
 
 def index(request):
     context = {}

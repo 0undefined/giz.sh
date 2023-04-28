@@ -7,5 +7,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('users.urls')),
     #path(r'^\w+/', include('users.urls')),
-    path('', include('git.urls')),
+    path('', include('gitolite.urls')),
 ]

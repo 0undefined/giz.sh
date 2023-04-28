@@ -21,6 +21,9 @@ services:
         max-file: "1"
     environment:
       #- PYTHONUNBUFFERED=1
+      - GITOLITE_HOST=gitolite
+      - GITOLITE_PORT=22
+      - GITOLITE_KEY
       - DEBUG=True
     depends_on:
       - redis
@@ -28,8 +31,9 @@ services:
       - 8000:8000
     volumes:
       - ./tonic:/usr/share/www
-    command: python3 manage.py runserver 0.0.0.0:8000
+      - gitolite-sshkeys:/root/keys
 
 volumes:
   gitolite-sshkeys:
   gitolite-git:
+# django:

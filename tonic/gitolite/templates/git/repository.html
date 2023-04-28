@@ -1,0 +1,37 @@
+{% extends 'index/base.html' %}
+{% block STYLE %}
+<style>
+.remote {
+  font-family: Courier New;
+  border: 1pt solid var(--color-fg);
+  border-radius: var(--padding);
+  padding: var(--padding);
+  font-size: 9pt;
+}
+</style>
+{% endblock %}
+{% block CONTENT %}
+<div class="maincontent">
+
+<h3>{{ repository.name }}</h3>
+
+{% if collaborators %}
+<h4>Collaborators:</h4>
+{% for c in collaborators %}
+<a href="{% url 'users:user' c.user %}">{{ c.user }}</a><br>
+{% endfor %}
+{% endif %}
+{% if repository.description %}
+<p>{{ repository.description }}</p>
+{% endif %}
+
+&lt;README.md&gt;
+</div>
+<div class="rightcontent">
+  {{ visibility }}<br>
+  <div class="remote">{{ repository.get_remote_url }}</div><br>
+  {% if repository.owner == request.user %}
+  <a href="">Settings</a>
+  {% endif %}
+</div>
+{% endblock %}

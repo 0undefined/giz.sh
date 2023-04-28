@@ -14,15 +14,43 @@
   <style>
     :root {
       --padding: 4pt;
+      --border-sz: 1pt;
+
       --color-bg: #080808;
-      --color-content-bg: #323437;
       --color-fg: #eeeeee;
+      --color-content-bg: #323437;
+
+      --black:   #323437;
+      --red:     #ff5454;
+      --green:   #8cc85f;
+      --yellow:  #e3c78a;
+      --blue:    #80a0ff;
+      --purple:  #cf87e8;
+      --cyan:    #79dac8;
+      --white:   #c6c6c6;
+      --black-light:  #949494;
+      --red-light:    #ff5189;
+      --green-light:  #36c692;
+      --yellow-light: #c2c292;
+      --blue-light:   #74b2ff;
+      --purple-light: #ae81ff;
+      --cyan-light:   #85dc85;
+      --white-light:  #e4e4e4;
+
+      --color-a: var(--blue);
+      --color-accent: var(--purple-light);
     }
     body {
       padding: 0;
       margin: 0;
       background-color: var(--color-bg);
       color: var(--color-fg);
+    }
+
+    a {
+      color: var(--color-a);
+      text-decoration: none;
+      font-weight: 600;
     }
 
     nav {
@@ -97,16 +125,17 @@
       position: fixed;
       background: #323437;
       border-radius: var(--padding);
-      border: 1pt solid #b2b2b2;
+      border: var(--border-sz) solid #b2b2b2;
     }
     .user_options details ul li * {
       float:left;
+      color: var(--color-fg);
     }
     .usersettings > ul {
       right: 1pc;
     }
     .user_options .login {
-      border: 1pt solid #b2b2b2;
+      border: var(--border-sz) solid #b2b2b2;
       border-radius: var(--padding);
       color: #b2b2b2;
       background-color: var(--color-content-bg);
@@ -132,7 +161,7 @@
     .contentcontainer > * {
       margin: var(--padding);
       padding: var(--padding);
-      border: 1pt solid #9e9e9e;
+      border: var(--border-sz) solid #9e9e9e;
       border-radius: var(--padding);
       background: var(--color-content-bg);
     }
