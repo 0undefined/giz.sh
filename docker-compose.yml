@@ -32,6 +32,7 @@ services:
     volumes:
       - ./tonic:/usr/share/www
       - gitolite-sshkeys:/root/keys
+      - gitolite-git:/usr/share/git
 
 volumes:
   gitolite-sshkeys:
