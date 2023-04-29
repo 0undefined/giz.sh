@@ -1,0 +1,39 @@
+{% extends 'index/base.html' %}
+{% block STYLE %}
+<style>
+</style>
+{% endblock %}
+{% block CONTENT %}
+<div class="maincontent card">
+  {{ owner }}
+  <form action="/new" method="post" class="form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="row">
+      <div class="owner">
+        Owner
+        <select id="id_owner" name="owner" required="">
+          <option value="{{ request.user.id }}">{{ request.user.username }}</option>
+          <option value="group">group placeholder</option>
+          <option value="group">group placeholder</option>
+        </select>
+      </div>
+      /
+      <div class="form-charfield">
+        {{ form.name }}
+      </div>
+    </div>
+    <div>
+      {{ form.description.label }}<br>
+      {{ form.description }}
+    </div>
+    <div class="row">
+      <div class="repovisibility">
+        {{ form.visibility.label }}
+        {{ form.visibility }}
+      </div>
+      <input type="submit" value="New">
+    </div>
+  </form>
+</div>
+{% endblock %}
