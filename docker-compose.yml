@@ -31,10 +31,11 @@ services:
       - 8000:8000
     volumes:
       - ./tonic:/usr/share/www
-      - gitolite-sshkeys:/root/keys
-      - gitolite-git:/usr/share/git
+      - gitolite-sshkeys:/root/keys:ro
+      - gitolite-git:/usr/share/git:ro
 
 volumes:
   gitolite-sshkeys:
   gitolite-git:
+  database:
 # django:

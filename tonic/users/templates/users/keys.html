@@ -1,0 +1,38 @@
+{% extends 'index/base.html' %}
+{% block STYLE %}
+<style>
+</style>
+{% endblock %}
+
+{% block CONTENT %}
+
+<div class="maincontent">
+  <div class="card">
+    <h2>Settings for {{ user }}</h2>
+    {% if not keys.count > 0 %}
+    <p>You have not added any public keys yet!</p>
+    {% else %}
+    <ul>
+      {% for k in keys %}
+      <li>{{ k.name }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+  <div class="card">
+    <form action="{% url 'users:addkey' user %}" method="post" class="form">{% csrf_token %}
+      <div>
+        <label for="public">Paste your <b>public</b> key here</label><br>
+      {{ form_rsa.public }}
+      </div>
+      <div class="row">
+        <label for="name">Key name</label>
+        <div class="form-charfield">
+        {{ form_rsa.name }}
+        </div>
+        <input type="submit" value="Add">
+      </div>
+      <form>
+  </div>
+</div>
+{% endblock %}

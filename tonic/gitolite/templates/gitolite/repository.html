@@ -23,32 +23,38 @@
 {% endblock %}
 {% block CONTENT %}
 <div class="maincontent">
+  <div class="card">
 
-  <h3>{{ repository.name }}<span class="visibility">{{ visibility }}</span></h3>
+    <h3>{{ repository.name }}<span class="visibility">{{ visibility }}</span></h3>
 
-  {% if files %}
-  <hr>
-  Files
-  <ul>
-    {% for dir in files.trees %}
-    <li>[d] {{ dir.name }}
-      {% if dir.trees|length == 1 and dir.blobs|length == 0 %}
-      / {{ dir.trees.pop.name }} {# extend with recursion #}
-      {% endif %}
-    </li>
-    {% endfor %}
-    {% for file in files.blobs %}
-    <li>[f] {{ file.name }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %}
+    {% if files %}
+    <hr>
+    Files
+    <ul>
+      {% for dir in files.trees %}
+      <li>[d] {{ dir.name }}
+        {% if dir.trees|length == 1 and dir.blobs|length == 0 %}
+        / {{ dir.trees.pop.name }} {# extend with recursion #}
+        {% endif %}
+      </li>
+      {% endfor %}
+      {% for file in files.blobs %}
+      <li>[f] {{ file.name }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+  <div class="card">
   {% if readme %}
   <hr>
   [...] README.md<br>
   {{ readme|safe }}
+  {% else %}
+  No readme yet!
   {% endif %}
+  </div>
 </div>
-<div class="rightcontent">
+<div class="rightcontent card">
 {% if repository.description %}
 <h4>About</h4>
 <p>{{ repository.description }}</p>

@@ -45,6 +45,7 @@
       margin: 0;
       background-color: var(--color-bg);
       color: var(--color-fg);
+      font-family: Verdana, sans-serif;
     }
 
     a {
@@ -78,7 +79,7 @@
       margin: var(--padding);
       gap: var(--padding);
     }
-    .navcontainer > img {
+    .navcontainer > a > img {
       width: 2pc;
       height: 2pc;
     }
@@ -158,17 +159,24 @@
       margin: 0 auto;
     }
 
-    .contentcontainer > * {
+    .card {
       margin: var(--padding);
       padding: var(--padding);
       border: var(--border-sz) solid #9e9e9e;
       border-radius: var(--padding);
       background: var(--color-content-bg);
     }
+
+    .float {
+      margin: var(--padding);
+      padding: var(--padding);
+    }
+
     .contentcontainer .maincontent {
       /*min-width: 12cm;*/
       flex-shrink: 1;
       flex-grow: 3;
+      flex-direction: row;
       max-width: 24cm;
     }
     .contentcontainer .rightcontent,
@@ -187,23 +195,58 @@
     /*****************************************
       COMMON STYLING
      ****************************************/
-    /*
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    }
-    th {
-      background-color: #acf;
-    }
-    tr:nth-child(odd) {
-      background-color: #eaeaf6;
-    }
-    td, th {
-      border: 1px solid #dadada;
-      padding: 3pt;
-    }
-    */
+.form {
+  display: flex;
+  flex-flow:column;
+  align-content:stretch;
+  gap:var(--padding);
+}
+
+.form * {
+  margin:var(--padding);
+}
+
+.form div textarea {
+  width: calc(100% - 2 * var(--padding));
+}
+
+.form div.row div select,
+.form div.row input[type="submit"],
+.form div textarea,
+.form div input {
+  border-radius:var(--padding);
+  border: none;
+  padding: var(--padding);
+  margin:0;
+}
+
+.form div.row,
+.form div.row {
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:var(--padding);
+}
+
+.form div.row div.form-charfield input,
+.form div.row div.form-charfield,
+.form div.row div.repovisibility {
+  flex-grow:1;
+}
+
+.form div.row div.form-charfield input[type="text"] {
+  width: calc(100% - var(--padding));
+}
+
+.form div.row input[type="submit"] {
+  background-color: #8cc85f;
+  width: 8pc;
+}
+.form input[type="submit"] {
+}
+  ul {
+    padding-left: calc(2 *  var(--padding));
+  }
   </style>
   {% block STYLE %}{% endblock %}
   <title>{% block TITLE %}index{% endblock %}</title>
@@ -211,8 +254,9 @@
 <body>
   <nav>
     <span class="navcontainer">
-      <img src="{% static 'index/favicon.png' %}">
-    <form post="/" class="searchbar" name="search"><input type="text" name="search" placeholder="Search"></input></form>
+      <a href="{% url 'index' %}"><img src="{% static 'index/favicon.png' %}"></a>
+      <form post="/" class="searchbar" name="search"><input type="text" name="search" placeholder="Search"></input></form>
+      {% block EXTRANAV %}{% endblock %}
     </span>
     {% if request.user.is_authenticated %}
     <span class="user_options">
@@ -231,8 +275,8 @@
       <details class="usersettings">
         <summary><div class="fas fa-wheelchair"></div></summary>
         <ul>
-          <li><a href="{% url 'users:edit' request.user.username %}">Settings</a></li>
-          <li><a href="#">Repositories</a></li>
+          <li><a href="{% url 'users:settings' request.user.username %}">Settings</a></li>
+          <li><a href="{% url 'users:user' request.user.username %}">Repositories</a></li>
           <li><a href="#">Bookmarks</a></li>
           <li><a href="#">Documentation</a></li>
           <li><a href="{% url 'users:logout' %}">Logout</a></li>

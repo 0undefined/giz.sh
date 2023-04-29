@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.core.validators import RegexValidator
+from django.urls import reverse
 import os
 
 
@@ -46,11 +47,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=255,
         null=True,
         blank=True)
+    bio = models.TextField(max_length=512, blank=True)
+    name = models.CharField(blank=True, max_length=128)
     first_name = ""
     last_name = ""
     summary = models.CharField(max_length=1024, default="", blank=True)
 
     objects = UserManager()
+
+    def get_absolute_url(self):
+        return reverse('users:user', kwargs={'user': self.username})
 
     # TODO: Update gitolites backend
     def save(self, *args, **kwargs):

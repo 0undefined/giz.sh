@@ -12,7 +12,7 @@ from .apps import git_get_readme_html, git_get_tree
 
 class RepositoryView(DetailView):
     model = Repository
-    template_name = "git/repository.html"
+    template_name = "gitolite/repository.html"
     context_object_name = 'repository'
 
     def get_object(self):
@@ -42,7 +42,7 @@ class RepositoryView(DetailView):
 class RepositoryCreate(LoginRequiredMixin, CreateView):
     model = Repository
     fields = ['owner', 'name', 'description', 'visibility']
-    template_name = "git/new.html"
+    template_name = "gitolite/new.html"
     #context_object_name = 'repository'
 
 

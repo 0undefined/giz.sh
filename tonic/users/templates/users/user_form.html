@@ -1,0 +1,31 @@
+{% extends 'index/base.html' %}
+{% block STYLE %}
+<style>
+</style>
+{% endblock %}
+
+{% block CONTENT %}
+<div class="maincontent card">
+  <h2>Settings for {{ user }}</h2>
+  <hr>
+  <form method="post" class="form">{% csrf_token %}
+    <div class="row">
+      {{ form.username.label }}
+      <div class="form-charfield">
+        {{ form.username }}
+      </div>
+    </div>
+    <div class="row">
+      {{ form.name.label }}
+      <div class="form-charfield">
+        {{ form.name }}
+      </div>
+      <input type="submit" value="Save">
+    </div>
+    <div>
+      {{ form.bio.label }}
+      {{ form.bio }}
+    </div>
+  </form>
+</div>
+{% endblock %}

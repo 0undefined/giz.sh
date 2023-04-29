@@ -126,6 +126,7 @@ def git_get_file_content(repo, filename):
 def git_get_readme_html(repo):
     return markdown(git_get_file_content(repo, "README.md"))
 
+
 def git_get_tree(repo, subdir=None):
     from .models import Repository
 
@@ -164,13 +165,13 @@ class GitoliteConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'gitolite'
 
-    def ready(self):
-        repo = git_init()
+    #def ready(self):
+        #repo = git_init()
 
         # Check if DB is up-to-date with gitolite
-        logger.warn("Checking gitolite configuration")
+        #logger.warn("Checking gitolite configuration")
         # Iterate keydir for users
-        missing_users = []
+        #missing_users = []
 
         #userkeydirectories = os.listdir(os.path.join(settings.GITOLITE_ADMIN_PATH, 'keydir'))
         #for f in userkeydirectories:

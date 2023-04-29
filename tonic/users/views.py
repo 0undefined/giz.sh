@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
+from django.views.generic.edit import UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import RSA_Key
 from .forms import RSA_KeyForm
@@ -25,12 +27,18 @@ def UserView(request, user=None):
     return render(request, 'users/user.html', context=context)
 
 
-def EditUser(request, user=None):
+class UserUpdateView(LoginRequiredMixin, UpdateView):
+    model = User
+    fields = ['name', 'bio', 'email']
+    def get_object(self):
+        return get_object_or_404(User, username=self.kwargs['username'])
+
+
+def EditUserKeys(request, user=None):
     userobj = get_object_or_404(User, username=user)
     if userobj.username == request.user.username:
         form_rsa = RSA_KeyForm()
         context = {'user': userobj, 'keys': RSA_Key.objects.filter(user=userobj), 'form_rsa': form_rsa}
-                # Associates/friends
         return render(request, 'users/edit.html', context=context)
     # TODO: return permission denied
     return render(request, 'index/index.html')
@@ -46,7 +54,7 @@ def AddUserKey(request, user=None):
     else:
         return JsonResponse(form.errors)
 
-    return HttpResponseRedirect(reverse('users:edit', kwargs={'user':user}))
+    return HttpResponseRedirect(reverse('users:settings', kwargs={'user':user}))
 
 
 def Userlogin(request):
