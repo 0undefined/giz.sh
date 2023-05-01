@@ -27,7 +27,7 @@
 
     <h3>{{ repository.name }}<span class="visibility">{{ visibility }}</span></h3>
 
-    {% if files %}
+    {% if files.0|length > 0 or files.1|length > 0 %}
     <hr>
     Files
     <ul>

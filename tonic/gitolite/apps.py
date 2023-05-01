@@ -139,8 +139,8 @@ def git_get_tree(repo, subdir=None):
     tree = ([],[])
 
     try:
-        repo = Repo(repo_path)
-        tree = repo.tree()
+        repository = Repo(repo_path)
+        tree = repository.tree()
 
         subdirs = []
         if isinstance(subdir,str):
@@ -155,8 +155,9 @@ def git_get_tree(repo, subdir=None):
 
                 dd = dd[0]
 
-    except:
-        pass
+    except Exception as e:
+        logger.warn("Failed to get tree for %s -- %s" % (repo.name, e))
+        return tree
 
     return tree
 
