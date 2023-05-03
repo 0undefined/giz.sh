@@ -1,111 +1,21 @@
 {% extends 'index/base.html' %}
-
-{% block TITLE %}{{ user.username }}'s profile{% endblock %}
-
-{% block STYLE %}
-<style>
-.profilepic-big {
-  width: 100%;
-  height: auto;
-  background-color: #ccc;
-  display: block;
-}
-.summary {
-  color: #1a1a1a;
-  font-family: "Arial Black", Gadget, sans-serif;
-}
-.wrapper {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-gap: 2pt;
-  grid-auto-rows: minmax(12pc, auto);
-}
-.sidepanel {
-  grid-column: 1;
-  grid-row: 1 / 5;
-}
-.profile-content {
-  grid-column: 2 / 5;
-  grid-row: 1 / 5;
-}
-.sidepanel h2,
-.sidepanel div.summary {
-  padding-left: 1pc;
-}
-span.repository h3 {
-  margin-top: 0;
-  display: inline-block;
-}
-span.repository span.price {
-  float: right;
-  color: #030;
-}
-span.repository {
-  background-color: #fff;
-  width: calc(50% - 32pt);
-  display: inline-block;
-  margin: 2pt;
-  border: 1px solid #ccc;
-  padding: 1pc;
-  box-shadow: 0px 0px 4pt #0004;
-}
-hr {
-  color: #fff;
-}
-span.repository hr {
-  margin-top: -4pt;
-}
-span.repository h3 a {
-  font-style: normal;
-  text-decoration: none;
-  color: #009;
-}
-/* Tabs */
-.tabs {
-  list-style: none;
-  position: relative;
-  padding: 0;
-}
-.tabs li {
-    float: left;
-    display: block;
-  }
-.tabs input[type="radio"] {
-    position: absolute;
-    top: 0;
-    left: -9999px;
-  }
-.tabs label {
-    display: block;
-    padding: 0.5pc 2pc;
-    border-radius: 2pt 2pt 0 0;
-    cursor: pointer;
-    position: relative;
-    margin-bottom: 6pt;
-    top: 0;
-    border-bottom: 2pt solid #dadada;
-  }
-.tabs .tab-content {
-    z-index: 2;
-    display: none;
-    overflow: hidden;
-    width: 100%;
-    position: absolute;
-    left: 0;
-  }
-.tabs [id^="tab"]:checked + label {
-    top: 0;
-    padding-top: 0.2pc;
-    padding-bottom: 0.8pc;
-    border-bottom: 2pt solid #00c9ffff;
-  }
-.tabs [id^="tab"]:checked ~ [id^="tab-content"] {
-    display: block;
-  }
-</style>
-{% endblock %}
-{% block CONTENT %}
-{% if error %}
-<div class="error-box">{{ error }}<br/>{{ errors }}</div>
-{% endif %}
+{% block CONTENT  %}
+<div class="leftcontent card">
+  [ProfilePic]
+  <h4>{{ user.username }}</h4>
+  {% if user.bio|length > 0 %}
+  <hr>
+  <p>{{ user.bio }}</p>
+  {% endif %}
+</div>
+<div class="maincontent card">
+  <h2>Repositories</h2>
+  <hr>
+  {% for r in repositories %}
+  <a href="{% url 'repo' owner=user.username name=r.name %}">{{ r.name }}</a><br>
+  {% endfor %}
+</div>
+<div class="rightcontent card">
+  right content
+</div>
 {% endblock %}

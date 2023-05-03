@@ -30,14 +30,14 @@ form.reposearch input[type="text"] {
 {% if request.user.is_authenticated %}
 <div class="leftcontent card">
       [ProfilePic]
-      <a href="{% url 'users:user' request.user.username %}">
+      <a href="{% url 'users:profile' request.user.username %}">
         {% if request.user.is_superuser %}
         <i class="is_admin fas fa-star"></i>
         {% endif %}<span class="username">{{ request.user.get_username }}</span>
       </a>
       <ul>
-        <li><a href="{% url 'users:settings' request.user.username %}">Settings</a></li>
-        <li><a href="{% url 'users:user' request.user.username %}">Repositories</a></li>
+        <li><a href="{% url 'users:settings' %}">Settings</a></li>
+        <li><a href="{% url 'users:profile' request.user.username %}">Repositories</a></li>
         <li><a href="#">Bookmarks</a></li>
         <li><a href="#">Documentation</a></li>
         <li><a href="{% url 'users:logout' %}">Logout</a></li>

@@ -204,12 +204,18 @@
 
 .form * {
   margin:var(--padding);
+  box-sizing: border-box;
 }
 
+.form textarea,
 .form div textarea {
   width: calc(100% - 2 * var(--padding));
 }
 
+.form select,
+.form input[type="submit"],
+.form textarea,
+.form input,
 .form div.row div select,
 .form div.row input[type="submit"],
 .form div textarea,
@@ -226,16 +232,18 @@
   flex-direction:row;
   align-items:center;
   gap:var(--padding);
+  margin:0;
 }
 
 .form div.row div.form-charfield input,
 .form div.row div.form-charfield,
 .form div.row div.repovisibility {
   flex-grow:1;
+  margin:0;
 }
 
 .form div.row div.form-charfield input[type="text"] {
-  width: calc(100% - var(--padding));
+  width: 100%;
 }
 
 .form div.row input[type="submit"] {
@@ -243,10 +251,11 @@
   width: 8pc;
 }
 .form input[type="submit"] {
+  background-color: var(--green);
 }
-  ul {
-    padding-left: calc(2 *  var(--padding));
-  }
+ul {
+  padding-left: calc(2 *  var(--padding));
+}
   </style>
   {% block STYLE %}{% endblock %}
   <title>{% block TITLE %}index{% endblock %}</title>
@@ -267,7 +276,7 @@
         </ul>
       </details>
       [ProfilePic]
-      <a href="{% url 'users:user' request.user.username %}">
+      <a href="{% url 'users:profile' request.user.username %}">
         {% if request.user.is_superuser %}
         <i class="is_admin fas fa-star"></i>
         {% endif %}<span class="username">{{ request.user.get_username }}</span>
@@ -275,8 +284,8 @@
       <details class="usersettings">
         <summary><div class="fas fa-wheelchair"></div></summary>
         <ul>
-          <li><a href="{% url 'users:settings' request.user.username %}">Settings</a></li>
-          <li><a href="{% url 'users:user' request.user.username %}">Repositories</a></li>
+          <li><a href="{% url 'users:settings' %}">Settings</a></li>
+          <li><a href="{% url 'users:profile' request.user.username %}">Repositories</a></li>
           <li><a href="#">Bookmarks</a></li>
           <li><a href="#">Documentation</a></li>
           <li><a href="{% url 'users:logout' %}">Logout</a></li>

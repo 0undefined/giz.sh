@@ -4,61 +4,6 @@
 
 {% block STYLE %}
 <style>
-form#login {
-  border: 1pt solid var(--color-accent);
-  font-family: Arial, sans-serif;
-  /*margin: var(--padding) auto;*/
-  padding: var(--padding);
-  width: 25%;
-}
-form#login input,
-form#login label {
-  background-color: #222;
-  border: none;
-  border: var(--border-sz) solid var(--black-light);
-  border-radius: 0;
-  color: #ddd;
-  display: inline-block;
-  font-size: inherit;
-  height: 1.25em;
-  padding: var(--padding);
-  box-sizing: content-box;
-  -moz-box-sizing: content-box; /* or `border-box` */
-  -webkit-box-sizing: content-box;
-}
-form#login label {
-  background-color: var(--black);
-  border-right: none;
-  margin-right: 0;
-  margin-bottom: 0.5em;
-  vertical-align:top;
-  width: 0.75em;
-}
-form#login input {
-  border-left: none;
-  margin-bottom: var(--padding);
-  margin-left: 0;
-  width: calc(100% - 2em - 2 * var(--padding));
-}
-form#login input[type="submit"] {
-  border: var(--border-sz) solid var(--color-accent);
-  border-radius: var(--padding);
-  width: calc(100% - 4 * var(--padding));
-}
-form#login input[type="submit"]:hover {
-  background-color: var(--color-accent);
-  border: var(--border-sz) solid var(--black-light);
-  color: var(--color-bg);
-  cursor:pointer;
-}
-form.maincontent {
-  flex-grow:0 !important;
-  flex-shrink:0 !important;
-}
-.contentcontainer {
-  align-items: center;
-  height: 90vh;
-}
 /*
   form#login {
     width: 12pc;
@@ -94,13 +39,28 @@ form.maincontent {
 {% endblock %}
 
 {% block CONTENT %}
-<form class="maincontent" id="login" method="post">{% csrf_token %}
+<div>
+{% if form.errors %}
+<div class="card error-box">
+  <h3>{{ error }}</h3>
+
+  <ul>
+  {% for field in form %}
+    {% for error in field.errors %}
+    <li>{{ field.label }}: {{ error }}</li>
+    {% endfor %}
+  {% endfor %}
+    {% for error in field.non_field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+<form class="form card" id="login" method="post">{% csrf_token %}
   <h3>Sign in to tonic</h3>
-<label for="username">U</label><input type="text"     placeholder="Username" name="username" maxlength="128" required="" id="username">
-<label for="password">P</label><input type="password" placeholder="Password" name="password" maxlength="128" required="" id="password">
+<input type="text"     placeholder="Username" name="username" maxlength="128" required="" id="username">
+<input type="password" placeholder="Password" name="password" maxlength="128" required="" id="password">
 <input name="login" type="submit" value="Login"/>
 </form>
-{% if error %}
-<div class="error-box">{{ error }}<br/>{{ errors }}</div>
-{% endif %}
+</div>
 {% endblock %}

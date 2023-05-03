@@ -1,0 +1,36 @@
+{% extends 'users/user_form.html' %}
+{% block STYLE %}
+<style>
+.key_used {
+  color: var(--white);
+}
+.key {
+  color: var(--purple);
+}
+</style>
+{% endblock %}
+
+{% block SETTINGS %}
+<div class="card">
+  <h2>Invitations for {{ user }}</h2>
+  {% if referer %}
+  <p>Referred by <a href="{% url 'users:user' referer.referer.username %}">{{ referer.referer.username }}</a> ({{ referer.key }})</p>
+  {% else %}
+  <p>OG user</p>
+  {% endif %}
+
+  {% if invitations|length > 0 %}
+  <ul>
+    {% for invite in invitations %}
+    {% if invite.used %}
+    <li><tt class="key_used">{{ invite.key }}</tt> used by <a href="{% url 'users:user' invite.user.username %}">{{ invite.user.username }}</a></li>
+    {% else %}
+      <li><tt class="key">{{ invite.key }}</tt></li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+  {% else %}
+  No invitations to give out!
+  {% endif %}
+</div>
+{% endblock %}

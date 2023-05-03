@@ -1,42 +1,55 @@
 {% extends 'index/base.html' %}
 
-{% block TITLE %}Sign up{% endblock %}
-
 {% block STYLE %}
 <style>
-  form#signup {
-    width: 12pc;
-    margin: 0pt auto;
-    background-color: #666;
-    padding: 1pc;
-    border: 1pt solid #7e4798;
-  }
-  form#signup input {
-    background-color: #aaa;
-    width: 100%;
-    border: 0pt solid #7e4798;
-    padding: 4pt;
-    margin: 4pt 0;
-  }
-  form#signup input[type="password"],
-  form#signup input[type="text"] {
-    width: calc(100% - 10pt);
-  }
-  form#signup input[type="submit"] {
-    width: calc(100% - 2pt);
-    background-color: #7e4798;
-  }
+.error-box {
+  background-color: var(--red);
+  border: none;
+  color: var(--color-bg);
+}
+.error-box ul {
+  padding-left: 2em;
+}
+.error-box ul li {
+  list-style-type: circle;
+}
+.contentcontainer {
+  align-items: center;
+  height: 90vh;
+}
 </style>
 {% endblock %}
 
+{% block TITLE %}Sign up{% endblock %}
+
 {% block CONTENT %}
-<form id="signup" method="post">{% csrf_token %}
+<div class="maincontent">
+{% if form.errors %}
+<div class="card error-box">
+  <h3>{{ error }}</h3>
+
+  <ul>
+  {% for field in form %}
+    {% for error in field.errors %}
+    <li>{{ field.label }}: {{ error }}</li>
+    {% endfor %}
+  {% endfor %}
+    {% for error in field.non_field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+<form class="form card" id="signup" method="post">{% csrf_token %}
+  <div class="row">
+      <div class="form-charfield">
 <input type="text"     placeholder="Username" name="username" maxlength="128" required="" id="id_username">
+  </div>
+<input type="submit" value="Signup"/>
+  </div>
 <input type="password" placeholder="Password" name="password1" maxlength="128" required="" id="id_password1">
 <input type="password" placeholder="Password" name="password2" maxlength="128" required="" id="id_password2">
-<input type="submit" value="Signup"/>
+<input type="text"     placeholder="Invitation" name="invitationkey" maxlength="128" required="" id="id_invitationkey">
 </form>
-{% if error %}
-<div class="error-box">{{ error }}<br/>{{ errors }}</div>
-{% endif %}
+</div>
 {% endblock %}
