@@ -57,6 +57,7 @@ def git_add_key_file(key):
         raise TypeError("Expected RSA_Key object in first argument, got %s" % (str(type(key))))
 
     keyname_dir = os.path.join(settings.GITOLITE_ADMIN_PATH, 'keydir', key.name)
+    repo = git_init()
 
     if not os.path.exists(keyname_dir):
         os.makedirs(keyname_dir)
@@ -69,7 +70,6 @@ def git_add_key_file(key):
     keyfile.close()
 
     # Commit it to gitolite
-    repo = git_init()
     repo.index.add([keypath])
     repo.index.commit("Add user %s's ssh key \"%s.pub\"" % (user.username, key.name))
     # TODO: Handle error?
@@ -85,6 +85,7 @@ def git_update_userrepos(user):
         raise TypeError("Expected User object in first argument, got %s" % (str(type(user))))
 
     userconfpath = os.path.join(settings.GITOLITE_ADMIN_PATH, 'conf', user.username + '.cfg')
+    repo = git_init()
 
     userrepos = Repository.objects.filter(owner=user)
     userconf = open(userconfpath, 'w')
@@ -92,7 +93,6 @@ def git_update_userrepos(user):
     userconf.close()
 
     # Commit it to gitolite
-    repo = git_init()
     repo.index.add([userconfpath])
     repo.index.commit("Update user \"%s\" config" % (user.username))
     # TODO: Handle error?
@@ -108,6 +108,9 @@ def git_get_file_content(repo, filename):
     if not isinstance(filename, str):
         raise TypeError("Expected str in second argument, got %s" % (str(type(filename))))
 
+    # No need to call `git_init`, since we retrieve the info from the RO mount
+    # it's always up-to-date since it is updated directly from the gitolite
+    # service
     repo_path = os.path.join(
         settings.GITOLITE_ADMIN_PATH, '..', 'git',
         'repositories', repo.owner.username, repo.name + '.git')
@@ -133,6 +136,7 @@ def git_get_tree(repo, subdir=None):
     if not isinstance(repo, Repository):
         raise TypeError("Expected Repository object in first argument, got %s" % (str(type(repo))))
 
+    # Same reason to not call `git_init` as in `git_get_file_content`
     repo_path = os.path.join(
         settings.GITOLITE_ADMIN_PATH, '..', 'git',
         'repositories', repo.owner.username, repo.name + '.git')
@@ -166,44 +170,6 @@ class GitoliteConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'gitolite'
 
-    #def ready(self):
-        #repo = git_init()
-
-        # Check if DB is up-to-date with gitolite
-        #logger.warn("Checking gitolite configuration")
-        # Iterate keydir for users
-        #missing_users = []
-
-        #userkeydirectories = os.listdir(os.path.join(settings.GITOLITE_ADMIN_PATH, 'keydir'))
-        #for f in userkeydirectories:
-        #    if not os.path.isdir(f) or User.objects.filter(username=f).exists():
-        #        continue
-
-        #    logger.warn("Adding user %s from gitolite keydir" % f)
-
-        #    newuser = User(username=f)
-        #    newuser.save()
-
-        #    for k in os.listdir(os.path.join(settings.GITOLITE_ADMIN_PATH, 'keydir', f)):
-        #        if os.path.isdir(k):
-        #            continue
-        #        keyfile = open(k, 'r')
-        #        publickeydata = keyfile.read()
-
-        #        newkey = RSA_Key(public=publickeydata, name=k, user=newuser)
-        #        newkey.save()
-
-        #logger.warn("Updating database")
-        #logger.warn("Updating gitolite")
-
-        # Serialize config:
-        # @services = tonic
-        # repo @all
-        #   R = @services
-        #
-        # repo gitolite-admin
-        #   RW = @services
-        #   RW+ = admin
-        #
-        # include "groups.conf"
-        # include "users/*"
+# TODO: make a git_update_db_from_config
+# Reads the configuration in gitolite-admin.git and updates the DB accordingly.
+# Can lead to potentially password-less users.

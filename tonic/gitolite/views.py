@@ -19,11 +19,6 @@ class RepositoryView(DetailView):
         user = get_object_or_404(User, username=self.kwargs['owner'])
         reponame = self.kwargs['name']
         return Repository.objects.get(owner_id=user.id, name=self.kwargs['name'])
-        #get_object_or_404(
-        #    Repository,
-        #    owner_id=user.id,
-        #    name=self.kwargs['name']
-        #)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context

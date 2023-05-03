@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.core.validators import RegexValidator
 from django.urls import reverse
+import uuid
 import os
 
 
@@ -59,17 +60,17 @@ class User(AbstractBaseUser, PermissionsMixin):
         return reverse('users:user', kwargs={'user': self.username})
 
     # TODO: Update gitolites backend
-    def save(self, *args, **kwargs):
-        # We do not need to update any gitolite related stuffs yet, as we cannot
-        # commit an empty directory
+    #def save(self, *args, **kwargs):
+    #    # We do not need to update any gitolite related stuffs yet, as we cannot
+    #    # commit an empty directory
 
-        #userdir = os.path.join(settings.GITOLITE_ADMIN_PATH, 'keydir', self.username)
+    #    #userdir = os.path.join(settings.GITOLITE_ADMIN_PATH, 'keydir', self.username)
 
-        #os.makedirs(userdir)
+    #    #os.makedirs(userdir)
 
-        return super(User, self).save(*args, **kwargs)
-    #def create(cls, username, displayname, pswd, email):
-    #    pass
+    #    return super(User, self).save(*args, **kwargs)
+    ##def create(cls, username, displayname, pswd, email):
+    ##    pass
 
     class Meta():
         db_table='auth_user'
@@ -94,3 +95,10 @@ class RSA_Key(models.Model):
         git_add_key_file(self)
 
         return super(RSA_Key, self).save(*args, **kwargs)
+
+
+class Invitation(models.Model):
+    used = models.BooleanField(default=False)
+    key = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    referer = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='referal')

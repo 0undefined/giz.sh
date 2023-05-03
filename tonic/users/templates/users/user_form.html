@@ -5,15 +5,15 @@
   <h3>Settings</h3>
   <ul>
     <li><a href="{% url 'users:settings' %}">Preferences</a></li>
-    <li><a href="{% url 'users:keys' request.user.username %}">keys</a></li>
-    <li><a href="{% url 'users:invitations' request.user.username %}">invitations</a></li>
+    <li><a href="{% url 'users:settings-keys' %}">keys</a></li>
+    <li><a href="{% url 'users:settings-invitations' %}">invitations</a></li>
   </ul>
 </div>
 
 <div class="maincontent">
   {% block SETTINGS %}
   <div class="card">
-  <h2>Settings for {{ user }}</h2>
+  <h2>Profile settings for {{ user }}</h2>
   <hr>
   <form method="post" class="form">{% csrf_token %}
     <div class="row">

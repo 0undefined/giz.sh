@@ -23,7 +23,7 @@
   <ul>
     {% for invite in invitations %}
     {% if invite.used %}
-    <li><tt class="key_used">{{ invite.key }}</tt> used by <a href="{% url 'users:user' invite.user.username %}">{{ invite.user.username }}</a></li>
+    <li><tt class="key_used">{{ invite.key }}</tt> used by <a href="{% url 'users:profile' invite.user.username %}">{{ invite.user.username }}</a></li>
     {% else %}
       <li><tt class="key">{{ invite.key }}</tt></li>
     {% endif %}

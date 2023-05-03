@@ -1,13 +1,17 @@
 import re
 
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login, logout
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
+from django.views.generic import DetailView
 from django.views.generic.edit import UpdateView
+from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import RSA_Key
+from .models import RSA_Key, Invitation
 from .forms import RSA_KeyForm
 from . import forms
 User = get_user_model()
@@ -20,32 +24,58 @@ def Users(request):
     return render(request, 'users/index.html', context=context)
 
 
-def UserView(request, user=None):
-    userobj = get_object_or_404(User, username=user)
-    context = {'user': userobj, 'repositories': Repository.objects.filter(owner=userobj)}
-            # Associates/friends
-    return render(request, 'users/user.html', context=context)
+class UserView(DetailView):
+    model = User
+    template_name = "users/profile.html"
+    context_object_name = 'user'
+
+    def get_context_data(self, **kwargs):
+        context = super(UserView, self).get_context_data(**kwargs)
+        context['repositories'] = Repository.objects.filter(owner=self.object)
+        return context
+
+    def get_object(self):
+        user = get_object_or_404(User, id=self.request.user.id)
+        # TODO: prefetch related repos
+        return user
 
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     fields = ['name', 'bio', 'email']
     def get_object(self):
-        return get_object_or_404(User, username=self.kwargs['username'])
+        return get_object_or_404(User, username=self.request.user.username)
 
 
-def EditUserKeys(request, user=None):
-    userobj = get_object_or_404(User, username=user)
+@login_required
+def UserInvitationsView(request):
+    userobj = get_object_or_404(User, id=request.user.id)
+    if userobj.username == request.user.username:
+        referer = None
+        try:
+            referer = Invitation.objects.get(user=userobj)
+        except Invitation.DoesNotExist:
+            pass
+
+        context = {'user': userobj, 'invitations': Invitation.objects.filter(referer=userobj), 'referer': referer}
+        return render(request, 'users/user_invitations.html', context=context)
+    # TODO: return permission denied
+    return PermissionDenied("You do not have authorization to view or edit this page")
+
+
+@login_required
+def EditUserKeys(request):
+    userobj = get_object_or_404(User, id=request.user.id)
     if userobj.username == request.user.username:
         form_rsa = RSA_KeyForm()
         context = {'user': userobj, 'keys': RSA_Key.objects.filter(user=userobj), 'form_rsa': form_rsa}
-        return render(request, 'users/edit.html', context=context)
+        return render(request, 'users/keys.html', context=context)
     # TODO: return permission denied
-    return render(request, 'index/index.html')
+    return PermissionDenied("You do not have authorization to view or edit this page")
 
 
-def AddUserKey(request, user=None):
-    userobj = get_object_or_404(User, username=user)
+def AddUserKey(request):
+    userobj = get_object_or_404(User, id=request.user.id)
     form = RSA_KeyForm(request.POST.copy() or None)
     form.data['user'] = userobj
 
@@ -54,25 +84,11 @@ def AddUserKey(request, user=None):
     else:
         return JsonResponse(form.errors)
 
-    return HttpResponseRedirect(reverse('users:settings', kwargs={'user':user}))
+    return HttpResponseRedirect(reverse('users:settings-keys'))
 
 
-def Userlogin(request):
-    context = {}
-    if request.user.is_authenticated:
-        return HttpResponseRedirect('/')
-    elif request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return HttpResponseRedirect('/')
-        else:
-            context.update({
-                'error': "Login failed",
-            })
-    return render(request, 'users/login.html')
+class UserLogin(LoginView):
+    template_name = 'users/login.html'
 
 
 def Userlogout(request):
@@ -89,16 +105,12 @@ def Signup(request):
     elif request.method == 'POST':
         form = forms.SignupForm(request.POST)
         if form.is_valid():
-            if re.match(r'[\w-]+$', form.data['username']) is not None:
-                #username = form.data['username']
-                #password = form.data['password']
-                form.save()  #User.objects.create_user(username=username, password=password)
-                return HttpResponseRedirect('/')
-            else:
-                context.update({'error': "Invalid username. Please stick to alphanumeric characters"})
+            form.save()  #User.objects.create_user(username=username, password=password)
+            return HttpResponseRedirect('/')
         else:
             context.update({
-                'error': "Validation failed",
-                'errors': form.errors
+                #'error': "Validation failed",
+                #'errors': form.errors,
+                'form': form,
             })
     return render(request, 'users/signup.html', context=context)

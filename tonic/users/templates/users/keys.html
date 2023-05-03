@@ -18,7 +18,7 @@
   {% endif %}
 </div>
 <div class="card">
-  <form action="{% url 'users:addkey' user %}" method="post" class="form">{% csrf_token %}
+  <form action="{% url 'users:settings-addkey' %}" method="post" class="form">{% csrf_token %}
     <div>
       <label for="public">Paste your <b>public</b> key here</label><br>
     {{ form_rsa.public }}
