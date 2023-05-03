@@ -4,7 +4,8 @@ RUN apk upgrade -U
 RUN apk add bash py3-pip git musl openssh
 
 RUN pip install --no-input \
-  django django-extensions ipython GitPython umarkdown paramiko tzdata\
+  django django-extensions ipython django-debug-toolbar \
+  GitPython umarkdown paramiko tzdata\
   "redis[hiredis]" hiredis
 RUN rm -rf /var/cache/apk/*
 
