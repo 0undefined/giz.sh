@@ -148,8 +148,9 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
-GITOLITE_ADMIN_PATH = '/usr/share/gitolite-admin'
+SHARE_DIR = '/usr/share'
+GITOLITE_ADMIN_PATH = os.getenv("GITOLITE_ADMIN_PATH", os.path.join(SHARE_DIR, 'gitolite-admin'))
+GITOLITE_GIT_PATH = os.getenv("GITOLITE_ADMIN_PATH", os.path.join(SHARE_DIR, 'git', 'repositories'))
 GITOLITE_HOST = os.getenv("GITOLITE_HOST", 'gitolite')
 GITOLITE_PORT = int(os.getenv("GITOLITE_PORT", 22))
 GITOLITE_KEY = os.getenv("GITOLITE_KEY", os.environ['HOME'] + "/.ssh/id_rsa")
-# TODO: Create a key for tonic, to view gitolite repositories

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.db import models
 from users.models import User
 from gitolite.apps import git_update_userrepos
+import os
 
 
 class Repository(models.Model):
@@ -32,6 +33,12 @@ class Repository(models.Model):
 
     def get_absolute_url(self):
         return '/' + self.__str__()
+
+    def get_absolute_path(self):
+        return os.path.join(
+            settings.GITOLITE_GIT_PATH,
+            self.owner.username, self.name + '.git')
+
 
     def visibility_str(self):
         return Repository.Visibility.choices[self.visibility][1]

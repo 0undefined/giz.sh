@@ -145,9 +145,7 @@ def git_get_file_content(repo, filename):
     # No need to call `git_init`, since we retrieve the info from the RO mount
     # it's always up-to-date since it is updated directly from the gitolite
     # service
-    repo_path = os.path.join(
-        settings.GITOLITE_ADMIN_PATH, '..', 'git',
-        'repositories', repo.owner.username, repo.name + '.git')
+    repo_path = repo.get_absolute_path()
     filecontent = ""
 
     try:
@@ -171,9 +169,7 @@ def git_get_tree(repo, subdir=None):
         raise TypeError("Expected Repository object in first argument, got %s" % (str(type(repo))))
 
     # Same reason to not call `git_init` as in `git_get_file_content`
-    repo_path = os.path.join(
-        settings.GITOLITE_ADMIN_PATH, '..', 'git',
-        'repositories', repo.owner.username, repo.name + '.git')
+    repo_path = repo.get_absolute_path()
     tree = ([],[])
 
     try:

@@ -34,6 +34,18 @@
 }
 .language {
 }
+a.newrepo {
+  background-color: var(--green);
+  color: var(--color-bg);
+  border: var(--border-sz) solid var(--green-light);
+  border-radius: var(--padding);
+  font-size: var(--font-sz-normal);
+  font-weight: 400;
+
+  float:right;
+  padding: var(--padding);
+  margin: var(--padding);
+}
 </style>
 {% endblock %}
 
@@ -47,7 +59,7 @@
   {% endif %}
 </div>
 <div class="maincontent card">
-  <h2>Repositories</h2>
+  <h2>Repositories<a class="newrepo" href="{% url 'gitolite:repo_new' %}">New</a></h2>
   <hr>
   {% if repositories %}
   <div class="repocontainer">

@@ -16,6 +16,8 @@
     :root {
       --padding: 4pt;
       --border-sz: 1pt;
+      --font-sz-normal: 11pt;
+      --font-sz-nav: 13pt;
 
       --color-bg: #080808;
       --color-fg: #eeeeee;
@@ -61,7 +63,7 @@
       width: 100%;
       padding: 0pc;
       text-align: center;
-      font-size: 13pt;
+      font-size: var(--font-sz-nav);
       z-index: 3;
     }
     nav {
@@ -247,17 +249,28 @@
   width: 100%;
 }
 
-.form div.row input[type="submit"] {
-  background-color: #8cc85f;
-  min-width: 6pc;
-}
 .form div.row input[type="submit"],
 .form input[type="submit"] {
   background-color: var(--green);
+  border: var(--border-sz) solid var(--green-light);
+  min-width: 6pc;
 }
+.form div.row input[type="submit"]:hover,
+.form input[type="submit"]:hover {
+  background-color: var(--green-light);
+  border-color: var(--green);
+}
+
 .form div.row input[type="submit"].delete,
 .form input[type="submit"].delete {
   background-color: var(--red);
+  border: var(--border-sz) solid var(--red-light);
+}
+
+.form div.row input[type="submit"].delete:hover,
+.form input[type="submit"].delete:hover {
+  background-color: var(--red-light);
+  border-color: var(--red);
 }
 ul {
   padding-left: calc(2 *  var(--padding));
