@@ -14,7 +14,13 @@ Tonic attempts to build on the following design:
 2. [x] Setup gitolite
 3. [x] Mount project
 4. [x] Run django
-5. [ ] Update documentation
+5. [ ] Setup prod environment
+   * [ ] Setup gunicorn
+   * [ ] Setup nginx
+6. [ ] Make django app production ready
+7. [ ] Setup gitolite hooks to invalidate redis cache on push
+8. [ ] Buy domain
+?. [ ] Update documentation
 
 
 ## ROADMAP

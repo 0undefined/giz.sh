@@ -3,11 +3,12 @@ from django.conf import settings
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.core.validators import RegexValidator
 from django.urls import reverse
+from hashlib import sha256
 import uuid
 import os
 
 
-from gitolite.apps import git_add_key_file
+from gitolite.apps import git_add_key_file, git_rm_key_file
 
 
 class UserManager(BaseUserManager):
@@ -80,12 +81,13 @@ class RSA_Key(models.Model):
     public = models.TextField(max_length=16384, blank=False, unique=True)
     name = models.CharField(blank=False, max_length=128)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    sha = models.CharField(blank=False, max_length=64)
 
     def __str__(self):
         return self.name + ':' + self.user.username + '.pub'
 
 
-    # TODO: Overwrite save method to add key to gitolite keydir
     def save(self, *args, **kwargs):
         # Adding potentially missing newline
         public = self.public.strip()
@@ -94,7 +96,15 @@ class RSA_Key(models.Model):
 
         git_add_key_file(self)
 
+        self.sha = sha256(public.encode()).hexdigest()
+
         return super(RSA_Key, self).save(*args, **kwargs)
+
+    # TODO: Overwrite delete method to delete key in gitolite keydir
+    def delete(self, *args, **kwargs):
+        git_rm_key_file(self)
+
+        return super(RSA_Key, self).delete(*args, **kwargs)
 
 
 class Invitation(models.Model):

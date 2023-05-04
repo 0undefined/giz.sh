@@ -24,7 +24,6 @@ class RepositoryView(DetailView):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
-        context['visibility'] = Repository.Visibility.choices[self.object.visibility][1]
         context['collaborators'] = Collaborator.objects.filter(repo=self.object)
         # Extend to /owner/repo/(blob|tree)/branch/filename url path (for files/dirs)
         # Extend to /owner/repo/(blob|tree)/branch url path (for branches)

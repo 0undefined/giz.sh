@@ -25,7 +25,7 @@
 <div class="maincontent">
   <div class="card">
 
-    <h3>{{ repository.name }}<span class="visibility">{{ visibility }}</span></h3>
+    <h3>{{ repository.name }}<span class="visibility">{{ repository.visibility_str }}</span></h3>
 
     {% if files.0|length > 0 or files.1|length > 0 %}
     <hr>
@@ -67,7 +67,7 @@
   <h4>Collaborators:</h4>
   <ul>
     {% for c in collaborators %}
-    <li><a href="{% url 'users:user' c.user.username %}">{{ c.user.username }}</a></li>
+    <li><a href="{% url 'users:profile' c.user.username %}">{{ c.user.username }}</a></li>
     {% endfor %}
   </ul>
   {% endif %}

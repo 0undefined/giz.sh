@@ -16,6 +16,7 @@
 .contentcontainer {
   align-items: center;
   height: 90vh;
+  max-width: 24pc;
 }
 </style>
 {% endblock %}
@@ -41,15 +42,16 @@
 </div>
 {% endif %}
 <form class="form card" id="signup" method="post">{% csrf_token %}
+  <h3>Sign up for tonic</h3>
   <div class="row">
-      <div class="form-charfield">
-<input type="text"     placeholder="Username" name="username" maxlength="128" required="" id="id_username">
+    <div class="form-charfield">
+      <input type="text"     placeholder="Username" name="username" maxlength="128" required="" id="id_username">
   </div>
-<input type="submit" value="Signup"/>
+  <input type="submit" value="Signup"/>
   </div>
-<input type="password" placeholder="Password" name="password1" maxlength="128" required="" id="id_password1">
-<input type="password" placeholder="Password" name="password2" maxlength="128" required="" id="id_password2">
-<input type="text"     placeholder="Invitation" name="invitationkey" maxlength="128" required="" id="id_invitationkey">
+<input type="password" placeholder="Password"        name="password1"     maxlength="128" required="" id="id_password1">
+<input type="password" placeholder="Repeat password" name="password2"     maxlength="128" required="" id="id_password2">
+<input type="text"     placeholder="Invitation"      name="invitationkey" maxlength="128" required="" id="id_invitationkey">
 </form>
 </div>
 {% endblock %}

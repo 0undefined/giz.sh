@@ -1,4 +1,38 @@
 {% extends 'index/base.html' %}
+{% block TITLE %}{{ user }}{% endblock %}
+
+{% block STYLE %}
+<style>
+.visibility {
+  font-size: 9pt;
+  font-weight: 100;
+  color: var(--white);
+  float:right;
+  padding: var(--padding);
+  border: var(--border-sz) solid var(--white);
+  border-radius: var(--padding);
+}
+.repocontainer {
+  display:flex;
+  flex-direction:column;
+  gap: var(--padding);
+  padding: var(--padding);
+}
+.repocontainer .row {
+  display:flex;
+  flex-direction:row;
+  gap: var(--padding);
+  padding: var(--padding);
+  align-items: center;
+}
+.repocontainer .row a {
+  flex-grow: 1;
+}
+.language {
+}
+</style>
+{% endblock %}
+
 {% block CONTENT  %}
 <div class="leftcontent card">
   [ProfilePic]
@@ -11,9 +45,20 @@
 <div class="maincontent card">
   <h2>Repositories</h2>
   <hr>
+  {% if repositories %}
+  <div class="repocontainer">
   {% for r in repositories %}
-  <a href="{% url 'repo' owner=user.username name=r.name %}">{{ r.name }}</a><br>
+  <div class="row">
+  <a href="{% url 'repo' owner=user.username name=r.name %}">{{ r.name }}</a>
+  <span class="lastupdated">&lt;lastupdated&gt;</span>
+  <span class="language">&lt;language&gt;</span>
+  <span class="visibility">{{ r.visibility_str }}</span>
+  </div>
   {% endfor %}
+  </div>
+  {% else %}
+  No repositories yet
+  {% endif %}
 </div>
 <div class="rightcontent card">
   right content

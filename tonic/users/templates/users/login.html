@@ -4,42 +4,27 @@
 
 {% block STYLE %}
 <style>
-/*
-  form#login {
-    width: 12pc;
-    margin: 0pt auto;
-    background-color: #666;
-    padding: 1pc;
-    border: 1pt solid #7e4798;
-  }
-  form#login input {
-    background-color: #aaa;
-    width: 100%;
-    border: 0pt solid #7e4798;
-    padding: 4pt;
-    margin: 4pt 0;
-  }
-  form#login input[type="password"],
-  form#login input[type="text"] {
-    width: calc(100% - 10pt);
-  }
-  form#login input[type="submit"] {
-    width: calc(100% - 2pt);
-    background-color: #7e4798;
-  }
-  form label {
-    background-color: #444;
-    border-right: none;
-    margin-right: 0;
-    margin-bottom: 0.5em;
-    vertical-align:top;
-    width: 0.75em;
-  }*/
+.error-box {
+  background-color: var(--red);
+  border: none;
+  color: var(--color-bg);
+}
+.error-box ul {
+  padding-left: 2em;
+}
+.error-box ul li {
+  list-style-type: circle;
+}
+.contentcontainer {
+  align-items: center;
+  height: 90vh;
+  max-width: 24pc;
+}
 </style>
 {% endblock %}
 
 {% block CONTENT %}
-<div>
+<div class="maincontent">
 {% if form.errors %}
 <div class="card error-box">
   <h3>{{ error }}</h3>

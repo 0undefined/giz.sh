@@ -209,7 +209,7 @@
 
 .form textarea,
 .form div textarea {
-  width: calc(100% - 2 * var(--padding));
+  width: 100%;
 }
 
 .form select,
@@ -226,13 +226,13 @@
   margin:0;
 }
 
-.form div.row,
 .form div.row {
   display:flex;
   flex-direction:row;
   align-items:center;
   gap:var(--padding);
   margin:0;
+  /*padding: var(--padding);*/
 }
 
 .form div.row div.form-charfield input,
@@ -248,10 +248,15 @@
 
 .form div.row input[type="submit"] {
   background-color: #8cc85f;
-  width: 8pc;
+  min-width: 6pc;
 }
+.form div.row input[type="submit"],
 .form input[type="submit"] {
   background-color: var(--green);
+}
+.form div.row input[type="submit"].delete,
+.form input[type="submit"].delete {
+  background-color: var(--red);
 }
 ul {
   padding-left: calc(2 *  var(--padding));

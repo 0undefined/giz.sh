@@ -13,5 +13,6 @@ urlpatterns = [
     path(r'settings/keys', views.EditUserKeys, name='settings-keys'),
     path(r'settings/invitations', views.UserInvitationsView, name='settings-invitations'),
     path(r'settings/addkey', views.AddUserKey, name='settings-addkey'),
-    path(r'<str:username>/', cache_page(60*60)(views.UserView.as_view()), name='profile'),
+    path(r'settings/rmkey', views.RmUserKey, name='settings-rmkey'),
+    re_path(r'^(?P<username>[a-z0-9_]{3,48})/$', cache_page(60*60)(views.UserView.as_view()), name='profile'),
 ]

@@ -1,5 +1,6 @@
-from django.conf import settings
 from django.apps import AppConfig
+from django.conf import settings
+from django.db import transaction
 from git import Repo
 from umarkdown import markdown
 
@@ -14,6 +15,7 @@ logger = logging.getLogger(__name__)
 # TODO:
 # Add a management command to update DB from gitolite-admin
 
+@transaction.atomic(durable=False)
 def git_init():
     gitolite_admin_dir = settings.GITOLITE_ADMIN_PATH
 
@@ -48,6 +50,7 @@ def git_init():
     return repo
 
 
+@transaction.atomic(durable=True)
 def git_add_key_file(key):
     from django.contrib.auth import get_user_model
     from users.models import RSA_Key
@@ -76,6 +79,37 @@ def git_add_key_file(key):
     repo.remote().push().raise_if_error()
 
 
+@transaction.atomic(durable=True)
+def git_rm_key_file(key):
+    from django.contrib.auth import get_user_model
+    from users.models import RSA_Key
+    User = get_user_model()
+
+    if not isinstance(key, RSA_Key):
+        raise TypeError("Expected RSA_Key object in first argument, got %s" % (str(type(key))))
+
+    keyname_dir = os.path.join(settings.GITOLITE_ADMIN_PATH, 'keydir', key.name)
+    repo = git_init()
+
+    user = key.user
+
+    keypath = os.path.join(keyname_dir, user.username + '.pub')
+
+    if not os.path.exists(keypath):
+        return
+
+    # Commit it to gitolite
+    repo.index.remove([keypath], working_tree=True)
+    #repo.index.add([keypath])
+    repo.index.commit("Remove user %s's ssh key \"%s.pub\"" % (user.username, key.name))
+    if os.path.exists(keypath):
+        raise Exception("You don goof again")
+    # TODO: Handle error?
+    repo.remote().push().raise_if_error()
+    repo.close()
+
+
+@transaction.atomic(durable=True)
 def git_update_userrepos(user):
     from django.contrib.auth import get_user_model
     from .models import Repository

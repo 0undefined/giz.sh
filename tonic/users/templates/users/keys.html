@@ -1,20 +1,59 @@
 {% extends 'users/user_form.html' %}
+
+{% block TITLE %}Your SSH keys{% endblock %}
+
 {% block STYLE %}
 <style>
+div.keylist > .form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding);
+}
+div.keylist > .form div.row {
+  border: var(--border-sz) solid var(--black-light);
+  border-radius: var(--padding);
+  padding: var(--padding);
+  margin: var(--padding) !important;
+}
+div.keylist > .form div.row .keyinfo {
+  flex-grow: 1;
+}
+div.keylist > .form div.row .keyinfo label {
+  font-weight: 600;
+}
+div.keylist > .form div.row .keyinfo .timestamp {
+  color: var(--black-light);
+}
+div.keylist > .form div.row input[type="submit"] {
+  float: right;
+  margin: var(--padding);
+}
+.hash {
+  font-family: monospace;
+}
 </style>
 {% endblock %}
 
 {% block SETTINGS %}
-<div class="card">
+<div class="card keylist">
   <h2>Settings for {{ user }}</h2>
   {% if not keys.count > 0 %}
-  <p>You have not added any public keys yet!</p>
+  <p>You have not added any public keys yet!<br>
+  <i>You need to add at least one public key to your profile in order to be able to
+  use this service.</i></p>
   {% else %}
-  <ul>
+  <form action="{% url 'users:settings-rmkey' %}" method="post" class="form">{% csrf_token %}
     {% for k in keys %}
-    <li>{{ k.name }}</li>
+    <div class="row">
+    <span class="keyinfo">
+      <label for="{{ k.name }}">{{ k.name }}</label>
+      <span class="timestamp">Created: {{ k.created|date:"Y-m-d G:i" }}</span> .. &lt;last used?&gt;<br>
+      <span class="hash">SHA256:{{ k.sha }}</span><br>
+    </span>
+      <input name="{{ k.name }}" type="submit" class="delete" value="Remove"/>
+    </div>
     {% endfor %}
-  </ul>
+    </form>
   {% endif %}
 </div>
 <div class="card">
@@ -31,5 +70,9 @@
       <input type="submit" value="Add">
     </div>
     <form>
+</div>
+<div class="card">
+  <h3>GPG keys</h3>
+  <p>Not implemented</p>
 </div>
 {% endblock %}

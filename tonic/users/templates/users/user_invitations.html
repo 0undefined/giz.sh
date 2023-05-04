@@ -1,4 +1,7 @@
 {% extends 'users/user_form.html' %}
+
+{% block TITLE %}Your referrals{% endblock %}
+
 {% block STYLE %}
 <style>
 .key_used {
@@ -6,6 +9,12 @@
 }
 .key {
   color: var(--purple);
+}
+.notinuse {
+  color: var(--black-light);
+}
+ul.referrals {
+  text-decoration: none;
 }
 </style>
 {% endblock %}
@@ -20,12 +29,12 @@
   {% endif %}
 
   {% if invitations|length > 0 %}
-  <ul>
+  <ul class="referrals">
     {% for invite in invitations %}
     {% if invite.used %}
     <li><tt class="key_used">{{ invite.key }}</tt> used by <a href="{% url 'users:profile' invite.user.username %}">{{ invite.user.username }}</a></li>
     {% else %}
-      <li><tt class="key">{{ invite.key }}</tt></li>
+    <li><tt class="key">{{ invite.key }}</tt> <i class="notinuse">not in use</i></li>
     {% endif %}
     {% endfor %}
   </ul>

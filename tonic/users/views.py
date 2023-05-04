@@ -35,8 +35,7 @@ class UserView(DetailView):
         return context
 
     def get_object(self):
-        user = get_object_or_404(User, id=self.request.user.id)
-        # TODO: prefetch related repos
+        user = get_object_or_404(User, username=self.kwargs['username'])
         return user
 
 
@@ -85,6 +84,25 @@ def AddUserKey(request):
         return JsonResponse(form.errors)
 
     return HttpResponseRedirect(reverse('users:settings-keys'))
+
+
+def RmUserKey(request):
+    userobj = get_object_or_404(User, id=request.user.id)
+    post = request.POST.copy()
+
+    #return PermissionDenied(post.decode())
+
+    for k,v in post.dict().items():
+        ## TODO: Allow people to create ssh-keys named 'csrfmiddlewaretoken'
+        #if k == 'csrfmiddlewaretoken':
+        #    continue
+
+        if v == 'Remove':
+            key = get_object_or_404(RSA_Key, user_id=request.user.id, name=k)
+            key.delete()
+            return HttpResponseRedirect(reverse('users:settings-keys'))
+
+    return HttpResponseRedirect(reverse('users:settings-keys'), context={'error':"Key not found"})
 
 
 class UserLogin(LoginView):
