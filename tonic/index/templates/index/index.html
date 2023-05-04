@@ -42,19 +42,16 @@ form.reposearch input[type="text"] {
         <li><a href="#">Documentation</a></li>
         <li><a href="{% url 'users:logout' %}">Logout</a></li>
       </ul>
+      {% if repositories %}
       <hr>
       <h4>Top {8} repos</h4>
       <form post="/" class="form reposearch" name="reposearch"><input type="text" name="search" placeholder="Find repository"></input></form>
       <ul>
-        <li>{owner}/{repo}</li>
-        <li>{owner}/{repo}</li>
-        <li>{owner}/{repo}</li>
-        <li>{owner}/{repo}</li>
-        <li>{owner}/{repo}</li>
-        <li>{owner}/{repo}</li>
-        <li>{owner}/{repo}</li>
-        <li>{owner}/{repo}</li>
+        {% for repo in repositories %}
+        <li><a href="{% url 'gitolite:repo' repo.owner repo.name %}">{{ repo.owner }}/{{ repo.name }}</li>
+        {% endfor %}
       </ul>
+      {% endif %}
 </div>
 {% endif %}
 <div class="maincontent">

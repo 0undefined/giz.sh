@@ -6,6 +6,7 @@
   <link href="{% static 'fa/css/fontawesome.min.css' %}" rel="stylesheet">
   <link href="{% static 'fa/css/solid.min.css' %}" rel="stylesheet">
   <link rel="icon" type="image/png" href="{% static 'index/favicon.png' %}">
+
   <meta charset="UTF-8">
   <meta name="description" content="Git-hosting server">
   <meta name="keywords" content="git,hosting,free">
@@ -276,7 +277,7 @@ ul {
     <span class="user_options">
       <details class="useradd"><summary>+</summary>
         <ul>
-          <li><a href="{% url 'repo_new' %}">new repo</a></li>
+          <li><a href="{% url 'gitolite:repo_new' %}">new repo</a></li>
           <li><a href="">new group</a></li>
         </ul>
       </details>
