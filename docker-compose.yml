@@ -12,30 +12,45 @@ services:
     image: redis:5
     ports:
       - 6379:6379
+  nginx:
+    build: services/nginx
+    volumes:
+      - static:/usr/share/www/static
+    ports:
+      - 80:80
   tonic:
     build: .
     logging:
+      #driver: "journald"
       driver: "json-file"
       options:
         max-size: "10k"
         max-file: "1"
+          #tag: mytag
     environment:
       #- PYTHONUNBUFFERED=1
       - GITOLITE_HOST=gitolite
       - GITOLITE_PORT=22
       - GITOLITE_KEY
-      - DEBUG=True
+      - PROD=True
+      - SECRET_KEY
     depends_on:
+      - gitolite
       - redis
+      - nginx
+        # database
     ports:
       - 8000:8000
     volumes:
       - ./tonic:/usr/share/www
       - gitolite-sshkeys:/root/keys:ro
       - gitolite-git:/usr/share/git:ro
+      - static:/usr/share/giz/static
+    command: gunicorn -c /usr/share/gunicorn-conf.py
 
 volumes:
   gitolite-sshkeys:
   gitolite-git:
   database:
+  static:
 # django:

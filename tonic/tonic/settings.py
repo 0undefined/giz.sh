@@ -13,11 +13,13 @@ os.path.join(BASE_DIR, APP_DIR)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '42adozyr@jx8p_$fx#2z__&wfp59d*n$f7brnn-=y+x@=#_85_'
+try:
+    SECRET_KEY = os.environ['SECRET_KEY']
+except KeyError as e:
+    raise RuntimeError("Could not find $SECRET_KEY in environment")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", not os.getenv("PROD", True))
 
 ALLOWED_HOSTS = ['*']
 #INTERNAL_IPS = ['127.0.0.1', '0.0.0.0']  # used by debug_toolbar
@@ -57,6 +59,10 @@ MIDDLEWARE = [
 
 if DEBUG:
     INSTALLED_APPS.append('debug_toolbar')
+else:
+    #SECURE_SSL_REDIRECT=True
+    SESSION_COOKIE_SECURE=True
+    CSRF_COOKIE_SECURE=True
 
 ROOT_URLCONF = 'tonic.urls'
 
@@ -145,6 +151,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 STATIC_URL = '/static/'
+STATIC_ROOT = '/usr/share/giz/static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
