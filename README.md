@@ -18,6 +18,8 @@ Tonic attempts to build on the following design:
    * [ ] Setup gunicorn
    * [ ] Setup nginx
 6. [ ] Make django app production ready
+   * [ ] Get secrets from variables
+   * [ ] Also in docker
 7. [ ] Setup gitolite hooks to invalidate redis cache on push
 8. [ ] Buy domain
 ?. [ ] Update documentation
