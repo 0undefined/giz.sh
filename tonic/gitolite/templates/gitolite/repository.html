@@ -66,6 +66,7 @@
   {% if collaborators %}
   <h4>Collaborators:</h4>
   <ul>
+    <li><a href="{% url 'users:profile' repository.owner %}">{{ repository.owner.username }}</a> (owner)</li>
     {% for c in collaborators %}
     <li><a href="{% url 'users:profile' c.user.username %}">{{ c.user.username }}</a></li>
     {% endfor %}

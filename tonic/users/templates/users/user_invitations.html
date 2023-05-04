@@ -23,7 +23,7 @@ ul.referrals {
 <div class="card">
   <h2>Invitations for {{ user }}</h2>
   {% if referer %}
-  <p>Referred by <a href="{% url 'users:user' referer.referer.username %}">{{ referer.referer.username }}</a> ({{ referer.key }})</p>
+  <p>Referred by <a href="{% url 'users:profile' referer.referer.username %}">{{ referer.referer.username }}</a> ({{ referer.key }})</p>
   {% else %}
   <p>OG user</p>
   {% endif %}

@@ -28,6 +28,10 @@
 .repocontainer .row a {
   flex-grow: 1;
 }
+.collabs {
+  margin-left:var(--padding);
+  margin-right:var(--padding);
+}
 .language {
 }
 </style>
@@ -52,6 +56,7 @@
   <a href="{% url 'gitolite:repo' owner=user.username name=r.name %}">{{ r.name }}</a>
   <span class="lastupdated">&lt;lastupdated&gt;</span>
   <span class="language">&lt;language&gt;</span>
+  {% if r.collab_count %}<span class="collabs">{{ r.collab_count|add:1 }}<span class="fas fa-user-friends"></span></span>{% endif %}
   <span class="visibility">{{ r.visibility_str }}</span>
   </div>
   {% endfor %}

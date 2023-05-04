@@ -4,10 +4,17 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
 from django.views.generic.edit import CreateView
 from django.forms import ModelChoiceField
+from django.http import Http404
 
 from users.models import User
 from .models import Repository, Collaborator
 from .apps import git_get_readme_html, git_get_tree
+
+def get_object_or_404_ext(model, message, **kwargs):
+    try:
+        return model.objects.get(**kwargs)
+    except model.DoesNotExist:
+        raise Http404(message)
 
 
 class RepositoryView(DetailView):
@@ -16,9 +23,26 @@ class RepositoryView(DetailView):
     context_object_name = 'repository'
 
     def get_object(self):
-        user = get_object_or_404(User, username=self.kwargs['owner'])
+        owner = get_object_or_404(User, username=self.kwargs['owner'])
         reponame = self.kwargs['name']
-        return Repository.objects.get(owner_id=user.id, name=self.kwargs['name'])
+
+        # For "security by obscurity" reasons we need to return the same 404
+        # message whether the user does not have permissions to view the repo,
+        # or the repo simply does not exist
+        exception404message = "Repository not found"
+
+        repo = get_object_or_404_ext(Repository, exception404message, owner=owner, name=self.kwargs['name'])
+
+        if repo.visibility == Repository.Visibility.PUBLIC:
+            return repo
+
+        user = self.request.user
+        if user == owner:
+            return repo
+
+        get_object_or_404_ext(Collaborator, exception404message, repo=repo, user=user)
+
+        return repo
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context

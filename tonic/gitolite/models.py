@@ -18,10 +18,12 @@ class Repository(models.Model):
                 "Repository name must consist only of latin letters, numbers, underscores and dashes."
             )])
 
-    owner = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='repos')
 
     visibility = models.IntegerField(choices=Visibility.choices, default=Visibility.PRIVATE)
     description = models.TextField(max_length=140, null=True, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_last_updated = models.DateTimeField(null=True, default=None)
 
     # TODO: override save() to commit repository to gitolite beforehand
 
@@ -73,8 +75,8 @@ class Collaborator(models.Model):
         WRITE = 2, 'RW'
         READWRITEPLUS = 3, 'RW+'
 
-    user = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
-    repo = models.ForeignKey(Repository, null=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='collabs')
+    repo = models.ForeignKey(Repository, null=False, on_delete=models.CASCADE, related_name='collabs')
     perm = models.IntegerField(choices=Permissions.choices,
                                default=Permissions.NO_PERM)
 

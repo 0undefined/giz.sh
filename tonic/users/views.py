@@ -1,15 +1,16 @@
 import re
 
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, get_object_or_404
+from django.db.models import Count
 from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic.edit import UpdateView
-from django.contrib.auth.views import LoginView
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import RSA_Key, Invitation
 from .forms import RSA_KeyForm
@@ -31,7 +32,24 @@ class UserView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(UserView, self).get_context_data(**kwargs)
-        context['repositories'] = Repository.objects.filter(owner=self.object)
+        repos = (
+            # Get both own repos and collab repos
+            Repository.objects.filter(owner=self.object) | Repository.objects.filter(collabs__user=self.object)
+        ).prefetch_related('collabs').annotate(collab_count=Count('collabs'))
+
+        # If this is not the owner, show only public & collaboration repos
+        if self.request.user != self.object:
+            repos = repos.filter(
+                visibility=Repository.Visibility.PUBLIC
+            ).union(
+                repos.filter(
+                    visibility=Repository.Visibility.PRIVATE,
+                    collabs__user=self.request.user
+                )
+            )
+
+
+        context['repositories'] = repos.order_by('date_created')
         return context
 
     def get_object(self):

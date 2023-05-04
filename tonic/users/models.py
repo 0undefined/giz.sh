@@ -25,7 +25,7 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, *args, **kwargs):
         user = self.create_user(
-            kwargs['username'], kwargs['email'], password=kwargs['password'])
+            kwargs['username'], password=kwargs['password'])
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
@@ -79,10 +79,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class RSA_Key(models.Model):
     public = models.TextField(max_length=16384, blank=False, unique=True)
+    sha = models.CharField(blank=False, max_length=64)
     name = models.CharField(blank=False, max_length=128)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
-    sha = models.CharField(blank=False, max_length=64)
+
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_last_used = models.DateTimeField(blank=True)
 
     def __str__(self):
         return self.name + ':' + self.user.username + '.pub'
