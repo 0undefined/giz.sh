@@ -18,7 +18,7 @@ services:
       - static:/usr/share/www/static
     ports:
       - 80:80
-  tonic:
+  giz:
     build: .
     logging:
       #driver: "journald"
@@ -42,7 +42,7 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - ./tonic:/usr/share/www
+      - ./giz:/usr/share/www
       - gitolite-sshkeys:/root/keys:ro
       - gitolite-git:/usr/share/git:ro
       - static:/usr/share/giz/static

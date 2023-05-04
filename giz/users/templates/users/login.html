@@ -1,5 +1,7 @@
 {% extends 'index/base.html' %}
 
+{% block TITLE %}Login{% endblock %}
+
 {% block STYLE %}
 <style>
 .error-box {
@@ -21,8 +23,6 @@
 </style>
 {% endblock %}
 
-{% block TITLE %}Sign up{% endblock %}
-
 {% block CONTENT %}
 <div class="maincontent">
 {% if form.errors %}
@@ -41,17 +41,11 @@
   </ul>
 </div>
 {% endif %}
-<form class="form card" id="signup" method="post">{% csrf_token %}
-  <h3>Sign up for tonic</h3>
-  <div class="row">
-    <div class="form-charfield">
-      <input type="text"     placeholder="Username" name="username" maxlength="128" required="" id="id_username">
-  </div>
-  <input type="submit" value="Signup"/>
-  </div>
-<input type="password" placeholder="Password"        name="password1"     maxlength="128" required="" id="id_password1">
-<input type="password" placeholder="Repeat password" name="password2"     maxlength="128" required="" id="id_password2">
-<input type="text"     placeholder="Invitation"      name="invitationkey" maxlength="128" required="" id="id_invitationkey">
+<form class="form card" id="login" method="post">{% csrf_token %}
+  <h3>Sign in to giz</h3>
+<input type="text"     placeholder="Username" name="username" maxlength="128" required="" id="username">
+<input type="password" placeholder="Password" name="password" maxlength="128" required="" id="password">
+<input name="login" type="submit" value="Login"/>
 </form>
 </div>
 {% endblock %}

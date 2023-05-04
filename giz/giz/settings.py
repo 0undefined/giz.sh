@@ -64,7 +64,7 @@ else:
     SESSION_COOKIE_SECURE=True
     CSRF_COOKIE_SECURE=True
 
-ROOT_URLCONF = 'tonic.urls'
+ROOT_URLCONF = 'giz.urls'
 
 TEMPLATES = [
     {
@@ -82,7 +82,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'tonic.wsgi.application'
+WSGI_APPLICATION = 'giz.wsgi.application'
 
 
 # Database

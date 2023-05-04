@@ -13,12 +13,12 @@ RUN rm -rf /var/cache/apk/*
 RUN adduser -D --shell /bin/bash django
 
 WORKDIR /usr/share/www
-ADD ./tonic/ /usr/share/www
+ADD ./giz/ /usr/share/www
 ADD ssh /root/.ssh
 ADD gitconfig /root/.gitconfig
 COPY ./conf/gunicorn/dev.py /usr/share/gunicorn-conf.py
 
-VOLUME  ./tonic:/usr/share/www
+VOLUME  ./giz:/usr/share/www
 
 EXPOSE 8000:8000
 

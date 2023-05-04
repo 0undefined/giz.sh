@@ -25,7 +25,7 @@ permissions and collaborators, as well as miscellaneous information, such as
 "stars", commit statistics, and other
 neat information.
 
-tonic:
+giz:
 Binds all the compnents together.
 * user profile: `localhost/<username>`
 * repo: `localhost/<username>/<reponame>`
