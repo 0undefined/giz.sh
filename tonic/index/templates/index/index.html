@@ -48,7 +48,7 @@ form.reposearch input[type="text"] {
       <form post="/" class="form reposearch" name="reposearch"><input type="text" name="search" placeholder="Find repository"></input></form>
       <ul>
         {% for repo in repositories %}
-        <li><a href="{% url 'gitolite:repo' repo.owner repo.name %}">{{ repo.owner }}/{{ repo.name }}</li>
+        <li><a href="{% url 'gitolite:repo' repo.owner repo.name %}">{{ repo.owner }}/{{ repo.name }}</a></li>
         {% endfor %}
       </ul>
       {% endif %}

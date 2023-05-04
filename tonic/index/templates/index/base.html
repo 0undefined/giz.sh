@@ -14,23 +14,23 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <style>
     :root {
-      --padding: 4pt;
-      --border-sz: 1pt;
+      --padding:         4pt;
+      --border-sz:       1pt;
       --font-sz-normal: 11pt;
-      --font-sz-nav: 13pt;
+      --font-sz-nav:    13pt;
 
-      --color-bg: #080808;
-      --color-fg: #eeeeee;
+      --color-bg:     #080808;
+      --color-fg:     #eeeeee;
       --color-content-bg: #323437;
 
-      --black:   #323437;
-      --red:     #ff5454;
-      --green:   #8cc85f;
-      --yellow:  #e3c78a;
-      --blue:    #80a0ff;
-      --purple:  #cf87e8;
-      --cyan:    #79dac8;
-      --white:   #c6c6c6;
+      --black:        #323437;
+      --red:          #ff5454;
+      --green:        #8cc85f;
+      --yellow:       #e3c78a;
+      --blue:         #80a0ff;
+      --purple:       #cf87e8;
+      --cyan:         #79dac8;
+      --white:        #c6c6c6;
       --black-light:  #949494;
       --red-light:    #ff5189;
       --green-light:  #36c692;
@@ -127,9 +127,10 @@
       padding:calc(2 * var(--padding));
       display: block;
       position: fixed;
-      background: #323437;
+      background: var(--color-content-bg);
       border-radius: var(--padding);
       border: var(--border-sz) solid #b2b2b2;
+      box-shadow: 0 0 var(--font-sz-normal) var(--black);
     }
     .user_options details ul li * {
       float:left;
@@ -138,15 +139,20 @@
     .usersettings > ul {
       right: 1pc;
     }
-    .user_options .login {
-      border: var(--border-sz) solid #b2b2b2;
-      border-radius: var(--padding);
-      color: #b2b2b2;
-      background-color: var(--color-content-bg);
+    .user_options a.login {
+      border: var(--border-sz) solid var(--black-light);
+      background-color: var(--cyan);
+    }
+    .user_options a.signup {
+      border: var(--border-sz) solid var(--black-light);
+      background-color: var(--cyan-light);
     }
     .user_options a.login,
-    .user_options a.logout {
+    .user_options .signup {
+      border-radius: var(--padding);
       padding: var(--padding);
+      padding-left:  calc(2 * var(--padding));
+      padding-right: calc(2 * var(--padding));
     }
 
     .contentcontainer {
@@ -155,17 +161,18 @@
       flex-wrap: wrap;
       align-items: flex-start;
       justify-content: center;
-      /*width: 90%;*/
       overflow: scroll;
       max-width: 100vw;
       min-width: 8cm;
       margin: 0 auto;
+      padding: var(--padding);
+      gap: var(--padding);
     }
 
     .card {
       margin: var(--padding);
       padding: var(--padding);
-      border: var(--border-sz) solid #9e9e9e;
+      border: var(--border-sz) solid var(--black-light);
       border-radius: var(--padding);
       background: var(--color-content-bg);
     }
@@ -179,8 +186,10 @@
       /*min-width: 12cm;*/
       flex-shrink: 1;
       flex-grow: 3;
-      flex-direction: row;
+      flex-direction: column;
       max-width: 24cm;
+      display:flex;
+      gap:var(--padding);
     }
     .contentcontainer .rightcontent,
     .contentcontainer .leftcontent {
@@ -194,6 +203,12 @@
       max-width: 12cm;
       */
     }
+.rightcontent.card,
+.leftcontent.card,
+.maincontent.card,
+.maincontent .card {
+  margin:0 !important;
+}
 
     /*****************************************
       COMMON STYLING
@@ -288,7 +303,7 @@ ul {
     </span>
     {% if request.user.is_authenticated %}
     <span class="user_options">
-      <details class="useradd"><summary>+</summary>
+      <details class="useradd"><summary><i class="fas fa-plus-circle"></i></summary>
         <ul>
           <li><a href="{% url 'gitolite:repo_new' %}">new repo</a></li>
           <li><a href="">new group</a></li>
@@ -301,7 +316,7 @@ ul {
         {% endif %}<span class="username">{{ request.user.get_username }}</span>
       </a>
       <details class="usersettings">
-        <summary><div class="fas fa-wheelchair"></div></summary>
+        <summary><div class="fas fa-caret-down"></div></summary>
         <ul>
           <li><a href="{% url 'users:settings' %}">Settings</a></li>
           <li><a href="{% url 'users:profile' request.user.username %}">Repositories</a></li>
@@ -314,7 +329,7 @@ ul {
     {% else %}
     <span class="user_options">
     <a class="login" href="{% url 'users:login' %}">Sign in</a>
-    <a class="logout" href="{% url 'users:signup' %}">Sign up</a>
+    <a class="signup" href="{% url 'users:signup' %}">Sign up</a>
     </span>
     {% endif %}
   </nav>
