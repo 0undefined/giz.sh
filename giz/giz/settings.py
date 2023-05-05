@@ -21,14 +21,17 @@ except KeyError as e:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", not os.getenv("PROD", True))
 
+
 DEFAULT_DOMAIN = 'giz.sh'
 ALLOWED_HOSTS = [DEFAULT_DOMAIN, '127.0.0.1', '70.34.196.53']
-#INTERNAL_IPS = ['127.0.0.1', '0.0.0.0']  # used by debug_toolbar
+
 
 if DEBUG:
     import socket  # only if you haven't already imported this
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
+
+    ALLOWED_HOSTS.append('localhost')
 
 # Application definition
 

@@ -8,17 +8,6 @@ services:
       - gitolite-git:/var/lib/git
     environment:
       - SSH_KEY
-  redis:
-    image: redis:5
-    ports:
-      - 6379:6379
-  nginx:
-    build: services/nginx
-    volumes:
-      - static:/usr/share/www/static
-    ports:
-      - 80:80
-      - 443:443
   giz:
     build: .
     logging:
@@ -33,12 +22,10 @@ services:
       - GITOLITE_HOST=gitolite
       - GITOLITE_PORT=22
       - GITOLITE_KEY
-      - PROD=True
+      - DEBUG=True
       - SECRET_KEY
     depends_on:
       - gitolite
-      - redis
-      - nginx
         # database
     ports:
       - 8000:8000
@@ -47,7 +34,6 @@ services:
       - gitolite-sshkeys:/root/keys:ro
       - gitolite-git:/usr/share/git:ro
       - static:/usr/share/giz/static
-    command: gunicorn -c /usr/share/gunicorn-conf.py
 
 volumes:
   gitolite-sshkeys:
