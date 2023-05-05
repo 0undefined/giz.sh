@@ -34,7 +34,6 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'username'
-    #REQUIRED_FIELDS = ['name', 'initials', 'email']
     username = models.CharField(
             unique=True,
             max_length=48,
@@ -54,6 +53,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = ""
     last_name = ""
     summary = models.CharField(max_length=1024, default="", blank=True)
+    #REQUIRED_FIELDS = ['password']
 
     objects = UserManager()
 

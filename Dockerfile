@@ -11,6 +11,7 @@ RUN pip install --no-input \
 RUN rm -rf /var/cache/apk/*
 
 RUN adduser -D --shell /bin/bash django
+RUN mkdir -p /usr/share/www/static
 
 WORKDIR /usr/share/www
 ADD ./giz/ /usr/share/www

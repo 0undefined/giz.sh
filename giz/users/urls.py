@@ -1,5 +1,4 @@
 from django.urls import path, re_path
-from django.views.decorators.cache import cache_page
 from users import views
 
 app_name = 'users'
@@ -14,5 +13,5 @@ urlpatterns = [
     path(r'settings/invitations', views.UserInvitationsView, name='settings-invitations'),
     path(r'settings/addkey', views.AddUserKey, name='settings-addkey'),
     path(r'settings/rmkey', views.RmUserKey, name='settings-rmkey'),
-    re_path(r'^(?P<username>[a-z0-9_]{3,48})/$', cache_page(60*60)(views.UserView.as_view()), name='profile'),
+    re_path(r'^(?P<username>[a-z0-9_]{3,48})/$', views.UserView.as_view(), name='profile'),
 ]
