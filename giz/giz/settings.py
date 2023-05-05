@@ -21,7 +21,7 @@ except KeyError as e:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", not os.getenv("PROD", True))
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['giz.sh', '127.0.0.1', '70.34.196.53']
 #INTERNAL_IPS = ['127.0.0.1', '0.0.0.0']  # used by debug_toolbar
 
 if DEBUG:
@@ -63,6 +63,8 @@ else:
     #SECURE_SSL_REDIRECT=True
     SESSION_COOKIE_SECURE=True
     CSRF_COOKIE_SECURE=True
+
+CSRF_TRUSTED_ORIGINS = ['http://giz.sh', 'https://giz.sh', 'http://127.0.0.1', 'http://70.34.196.53']
 
 ROOT_URLCONF = 'giz.urls'
 

@@ -118,7 +118,7 @@ def git_update_userrepos(user):
     if not isinstance(user, User):
         raise TypeError("Expected User object in first argument, got %s" % (str(type(user))))
 
-    userconfpath = os.path.join(settings.GITOLITE_ADMIN_PATH, 'conf', user.username + '.cfg')
+    userconfpath = os.path.join(settings.GITOLITE_ADMIN_PATH, 'conf', user.username + '.conf')
     repo = git_init()
 
     userrepos = Repository.objects.filter(owner=user)

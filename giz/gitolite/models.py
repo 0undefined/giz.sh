@@ -71,9 +71,9 @@ class Repository(models.Model):
         return '\n\n'.join(conf)
 
     def save(self, *args, **kwargs):
+        repo = super(Repository, self).save(*args, **kwargs)
         git_update_userrepos(self.owner)
-
-        return super(Repository, self).save(*args, **kwargs)
+        return repo
 
 class Collaborator(models.Model):
     class Permissions(models.IntegerChoices):
