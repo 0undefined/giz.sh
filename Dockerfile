@@ -18,7 +18,7 @@ ADD ./giz/ /usr/share/www
 RUN mkdir -p /root/.ssh
 COPY ssh /root/.ssh
 COPY gitconfig /root/.gitconfig
-COPY ./conf/gunicorn/dev.py /usr/share/gunicorn-conf.py
+COPY ./conf/gunicorn/prod.py /usr/share/gunicorn-conf.py
 
 VOLUME  ./giz:/usr/share/www
 
