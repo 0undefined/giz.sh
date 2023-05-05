@@ -15,8 +15,10 @@ RUN mkdir -p /usr/share/www/static
 
 WORKDIR /usr/share/www
 ADD ./giz/ /usr/share/www
-ADD ssh /root/.ssh
-ADD gitconfig /root/.gitconfig
+RUN mkdir -p /root/.ssh
+COPY sshconfig /root/.ssh/config
+COPY ~/.ssh/id_rsa /root/.ssh
+COPY gitconfig /root/.gitconfig
 COPY ./conf/gunicorn/dev.py /usr/share/gunicorn-conf.py
 
 VOLUME  ./giz:/usr/share/www

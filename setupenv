@@ -1,0 +1,2 @@
+export SSH_KEY="$(cat ~/.ssh/id_rsa.pub)"
+export SECRET_KEY="$(cat ~/.secrets/django_key)"
