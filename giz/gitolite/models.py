@@ -44,7 +44,7 @@ class Repository(models.Model):
         return Repository.Visibility.choices[self.visibility][1]
 
     def get_remote_url(self):
-        return 'git@' + settings.GITOLITE_HOST + ':' + self.__str__() + '.git'
+        return 'git@' + settings.GITOLITE_REMOTE + ':' + self.__str__() + '.git'
 
     def __str__(self):
         return self.owner.username + '/' + self.name

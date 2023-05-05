@@ -21,7 +21,8 @@ except KeyError as e:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", not os.getenv("PROD", True))
 
-ALLOWED_HOSTS = ['giz.sh', '127.0.0.1', '70.34.196.53']
+DEFAULT_DOMAIN = 'giz.sh'
+ALLOWED_HOSTS = [DEFAULT_DOMAIN, '127.0.0.1', '70.34.196.53']
 #INTERNAL_IPS = ['127.0.0.1', '0.0.0.0']  # used by debug_toolbar
 
 if DEBUG:
@@ -64,7 +65,11 @@ else:
     SESSION_COOKIE_SECURE=True
     CSRF_COOKIE_SECURE=True
 
-CSRF_TRUSTED_ORIGINS = ['http://giz.sh', 'https://giz.sh', 'http://127.0.0.1', 'http://70.34.196.53']
+CSRF_TRUSTED_ORIGINS = [
+    'http://' + DEFAULT_DOMAIN, 'https://' + DEFAULT_DOMAIN,
+    'http://www.' + DEFAULT_DOMAIN, 'https://www.' + DEFAULT_DOMAIN,
+    'http://127.0.0.1', 'http://70.34.196.53'
+]
 
 ROOT_URLCONF = 'giz.urls'
 
@@ -158,8 +163,12 @@ STATIC_ROOT = '/usr/share/giz/static'
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 SHARE_DIR = '/usr/share'
+# only used to communicate with gitolite locally
 GITOLITE_ADMIN_PATH = os.getenv("GITOLITE_ADMIN_PATH", os.path.join(SHARE_DIR, 'gitolite-admin'))
 GITOLITE_GIT_PATH = os.getenv("GITOLITE_ADMIN_PATH", os.path.join(SHARE_DIR, 'git', 'repositories'))
 GITOLITE_HOST = os.getenv("GITOLITE_HOST", 'gitolite')
 GITOLITE_PORT = int(os.getenv("GITOLITE_PORT", 22))
 GITOLITE_KEY = os.getenv("GITOLITE_KEY", os.environ['HOME'] + "/.ssh/id_rsa")
+
+# Used to calculate remote url
+GITOLITE_REMOTE = 'localhost' if DEBUG else DEFAULT_DOMAIN
