@@ -5,7 +5,7 @@ wsgi_app = "giz.wsgi:application"
 loglevel = "info"
 
 # The number of worker processes for handling requests
-workers = multiprocessing.cpu_count() * 2 + 1
+workers = 2
 
 # The socket to bind
 bind = "0.0.0.0:8000"
