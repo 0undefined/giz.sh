@@ -14,9 +14,13 @@ Tonic attempts to build on the following design:
 2. [x] Setup gitolite
 3. [x] Mount project
 4. [x] Run django
-5. [ ] Setup prod environment
-   * [ ] Setup gunicorn
-   * [ ] Setup nginx
+5. [ ] Fix gitolite configuration file
+       We need to include user configuration files by adding `include "*.conf"`
+       or something similar. Preferrably add them in a subdirectory, eihter
+       `conf/users/` and `conf/organizations` respectively.
+5. [x] Setup prod environment
+   * [x] Setup gunicorn
+   * [x] Setup nginx
 6. [ ] Make django app production ready
    * [ ] Get secrets from variables
    * [ ] Also in docker
