@@ -26,7 +26,10 @@ class Repository(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_last_updated = models.DateTimeField(null=True, default=None)
 
-    # TODO: override save() to commit repository to gitolite beforehand
+    # Should render as a choice option
+    default_branch = models.CharField(
+            max_length=128,
+            default='master', blank=False)
 
     class Meta:
         unique_together = ('owner', 'name')
@@ -84,8 +87,22 @@ class Collaborator(models.Model):
 
     user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='collabs')
     repo = models.ForeignKey(Repository, null=False, on_delete=models.CASCADE, related_name='collabs')
-    perm = models.IntegerField(choices=Permissions.choices,
-                               default=Permissions.NO_PERM)
+    perm = models.IntegerField(choices=Permissions.choices, default=Permissions.NO_PERM)
+
+    # TODO: Add an _optional_ 'ref' field, s.t. we can create a config according
+    # to the following gitolite config:
+
+    #    repo foo bar
+    #
+    #        RW+                     =   alice @teamleads
+    #        -   master              =   dilbert @devteam
+    #        -   refs/tags/v[0-9]    =   dilbert @devteam
+    #        RW+ dev/                =   dilbert @devteam
+    #        RW                      =   dilbert @devteam
+    #        R                       =   @managers
+
+    # Add `ref` field in the unique_together set.
+    # if perm is NO_PERM, then `ref` must be supplied.
 
     class Meta:
         unique_together = ('user', 'repo')
@@ -93,13 +110,24 @@ class Collaborator(models.Model):
     def permission_str(self):
         return self.Permissions.choices[self.perm][1]
 
+    def permission_str_long(self):
+        if self.perm == self.Permissions.NO_PERM:
+            return 'none'
+        if self.perm == self.Permissions.READ:
+            return 'read'
+        if self.perm == self.Permissions.WRITE:
+            return 'write'
+        if self.perm == self.Permissions.READWRITEPLUS:
+            return 'readwriteplus'
+
     def __str__(self):
         return self.Permissions.choices[self.perm][1] + " = " + self.user.username + '  ' + self.repo.get_remote_url()
 
     def save(self, *args, **kwargs):
+        collab = super(Collaborator, self).save(*args, **kwargs)
         git_update_userrepos(self.repo.owner)
 
-        return super(Collaborator, self).save(*args, **kwargs)
+        return collab
     # TODO: override save() to commit permissions to repository in gitolite beforehand
     # TODO: override save() to check if collaboration permissions already exists
 

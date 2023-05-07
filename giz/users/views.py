@@ -76,7 +76,6 @@ def UserInvitationsView(request):
 
         context = {'user': userobj, 'invitations': Invitation.objects.filter(referer=userobj), 'referer': referer}
         return render(request, 'users/user_invitations.html', context=context)
-    # TODO: return permission denied
     return PermissionDenied("You do not have authorization to view or edit this page")
 
 
@@ -87,10 +86,10 @@ def EditUserKeys(request):
         form_rsa = RSA_KeyForm()
         context = {'user': userobj, 'keys': RSA_Key.objects.filter(user=userobj), 'form_rsa': form_rsa}
         return render(request, 'users/keys.html', context=context)
-    # TODO: return permission denied
     return PermissionDenied("You do not have authorization to view or edit this page")
 
 
+@login_required
 def AddUserKey(request):
     userobj = get_object_or_404(User, id=request.user.id)
     form = RSA_KeyForm(request.POST.copy() or None)
@@ -104,6 +103,7 @@ def AddUserKey(request):
     return HttpResponseRedirect(reverse('users:settings-keys'))
 
 
+@login_required
 def RmUserKey(request):
     userobj = get_object_or_404(User, id=request.user.id)
     post = request.POST.copy()

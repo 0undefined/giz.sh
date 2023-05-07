@@ -38,7 +38,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             unique=True,
             max_length=48,
             db_index=True,
-            validators=[RegexValidator(r'^[a-z0-9_]{4,48}$', "Username must comply with the following regex: [a-z0-9_]{4,48}$")])
+            validators=[RegexValidator(r'^[a-zA-Z][a-zA-Z0-9_]{3,48}$', "Username must comply with the following regex: [a-zA-Z0-9_]{4,48}$")])
     password = models.CharField(blank=True, max_length=128)
 
     is_active = models.BooleanField(default=True)
@@ -53,25 +53,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = ""
     last_name = ""
     summary = models.CharField(max_length=1024, default="", blank=True)
-    #REQUIRED_FIELDS = ['password']
+    initial_invitations = models.IntegerField(default=0)
+    initial_numorgs = models.IntegerField(default=1)
+
+    repo_size_limit = models.IntegerField(default=5242880)
 
     objects = UserManager()
 
     def get_absolute_url(self):
-        return reverse('users:user', kwargs={'user': self.username})
-
-    # TODO: Update gitolites backend
-    #def save(self, *args, **kwargs):
-    #    # We do not need to update any gitolite related stuffs yet, as we cannot
-    #    # commit an empty directory
-
-    #    #userdir = os.path.join(settings.GITOLITE_ADMIN_PATH, 'keydir', self.username)
-
-    #    #os.makedirs(userdir)
-
-    #    return super(User, self).save(*args, **kwargs)
-    ##def create(cls, username, displayname, pswd, email):
-    ##    pass
+        return reverse('users:profile', kwargs={'user': self.username})
 
     class Meta():
         db_table='auth_user'
@@ -96,11 +86,16 @@ class RSA_Key(models.Model):
         public += '\n'
         self.public = public
 
-        git_add_key_file(self)
-
         self.sha = sha256(public.encode()).hexdigest()
+        key = super(RSA_Key, self).save(*args, **kwargs)
 
-        return super(RSA_Key, self).save(*args, **kwargs)
+        try:
+            git_add_key_file(self)
+        except:
+            key.delete()
+            raise Exception("Failed to add keyfile to gitolite-admin")
+
+        return key
 
     # TODO: Overwrite delete method to delete key in gitolite keydir
     def delete(self, *args, **kwargs):
@@ -114,3 +109,61 @@ class Invitation(models.Model):
     key = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     referer = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='referal')
+
+
+class Organization(models.Model):
+    owner = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='organization_owner')
+    # Same as User.username
+    name = models.CharField(
+            unique=True,
+            max_length=48,
+            db_index=True,
+            validators=[RegexValidator(r'^[a-zA-Z][a-zA-Z0-9_]{3,48}$', "Username must comply with the following regex: [a-zA-Z0-9_]{4,48}$")])
+
+    # Same as User.name
+    displayname = models.CharField(blank=True, max_length=128)
+    hidden = models.BooleanField(default=False)
+
+    def get_absolute_url(self):
+        return reverse('users:group', kwargs={'group': self.name})
+
+    def get_repo_size_limit(self):
+        return self.owner.repo_size_limit
+
+
+class OrganizationMember(models.Model):
+    class ROLES(models.IntegerChoices):
+        # All permissions
+        OWNER = 0, "Owner"
+        # Can manage and invite users, create repositories
+        ADMIN = 1, "Administrator"
+        # Exists
+        MEMBER = 3, "Member"
+
+    user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='organizations')
+    organization = models.ForeignKey(Organization, null=False, on_delete=models.CASCADE, related_name='members')
+
+
+class OrganizationTeam(models.Model):
+    manager = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='team_manager')
+    # Same as User.username
+    name = models.CharField(
+            unique=True,
+            max_length=48,
+            db_index=True,
+            validators=[RegexValidator(r'^[a-zA-Z][a-zA-Z0-9_]{3,48}$', "Username must comply with the following regex: [a-zA-Z0-9_]{4,48}$")])
+
+    organization = models.ForeignKey(Organization, null=False, on_delete=models.CASCADE, related_name='teams')
+
+class OrganizationTeamMember(models.Model):
+    class DEFAULT_ROLES(models.IntegerChoices):
+        # Team manager, aka. organization admin, can create repos for the team
+        # and add members.
+        MANAGER = 0, "Manager"
+        # RW to everything git related as well as manage wiki, docs, issues & PR
+        MAINTAINER = 1, "Maintainer"
+        # Read only access to the repositories, but can modify wiki, docs, issues & PR
+        MEMBER = 2, "Member"
+
+    user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='teams')
+    organization = models.ForeignKey(OrganizationTeam, null=False, on_delete=models.CASCADE, related_name='members')

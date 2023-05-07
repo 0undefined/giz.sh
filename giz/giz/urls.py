@@ -5,7 +5,6 @@ from users import views
 
 urlpatterns = [
     path('__debug__/', include('debug_toolbar.urls')),
-    path('admin/', admin.site.urls),
     path('', include('index.urls')),
     path('', include('users.urls')),
     path('', include('gitolite.urls')),

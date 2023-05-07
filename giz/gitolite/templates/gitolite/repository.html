@@ -61,7 +61,7 @@
 {% endif %}
   <div class="remote">{{ repository.get_remote_url }}</div><br>
   {% if repository.owner == request.user %}
-  <a href="">Settings</a>
+  <a href="{% url 'gitolite:repo-settings' repository.owner repository.name %}">Settings</a>
   {% endif %}
   {% if collaborators %}
   <h4>Collaborators:</h4>

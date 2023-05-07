@@ -42,6 +42,8 @@
 
       --color-a: var(--blue);
       --color-accent: var(--purple-light);
+
+      --border: var(--border-sz) solid var(--black-light);
     }
     body {
       padding: 0;
@@ -140,11 +142,11 @@
       right: 1pc;
     }
     .user_options a.login {
-      border: var(--border-sz) solid var(--black-light);
+      border: var(--border);
       background-color: var(--cyan);
     }
     .user_options a.signup {
-      border: var(--border-sz) solid var(--black-light);
+      border: var(--border);
       background-color: var(--cyan-light);
     }
     .user_options a.login,
@@ -172,7 +174,7 @@
     .card {
       margin: var(--padding);
       padding: var(--padding);
-      border: var(--border-sz) solid var(--black-light);
+      border: var(--border);
       border-radius: var(--padding);
       background: var(--color-content-bg);
     }
