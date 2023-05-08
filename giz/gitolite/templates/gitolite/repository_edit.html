@@ -1,0 +1,61 @@
+{% extends 'index/base.html' %}
+{% block TITLE %}Settings for {{repository}}{% endblock %}
+{% block STYLE %}
+<style>
+.visibility {
+  font-size: 9pt;
+  font-weight: 100;
+  color: var(--white);
+  float:right;
+  padding: var(--padding);
+  border: var(--border-sz) solid var(--white);
+  border-radius: var(--padding);
+}
+</style>
+{% endblock %}
+{% block CONTENT %}
+<div class="leftcontent card">
+  <h3>Settings</h3>
+  <ul>
+    <li><a href="{% url 'gitolite:repo-settings' repository.owner repository.name %}">General</a></li>
+    <li><a href="{% url 'gitolite:repo-settings-collabs' repository.owner repository.name %}">Collaborators</a></li>
+    <li><a href="{% url 'gitolite:repo-settings-branches' repository.owner repository.name %}">Branches</a></li>
+    <li><a href="{% url 'gitolite:repo-settings-issues_and_prs' repository.owner repository.name %}">Miscellaneous</a></li>
+  </ul>
+</div>
+<div class="maincontent">
+  {% block SETTINGS %}
+  <div class="card">
+  <h2>Repository settings for {{ repository }}</h2>
+    collaborators: invite, remove, change permissions<br>
+
+    branches: read/write protection and such<br>
+
+    who can create issues &amp; PR
+  <hr>
+
+  <form method="post" class="form">{% csrf_token %}
+    <div class="row">
+      {{ form.name.label }}
+      <div class="form-charfield">
+        {{ form.name }}
+      </div>
+      {{ form.visibility.label }}
+        {{ form.visibility }}
+      <input type="submit" value="Save">
+    </div>
+    <div class="row">
+      {{ form.default_branch.label }}
+      <div class="form-charfield">
+        {{ form.default_branch }}
+      </div>
+    </div>
+    <div>
+      {{ form.description.label }}
+      {{ form.description }}
+    </div>
+  </form>
+  </div>
+  {% endblock %}
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'gitolite/repository_edit.html' %}
+{% block TITLE %}Manage collaborators{% endblock %}
+{% block STYLE %}
+<style>
+.hidden { display: none; }
+.permlist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding);
+}
+.permlist div {
+  display: flex;
+  flex-direction: row;
+  gap: var(--padding);
+  align-items: center;
+
+  margin: var(--padding);
+  padding: var(--padding);
+
+  border: var(--border);
+  border-radius: var(--padding);
+}
+.permlist div a {
+  flex-grow: 1;
+}
+.permlist div input {
+  margin-right: var(--padding) !important;
+}
+.perms {
+  padding: var(--padding);
+  min-width: 4pc;
+
+  border: var(--border);
+  border-radius: var(--padding);
+  font-weight: 600;
+
+  background-color: var(--color-bg);
+  color: var(--color-bg);
+}
+.perms.none {
+  background-color: var(--purple-light);
+}
+.perms.read {
+  background-color: var(--blue);
+}
+.perms.write {
+  background-color: var(--cyan);
+}
+.perms.readwriteplus {
+  background-color: var(--yellow);
+}
+</style>
+{% endblock %}
+{% block SETTINGS %}
+<div class="card">
+  <h2>Collaborators</h2>
+  <hr>
+  <br>
+  <form action="{% url 'gitolite:repo-add-collaborator' repository.owner repository.name %}" method="post" class="form">{% csrf_token %}
+    <div class="hidden">
+      {{ addform.repo }}
+    </div>
+    <div class="row">
+      {{ addform.user.label }}
+      <div class="form-charfield">
+        <input type="text" placeholder="Username" name="username" maxlength="128" required="" id="id_username">
+      </div>
+      {{ addform.perm.label }}
+      {{ addform.perm }}
+      <input type="submit" value="Invite">
+    </div>
+  </form>
+
+  {% if collaborators %}
+  <br>
+  <form action="{% url 'gitolite:repo-rm-collaborator' repository.owner repository.name %}" method="post" class="form
+    permlist">{% csrf_token %}
+    {% for c in collaborators %}
+    <div>
+      <span class="perms {{c.permission_str_long}}">{{c.permission_str}}</span>
+      <a href="{% url 'users:profile' c.user.username %}">{{ c.user.username }}</a>
+      <input name="{{ c.id }}" type="submit" class="delete" value="Remove"/>
+    </div>
+    {% endfor %}
+  </form>
+
+  {% endif %}
+</div>
+{% endblock %}
+
