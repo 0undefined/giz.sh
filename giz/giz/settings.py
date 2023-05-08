@@ -31,7 +31,8 @@ if DEBUG:
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
 
-    ALLOWED_HOSTS.append('localhost')
+ALLOWED_HOSTS.append('localhost')
+ALLOWED_HOSTS.append('giz')
 
 # Application definition
 
@@ -101,8 +102,12 @@ WSGI_APPLICATION = 'giz.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        #'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'HOST': 'postgres',
+        'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+        'NAME': 'giz',
+        'USER': 'postgres',
     }
 }
 

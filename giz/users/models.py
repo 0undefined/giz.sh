@@ -68,8 +68,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class RSA_Key(models.Model):
-    public = models.TextField(max_length=16384, blank=False, unique=True)
-    sha = models.CharField(blank=False, max_length=64)
+    # Having unique=True implies db_index=True
+    # This can be tough on postgres, so we just use the sha instead.
+    public = models.TextField(max_length=16384, blank=False)
+    sha = models.CharField(blank=False, max_length=64, unique=True)
+
     name = models.CharField(blank=False, max_length=128)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 

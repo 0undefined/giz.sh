@@ -3,8 +3,10 @@ FROM alpine:latest
 RUN apk upgrade -U
 RUN apk add bash py3-pip git musl openssh
 
-RUN pip install --no-input \
+RUN pip install --upgrade pip && \
+    pip install --no-input \
   django django-extensions django-csp django-ratelimit \
+  "psycopg[binary]" \
   django-debug-toolbar ipython \
   gunicorn \
   GitPython umarkdown paramiko tzdata \
@@ -15,7 +17,7 @@ RUN adduser -D --shell /bin/bash django
 RUN mkdir -p /usr/share/www/static
 
 WORKDIR /usr/share/www
-ADD ./giz/ /usr/share/www
+COPY ./giz/ /usr/share/www
 RUN mkdir -p /root/.ssh
 COPY ssh /root/.ssh
 COPY gitconfig /root/.gitconfig

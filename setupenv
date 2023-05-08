@@ -1,2 +1,30 @@
+#!/usr/bin/env sh
+
+if ! [ -e ~/.ssh/id_rsa.pub ]; then
+  if [ -e ~/.ssh/id_rsa ]; then
+    print "You seem to have a private key but no public key!"
+    print "This setup is confusing, exiting..."
+    exit 1
+  fi
+  ssh-keygen -t rsa -b 4096 -N '' -f ~/.ssh/id_rsa
+fi
+
+! [ -e ~/.secrets ] && mkdir ~/.secrets
+
+if ! [ -e ~/.secrets/django_key ]; then
+  strings /dev/random \
+    | grep -Eo '[a-zA-Z0-9@_-]' \
+    | head -64 \
+    | tr -d '\n' > .secrets/django_key
+fi
+
+if ! [ -e ~/.secrets/postgres_pswd ]; then
+  strings /dev/random \
+    | grep -Eo '[a-zA-Z0-9@_-]' \
+    | head -64 \
+    | tr -d '\n' > .secrets/postgres_pswd
+fi
+
 export SSH_KEY="$(cat ~/.ssh/id_rsa.pub)"
 export SECRET_KEY="$(cat ~/.secrets/django_key)"
+export POSTGRES_PASSWORD="$(cat ~/.secrets/postgres_pswd)"

@@ -1,4 +1,28 @@
+# This is (mostly) just a copy of docker-compose.yml
+# However, we there's a few changes to the `giz` service:
+# * command is set to gunicorn
+# * no ports are exposed
+# * DEBUG is not set, and PROD=True
+# * the source code is not mounted, but rather added
 services:
+  nginx:
+    build: services/nginx
+    volumes:
+      - static:/usr/share/www/static:ro
+    ports:
+      - 80:80
+      - 443:443
+  redis:
+    image: redis:5
+    #ports:
+    #  - 6379:6379
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD
+    volumes:
+      - /root/data:/var/lib/postgresql/data
   gitolite:
     image: jgiannuzzi/gitolite
     ports:
@@ -8,42 +32,26 @@ services:
       - gitolite-git:/var/lib/git
     environment:
       - SSH_KEY
-  redis:
-    image: redis:5
-    ports:
-      - 6379:6379
-  nginx:
-    build: services/nginx
-    volumes:
-      - static:/usr/share/www/static:ro
-    ports:
-      - 80:80
-      - 443:443
   giz:
     build: .
     logging:
-      #driver: "journald"
       driver: "json-file"
       options:
         max-size: "10k"
         max-file: "1"
-          #tag: mytag
     environment:
-      #- PYTHONUNBUFFERED=1
+      - PROD=True
       - GITOLITE_HOST=gitolite
       - GITOLITE_PORT=22
       - GITOLITE_KEY
-      - PROD=True
+      - POSTGRES_PASSWORD
       - SECRET_KEY
     depends_on:
-      - gitolite
-      - redis
       - nginx
-        # database
-    ports:
-      - 8000:8000
+      - redis
+      - gitolite
+      - postgres
     volumes:
-      - ./giz:/usr/share/www
       - gitolite-sshkeys:/root/keys:ro
       - gitolite-git:/usr/share/git:ro
       - static:/usr/share/giz/static
@@ -52,6 +60,4 @@ services:
 volumes:
   gitolite-sshkeys:
   gitolite-git:
-  database:
   static:
-# django:
