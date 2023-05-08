@@ -7,7 +7,7 @@ RUN pip install --no-input certbot certbot-nginx
 RUN mkdir -p /etc/nginx/sites-enabled
 
 ADD nginx.conf /etc/nginx/
-ADD localhost.conf /etc/nginx/sites-available/
+COPY giz.sh.conf /etc/nginx/sites-available/site.conf
 
-RUN ln -s /etc/nginx/sites-available/localhost.conf /etc/nginx/sites-enabled/localhost.conf
+RUN ln -s /etc/nginx/sites-available/site.conf /etc/nginx/sites-enabled/site.conf
 
