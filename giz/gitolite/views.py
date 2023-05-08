@@ -8,6 +8,8 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic.edit import CreateView, UpdateView
+from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
 
 from users.models import User
 from .models import Repository, Collaborator
@@ -61,6 +63,7 @@ class RepositoryView(DetailView):
         return context
 
 
+@method_decorator(ratelimit(key='header:x-real-ip', rate='2/h', method='POST', block=True), name='post')
 class RepositoryCreate(LoginRequiredMixin, CreateView):
     model = Repository
     fields = ['owner', 'name', 'description', 'visibility']

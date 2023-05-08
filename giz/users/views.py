@@ -11,6 +11,9 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic.edit import UpdateView
+from django_ratelimit.decorators import ratelimit
+from django.utils.decorators import method_decorator
+
 
 from .models import RSA_Key, Invitation
 from .forms import RSA_KeyForm
@@ -123,6 +126,7 @@ def RmUserKey(request):
     return HttpResponseRedirect(reverse('users:settings-keys'), context={'error':"Key not found"})
 
 
+@method_decorator(ratelimit(key='header:x-real-ip', rate='5/h', method='POST', block=True), name='post')
 class UserLogin(LoginView):
     template_name = 'users/login.html'
 
@@ -132,6 +136,7 @@ def Userlogout(request):
     return HttpResponseRedirect('/')
 
 
+@ratelimit(key='header:x-real-ip', rate='15/h', method='POST', block=True)
 def Signup(request):
     context = {
         'signupform': forms.SignupForm

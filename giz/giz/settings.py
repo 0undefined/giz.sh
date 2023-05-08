@@ -64,6 +64,7 @@ MIDDLEWARE = [
 if DEBUG:
     INSTALLED_APPS.append('debug_toolbar')
 else:
+    # Uncomment if NOT running behind a reverse proxy
     #SECURE_SSL_REDIRECT=True
     SESSION_COOKIE_SECURE=True
     CSRF_COOKIE_SECURE=True

@@ -15,7 +15,7 @@ services:
   nginx:
     build: services/nginx
     volumes:
-      - static:/usr/share/www/static
+      - static:/usr/share/www/static:ro
     ports:
       - 80:80
       - 443:443
