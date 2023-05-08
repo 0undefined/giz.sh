@@ -27,18 +27,25 @@
 
     <h3>{{ repository.name }}<span class="visibility">{{ repository.visibility_str }}</span></h3>
 
-    {% if files.0|length > 0 or files.1|length > 0 %}
+    {% if tree.files|length > 0 or tree.dirs|length > 0 %}
     <hr>
     Files
     <ul>
-      {% for dir in files.trees %}
-      <li>[d] {{ dir.name }}
-        {% if dir.trees|length == 1 and dir.blobs|length == 0 %}
-        / {{ dir.trees.pop.name }} {# extend with recursion #}
+      {% for dir in tree.dirs %}
+      {% if dir.path %}
+        {% if dir.object.type == 'tree' %}
+        <li>[d] {{ dir.path }}
+        {% elif dir.object.type == 'blob' %}
+        <li>[f] {{ dir.path }}
+        {% else %}{# This is just a Tree|Blob object #}
+        <li>[d] {{ dir.name }}
         {% endif %}
+      {% else %}
+        <li>[d] -- {{ dir.name }}
+      {% endif %}
       </li>
       {% endfor %}
-      {% for file in files.blobs %}
+      {% for file in tree.files %}
       <li>[f] {{ file.name }}</li>
       {% endfor %}
     </ul>

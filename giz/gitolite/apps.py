@@ -1,7 +1,8 @@
 from django.apps import AppConfig
 from django.conf import settings
 from django.db import transaction
-from git import Repo
+from django.http import Http404
+from git import Repo, Tree, Blob
 from umarkdown import markdown
 
 import logging
@@ -162,6 +163,21 @@ def git_get_readme_html(repo):
     return markdown(git_get_file_content(repo, "README.md"))
 
 
+def convert_list(t):
+    if len(t.trees) == 1 and len(t.blobs) == 0:
+        deep_list = convert_list(t.trees[0])
+        if isinstance(deep_list, Tree) or isinstance(deep_list, Blob):
+            # Run at end of recursion
+            return {'path': t.name + '/' + deep_list.name, 'object': deep_list}
+        else:
+            # Run when recursing
+            return {'path': t.name + '/' + deep_list['path'], 'object': deep_list['object']}
+
+    elif len(t.blobs) == 1 and len(t.trees) == 0:
+        return t.blobs[0]
+    else:
+        return t
+
 def git_get_tree(repo, subdir=None):
     from .models import Repository
 
@@ -170,24 +186,30 @@ def git_get_tree(repo, subdir=None):
 
     # Same reason to not call `git_init` as in `git_get_file_content`
     repo_path = repo.get_absolute_path()
-    tree = ([],[])
+    tree = {'files': [], 'dirs': []}
 
     try:
         repository = Repo(repo_path)
-        tree = repository.tree()
+        tree_ = repository.tree()
 
         subdirs = []
-        if isinstance(subdir,str):
-            subdirs = subdir.split('/').reverse()
+        files = []
+
+        if isinstance(subdir, str):
+            subdirs = subdir.split('/')
+            subdirs.reverse()
 
             while len(subdirs) > 0:
                 d = subdirs.pop()
-                dd = filter(tree.tree, lambda t: t.name == d)
+                dd = list(filter(lambda t: t.name == d, tree_.trees))
 
                 if len(dd) != 1:
-                    return 404
+                    raise Http404("Could not find file or directory in tree")
 
-                dd = dd[0]
+                tree_ = dd[0]
+
+        tree['files'] = tree_.blobs
+        tree['dirs'] = [convert_list(t) for t in tree_.trees]
 
     except Exception as e:
         logger.warn("Failed to get tree for %s -- %s" % (repo.name, e))

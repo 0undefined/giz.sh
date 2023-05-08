@@ -59,7 +59,7 @@ class RepositoryView(DetailView):
         # Extend to /owner/repo/(blob|tree)/branch url path (for branches)
         # Reminder: blob=file tree=dir
         context['readme'] = git_get_readme_html(self.object)
-        context['files'] = git_get_tree(self.object)
+        context['tree'] = git_get_tree(self.object)
         return context
 
 
