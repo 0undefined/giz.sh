@@ -39,7 +39,7 @@ def git_init():
     #logger.warn("Initializing git repo")
     if os.path.exists(gitolite_admin_dir) and os.path.isdir(gitolite_admin_dir):
         #logger.warn("Found directory at " + gitolite_admin_dir)
-        repo = Repo(gitolite_admin_dir)
+        return Repo(gitolite_admin_dir)
     else:
         logger.warn("Cloning gitolite-admin to " + gitolite_admin_dir)
         # Clone the repo otherwise
@@ -47,6 +47,58 @@ def git_init():
             'git@' + settings.GITOLITE_HOST + ':gitolite-admin.git',
             to_path=gitolite_admin_dir
         )
+
+        # Check if gitolite has needed configuration
+        userdir = os.path.join(gitolite_admin_dir, 'conf', 'users')
+        organizationdir = os.path.join(gitolite_admin_dir, 'conf', 'orgs')
+        gitoliteconf_path = os.path.join(gitolite_admin_dir, 'conf', 'gitolite.conf')
+
+        if not (os.path.exists(userdir) and os.path.isdir(userdir)):
+            os.makedirs(userdir)
+
+        if not (os.path.exists(organizatoindir) and os.path.isdir(organizatoindir)):
+            os.makedirs(organizatoindir)
+
+        # Check if they are included
+        gitoliteconf = open(gitoliteconf_path , 'r')
+        conf_lines = gitoliteconf.readlines()
+
+        includes_userconf = False
+        includes_orgconf = False
+
+        for line in conf_lines:
+            # Remove empty strings from split(' ')
+            cmd = filter(lambda x: len(x) > 0, line.split(' '))
+            if len(cmd) == 2 and cmd[0] == "include":
+                if cmd[1].find('users/*'):  # We dont really care if they use the correct suffix
+                    if includes_userconf:
+                        gitoliteconf.close()
+                        raise Exception("Already found some sort of user inclusion!")
+
+                    includes_userconf = True
+
+                if cmd[1].find('orgs/*'):
+                    if includes_orgconf:
+                        gitoliteconf.close()
+                        raise Exception("Already found some sort of organization inclusion!")
+
+                    includes_orgconf = True
+
+            if includes_userconf and includes_orgconf:
+                break
+
+        gitoliteconf.close()
+
+        if not (includes_userconf and includes_orgconf):
+            # Append the missing option(s)
+            gitoliteconf = open(gitoliteconf_path , 'a')
+            if not includes_userconf:
+                gitoliteconf.write('\ninclude "users/*.conf"\n')
+            if not includes_orgconf:
+                gitoliteconf.write('\ninclude "orgs/*.conf"\n')
+
+            gitoliteconf.close()
+
 
     return repo
 
