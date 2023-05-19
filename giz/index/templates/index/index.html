@@ -20,11 +20,11 @@ ul.invitationlist {
       </ul>
       {% if repositories %}
       <hr>
-      <h4>Top {8} repos</h4>
+      <h4>Top {{ repositories|length }} repos</h4>
       <form post="/" class="form reposearch" name="reposearch"><input type="text" name="search" placeholder="Find repository"></input></form>
       <ul>
         {% for repo in repositories %}
-        <li><a href="{% url 'gitolite:repo' repo.owner repo.name %}">{{ repo.owner }}/{{ repo.name }}</a></li>
+        <li><a href="{{ repo.get_absolute_url }}">{{ repo }}</a></li>
         {% endfor %}
       </ul>
       {% endif %}
@@ -94,7 +94,7 @@ ul.invitationlist {
     {% for invite in invites %}
     <li class="card invitation_prompt">
     <form action="{% url 'users:settings-collab' %}" method="post" class="form">{% csrf_token %}
-      <a href="{% url 'gitolite:repo' invite.repo.owner invite.repo.name %}">{{ invite.repo }}</a>
+      <a href="{{ invite.repo.get_absolute_url }}">{{ invite.repo }}</a>
       <div class="row">
       <input name="collab_id" type="hidden" class="hidden" value="{{invite.id}}"/>
       <input name="accept" type="submit" class="btn-submit" value="accept"/><input name="decline" type="submit" class="btn-delete" value="decline"/>

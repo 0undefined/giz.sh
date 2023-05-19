@@ -15,8 +15,10 @@ def index(request):
     context = {}
 
     if request.user.is_authenticated:
-        context['repositories'] = request.user.repos.all()
-        context['invites'] = request.user.collabs.all()
+        context['repositories'] = request.user.repos.union(
+            Repository.objects.filter(collabs__user=request.user)
+        ).order_by('date_last_updated', 'date_created', 'name')[:8]
+        context['invites'] = request.user.collabs.filter(accepted=False)
 
     return render(request, 'index/index.html', context=context)
 

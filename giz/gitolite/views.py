@@ -42,6 +42,9 @@ class RepositoryView(DetailView):
         if repo.visibility == Repository.Visibility.PUBLIC:
             return repo
 
+        if not self.request.user.is_authenticated:
+            raise Http404(exception404message)
+
         user = self.request.user
         if user == owner:
             return repo
@@ -57,7 +60,8 @@ class RepositoryView(DetailView):
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
         context['collaborators'] = Collaborator.active.filter(repo=self.object)
-        context['collaborators_pending'] = Collaborator.objects.filter(repo=self.object, accepted=False, user=self.request.user)
+        if self.request.user.is_authenticated:
+            context['collaborators_pending'] = Collaborator.objects.filter(repo=self.object, accepted=False, user=self.request.user)
         # Extend to /owner/repo/(blob|tree)/branch/filename url path (for files/dirs)
         # Extend to /owner/repo/(blob|tree)/branch url path (for branches)
         # Reminder: blob=file tree=dir

@@ -117,7 +117,7 @@ a.newrepo {
   <div class="repocontainer">
   {% for r in repositories %}
   <div class="row">
-  <a href="{% url 'gitolite:repo' owner=user.username name=r.name %}">{{ r.name }}</a>
+    <a href="{{ r.get_absolute_url }}">{{ r.name }}</a>
   <span class="lastupdated">&lt;lastupdated&gt;</span>
   <span class="language">&lt;language&gt;</span>
   {% if r.collab_count %}<span class="collabs">{{ r.collab_count|add:1 }}<span class="fas fa-user-friends"></span></span>{% endif %}
