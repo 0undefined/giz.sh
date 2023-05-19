@@ -1,18 +1,5 @@
 {% extends 'index/base.html' %}
 {% block TITLE %}Settings for {{repository}}{% endblock %}
-{% block STYLE %}
-<style>
-.visibility {
-  font-size: 9pt;
-  font-weight: 100;
-  color: var(--white);
-  float:right;
-  padding: var(--padding);
-  border: var(--border-sz) solid var(--white);
-  border-radius: var(--padding);
-}
-</style>
-{% endblock %}
 {% block CONTENT %}
 <div class="leftcontent card">
   <h3>Settings</h3>
@@ -42,7 +29,7 @@
       </div>
       {{ form.visibility.label }}
         {{ form.visibility }}
-      <input type="submit" value="Save">
+      <input class="btn-submit" type="submit" value="Save">
     </div>
     <div class="row">
       {{ form.default_branch.label }}

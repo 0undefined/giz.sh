@@ -20,6 +20,10 @@
   height: 90vh;
   max-width: 24pc;
 }
+#login input {
+  background-color: var(--color-fg);
+  color: var(--color-bg);
+}
 </style>
 {% endblock %}
 
@@ -27,10 +31,10 @@
 <div class="maincontent">
 {% if form.errors %}
 <div class="card error-box">
-  <h3>{{ error }}</h3>
+  <h5>Login error</h5>
 
   <ul>
-  {% for field in form %}
+  {% for field in form.fields %}
     {% for error in field.errors %}
     <li>{{ field.label }}: {{ error }}</li>
     {% endfor %}
@@ -45,7 +49,7 @@
   <h3>Sign in to giz</h3>
 <input type="text"     placeholder="Username" name="username" maxlength="128" required="" id="username">
 <input type="password" placeholder="Password" name="password" maxlength="128" required="" id="password">
-<input name="login" type="submit" value="Login"/>
+<input class="btn-submit" name="login" type="submit" value="Login"/>
 </form>
 </div>
 {% endblock %}

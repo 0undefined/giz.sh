@@ -14,15 +14,41 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <style>
     :root {
+      /*
+         #613583
+         #b36faf
+         #d7daa4
+         #def2e0
+         #605ba9
+
+
+         #ad81ff -- primary
+         #9263e9 -- secondary
+         #573399 -- tertiary
+         #25006b -- quaternary
+         #423956 -- quinary
+
+         #261f33  -- dark
+         #130f1a  -- darkest
+
+         hili:
+           #ffe866
+           #b5ffa8
+           #e548ae
+
+       */
       --padding:         4pt;
       --border-sz:       1pt;
+      --font-sz-small:   9pt;
       --font-sz-normal: 11pt;
+      --font-sz-big:    16pt;
       --font-sz-nav:    13pt;
 
-      --color-bg:     #080808;
+      --color-bg:     #130f1a; /*#080808;*/
       --color-fg:     #eeeeee;
-      --color-content-bg: #323437;
+      --color-content-bg: #261f33;
 
+      /* Colors from moonfly colorscheme */
       --black:        #323437;
       --red:          #ff5454;
       --green:        #8cc85f;
@@ -41,10 +67,22 @@
       --white-light:  #e4e4e4;
 
       --color-a: var(--blue);
-      --color-accent: var(--purple-light);
+      --color-primary:    #ad81ff;
+      --color-second:     #9263e9;
+      --color-tertiary:   #573399;
+      --color-quaternary: #25006b;
+      --color-quinary:    #423956;
 
-      --border: var(--border-sz) solid var(--black-light);
+      --color-accent: #b5ffa8;
+      --color-hi-yellow: #ffe866;
+      --color-hi-green: #b5ffa8;
+      --color-lo-green: #148101;
+      --color-hi-red: #e548ae;
+      --color-lo-red: #e5486f;
+
+      --border: var(--border-sz) solid var(--color-quinary);
     }
+
     body {
       padding: 0;
       margin: 0;
@@ -60,21 +98,19 @@
     }
 
     nav {
-      background: rgb(255,84,84);
-      background: linear-gradient(42deg, rgba(255,84,84,1) 0%, rgba(207,135,232,1) 53%, rgba(128,160,255,1) 100%);
+      background-color: var(--color-primary);
       width: 100%;
       padding: 0pc;
       text-align: center;
       font-size: var(--font-sz-nav);
       z-index: 3;
-    }
-    nav {
+
       display:flex;
       flex-flow: row;
       justify-content: space-between;
       flex-wrap: nowrap;
       align-items: stretch;
-      color: #080808;
+      color: var(--color-fg);
     }
     .navcontainer {
       display:flex;
@@ -87,6 +123,25 @@
     .navcontainer > a > img {
       width: 2pc;
       height: 2pc;
+    }
+
+    .navcontainer > a.link {
+      color: var(--color-fg);
+      padding:var(--padding);
+      border-radius: var(--padding);
+      transition: ease 0.25s;
+    }
+    .navcontainer > a.link:hover {
+      background-color: var(--color-second);
+      transition: ease 0.5s;
+    }
+
+    form.reposearch input[type="text"] {
+      border: var(--border-sz) solid var(--white);
+      border-radius: var(--padding);
+      padding: var(--padding);
+      background-color: var(--black);
+      color: var(--white);
     }
 
     .searchbar {
@@ -131,7 +186,7 @@
       position: fixed;
       background: var(--color-content-bg);
       border-radius: var(--padding);
-      border: var(--border-sz) solid #b2b2b2;
+      border: var(--border);
       box-shadow: 0 0 var(--font-sz-normal) var(--black);
     }
     .user_options details ul li * {
@@ -143,18 +198,37 @@
     }
     .user_options a.login {
       border: var(--border);
-      background-color: var(--cyan);
+      background-color: var(--color-second);
+      transition: ease 0.25s;
+    }
+    .user_options a.login:hover {
+      background-color: var(--color-tertiary);
+      color:var(--color-fg);
+      transition: ease 0.25s;
     }
     .user_options a.signup {
       border: var(--border);
-      background-color: var(--cyan-light);
+      color:rgba(0,0,0,0.75);
+      background-color: var(--color-hi-green);
     }
+    .user_options a.signup:hover {
+      background-color: var(--color-lo-green);
+      color:var(--color-fg);
+      transition: ease 0.25s;
+    }
+
     .user_options a.login,
-    .user_options .signup {
+    .user_options a.signup {
       border-radius: var(--padding);
       padding: var(--padding);
       padding-left:  calc(2 * var(--padding));
       padding-right: calc(2 * var(--padding));
+    }
+    .user_options > img.pp {
+      width: 2pc;
+      height: 2pc;
+      image-rendering: crisp-edges;
+      border-radius: var(--padding);
     }
 
     .contentcontainer {
@@ -173,7 +247,7 @@
 
     .card {
       margin: var(--padding);
-      padding: var(--padding);
+      padding: calc(2*var(--padding));
       border: var(--border);
       border-radius: var(--padding);
       background: var(--color-content-bg);
@@ -198,6 +272,9 @@
       flex-grow: 1;
       flex-shrink: 1;
       max-width: 8cm;
+      display: flex;
+      gap: var(--padding);
+      flex-direction: column;
       /*
       flex-shrink: 1;
       flex-grow: 1;
@@ -206,7 +283,9 @@
       */
     }
 .rightcontent.card,
+.rightcontent .card,
 .leftcontent.card,
+.leftcontent .card,
 .maincontent.card,
 .maincontent .card {
   margin:0 !important;
@@ -215,6 +294,8 @@
     /*****************************************
       COMMON STYLING
      ****************************************/
+ul { padding-left: calc(4 *  var(--padding)); }
+
 .form {
   display: flex;
   flex-flow:column;
@@ -223,9 +304,19 @@
 }
 
 .form * {
-  margin:var(--padding);
+  /*margin:var(--padding);*/
   box-sizing: border-box;
 }
+
+/*
+.form input[type="text"],
+.form div input[type="text"],
+.form textarea,
+.form div textarea {
+  background-color: var(--color-quinary);
+  border: var(--border) !important;
+}
+*/
 
 .form textarea,
 .form div textarea {
@@ -244,6 +335,8 @@
   border: none;
   padding: var(--padding);
   margin:0;
+  background-color: var(--color-quinary);
+  color: var(--color-fg);
 }
 
 .form div.row {
@@ -268,14 +361,13 @@
 
 .form div.row input[type="submit"],
 .form input[type="submit"] {
-  background-color: var(--green);
-  border: var(--border-sz) solid var(--green-light);
   min-width: 6pc;
+  cursor: pointer;
 }
+/*
 .form div.row input[type="submit"]:hover,
 .form input[type="submit"]:hover {
-  background-color: var(--green-light);
-  border-color: var(--green);
+  background-color: var(--color-lo-green);
 }
 
 .form div.row input[type="submit"].delete,
@@ -289,8 +381,51 @@
   background-color: var(--red-light);
   border-color: var(--red);
 }
-ul {
-  padding-left: calc(2 *  var(--padding));
+*/
+
+.btn {
+  padding:var(--padding) !important;
+  box-sizing:border-box !important;
+}
+.btn-submit {
+  padding:var(--padding) !important;
+  box-sizing:border-box !important;
+  background-color: var(--color-hi-green) !important;
+  color: rgba(0,0,0,0.75) !important;
+  /*border: var(--border) !important;*/
+  border: none !important;
+  border-radius: var(--padding);
+  transition: ease 0.25s;
+}
+.btn-submit:hover {
+  background-color: var(--color-lo-green) !important;
+  color: var(--color-fg) !important;
+  transition: ease 0.25s;
+}
+.btn-delete {
+  padding:var(--padding) !important;
+  box-sizing:border-box !important;
+  background-color: var(--color-hi-red) !important;
+  color: rgba(0,0,0,0.75) !important;
+  /*border: var(--border) !important;*/
+  border: none !important;
+  border-radius: var(--padding);
+  transition: ease 0.25s;
+}
+.btn-delete:hover {
+  background-color: var(--color-lo-red) !important;
+  transition: ease 0.25s;
+}
+
+/* Repository stuffs */
+.visibility { /* Repo visibility */
+  font-size: 9pt;
+  font-weight: 100;
+  color: var(--white);
+  float:right;
+  padding: var(--padding);
+  border: var(--border);
+  border-radius: var(--padding);
 }
   </style>
   {% block STYLE %}{% endblock %}
@@ -300,8 +435,22 @@ ul {
   <nav>
     <span class="navcontainer">
       <a href="{% url 'index' %}"><img src="{% static 'index/favicon.png' %}"></a>
+      {% if request.user.is_authenticated %}
       <form post="/" class="searchbar" name="search"><input type="text" name="search" placeholder="Search"></input></form>
-      {% block EXTRANAV %}{% endblock %}
+      {% else %}
+      &nbsp;
+      {% endif %}
+      {% block EXTRANAV %}
+      <a class="link" href="{% url 'discover' %}">Discover</a>
+      {% if request.user.is_authenticated %}
+      <a class="link" href="#">Pull requests</a>
+      <a class="link" href="#">Issues</a>
+      {% else %}
+      <a class="link" href="{% url 'discover' %}">About</a>
+      <a class="link" href="{% url 'discover' %}">FAQ</a>
+      {% endif %}
+      <a class="link" href="{% url 'discover' %}">Help</a>
+      {% endblock %}
     </span>
     {% if request.user.is_authenticated %}
     <span class="user_options">
@@ -311,7 +460,7 @@ ul {
           <li><a href="">new group</a></li>
         </ul>
       </details>
-      [ProfilePic]
+      <img class="pp" src="{% static 'users/box.png' %}">
       <a href="{% url 'users:profile' request.user.username %}">
         {% if request.user.is_superuser %}
         <i class="is_admin fas fa-star"></i>
@@ -330,8 +479,8 @@ ul {
     </span>
     {% else %}
     <span class="user_options">
-    <a class="login" href="{% url 'users:login' %}">Sign in</a>
     <a class="signup" href="{% url 'users:signup' %}">Sign up</a>
+    <a class="login" href="{% url 'users:login' %}">Sign in</a>
     </span>
     {% endif %}
   </nav>

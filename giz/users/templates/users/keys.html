@@ -4,6 +4,7 @@
 
 {% block STYLE %}
 <style>
+/*
 div.keylist > .form {
   display: flex;
   flex-direction: column;
@@ -28,6 +29,7 @@ div.keylist > .form div.row input[type="submit"] {
   float: right;
   margin: var(--padding);
 }
+*/
 .hash {
   font-family: monospace;
 }
@@ -50,7 +52,7 @@ div.keylist > .form div.row input[type="submit"] {
       <span class="timestamp">Created: {{ k.created|date:"Y-m-d G:i" }}</span> .. &lt;last used?&gt;<br>
       <span class="hash">SHA256:{{ k.sha }}</span><br>
     </span>
-      <input name="{{ k.name }}" type="submit" class="delete" value="Remove"/>
+      <input name="{{ k.name }}" type="submit" class="btn-delete" value="Remove"/>
     </div>
     {% endfor %}
     </form>
@@ -58,16 +60,14 @@ div.keylist > .form div.row input[type="submit"] {
 </div>
 <div class="card">
   <form action="{% url 'users:settings-addkey' %}" method="post" class="form">{% csrf_token %}
-    <div>
-      <label for="public">Paste your <b>public</b> key here</label><br>
+      <label for="public">Paste your <b>public</b> key here</label>
     {{ form_rsa.public }}
-    </div>
     <div class="row">
       <label for="name">Key name</label>
       <div class="form-charfield">
       {{ form_rsa.name }}
       </div>
-      <input type="submit" value="Add">
+      <input class="btn-submit" type="submit" value="Add">
     </div>
     <form>
 </div>

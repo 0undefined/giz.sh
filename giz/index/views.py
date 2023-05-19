@@ -14,7 +14,8 @@ def index(request):
     context = {}
 
     if request.user.is_authenticated:
-        context['repositories'] = Repository.objects.filter(owner=request.user)
+        context['repositories'] = request.user.repos.all()
+        context['invites'] = request.user.collabs.all()
 
     return render(request, 'index/index.html', context=context)
 

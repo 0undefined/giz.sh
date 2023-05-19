@@ -1,20 +1,11 @@
 {% extends 'index/base.html' %}
 {% block STYLE %}
 <style>
-.visibility {
-  font-size: 9pt;
-  font-weight: 100;
-  color: var(--white);
-  float:right;
-  padding: var(--padding);
-  border: var(--border-sz) solid var(--white);
-  border-radius: var(--padding);
-}
 .remote {
   font-family: Courier New;
-  background-color: var(--green-light);
+  background-color: var(--color-hi-green);
   color: var(--color-bg);
-  border: var(--border-sz) solid var(--green);
+  border: var(--border);
   border-radius: var(--padding);
   padding: var(--padding);
   font-size: 9pt;
@@ -27,8 +18,8 @@
 
     <h3>{{ repository.name }}<span class="visibility">{{ repository.visibility_str }}</span></h3>
 
-    {% if tree.files|length > 0 or tree.dirs|length > 0 %}
     <hr>
+    {% if tree.files|length > 0 or tree.dirs|length > 0 %}
     Files
     <ul>
       {% for dir in tree.dirs %}
@@ -49,6 +40,8 @@
       <li>[f] {{ file.name }}</li>
       {% endfor %}
     </ul>
+    {% else %}
+    &nbsp;<i>Empty repository</i>
     {% endif %}
   </div>
   <div class="card">
@@ -73,7 +66,6 @@
   {% if collaborators %}
   <h4>Collaborators:</h4>
   <ul>
-    <li><a href="{% url 'users:profile' repository.owner %}">{{ repository.owner.username }}</a> (owner)</li>
     {% for c in collaborators %}
     <li><a href="{% url 'users:profile' c.user.username %}">{{ c.user.username }}</a></li>
     {% endfor %}

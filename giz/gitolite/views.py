@@ -13,7 +13,7 @@ from django_ratelimit.decorators import ratelimit
 
 from users.models import User
 from .models import Repository, Collaborator
-from .forms import Collaborator_form
+from .forms import Collaborator_form, RepositoryForm
 from .apps import git_get_readme_html, git_get_tree
 
 def get_object_or_404_ext(model, message, **kwargs):
@@ -46,7 +46,7 @@ class RepositoryView(DetailView):
         if user == owner:
             return repo
 
-        get_object_or_404_ext(Collaborator, exception404message, repo=repo, user=user)
+        get_object_or_404_ext(Collaborator, exception404message, repo=repo, user=user, accepted=True)
 
         return repo
 
@@ -54,7 +54,7 @@ class RepositoryView(DetailView):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
-        context['collaborators'] = Collaborator.objects.filter(repo=self.object)
+        context['collaborators'] = Collaborator.active.filter(repo=self.object)
         # Extend to /owner/repo/(blob|tree)/branch/filename url path (for files/dirs)
         # Extend to /owner/repo/(blob|tree)/branch url path (for branches)
         # Reminder: blob=file tree=dir
@@ -65,16 +65,13 @@ class RepositoryView(DetailView):
 
 @method_decorator(ratelimit(key='header:x-real-ip', rate='2/h', method='POST', block=True), name='post')
 class RepositoryCreate(LoginRequiredMixin, CreateView):
-    model = Repository
-    fields = ['owner', 'name', 'description', 'visibility']
+    form_class = RepositoryForm
     template_name = "gitolite/new.html"
-    #context_object_name = 'repository'
 
-
-    #def __init__(self, *args, **kwargs):
-    #    super(RepositoryCreate, self).__init__(*args, **kwargs)
-
-    #    self.fields['owner'].queryset = User.objects.filter(id=self.request.user.id)
+    def get_form_kwargs(self):
+        kwargs = super(RepositoryCreate, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
 # Returns the repository if the user has access to its settings
 def user_has_settings_access(owner, reponame, user):
@@ -88,7 +85,7 @@ def user_has_settings_access(owner, reponame, user):
     if user == owner:
         return repo
 
-    collab = Collaborator.objects.filter(repo=repo, user=user)
+    collab = Collaborator.active.filter(repo=repo, user=user)
     # if private && !collab = 404
     # if collab: repo
     # else permissiondenied
@@ -161,9 +158,8 @@ def AddCollaborator(request, owner, name):
         form.save()
     else:
         return HttpResponseRedirect(
-                reverse('gitolite:repo-settings-collabs',
-                        kwargs={'owner':owner.username, 'name': name},
-                        context={'error': form.errors}))
+            reverse('gitolite:repo-settings-collabs', kwargs={'owner':owner.username, 'name': name})
+        )  #context={'error': form.errors}
 
     return HttpResponseRedirect(reverse('gitolite:repo-settings-collabs',
                                         kwargs={'owner':owner.username,
@@ -189,3 +185,14 @@ def RemoveCollaborator(request, owner, name):
 
     return HttpResponseRedirect(reverse('gitolite:repo-settings-collabs'), context={'error':"Key not found"}, kwargs=args)
 
+
+@login_required
+def CollabResponse(request):
+    if request.method != 'POST':
+        return HttpResponseRedirect(reverse('index'))
+
+    post = request.POST.copy()
+    user = request.user
+    raise Exception(post)
+
+    return HttpResponseRedirect(reverse('gitolite:repo'), kwargs={'owner':repo.owner, 'name': repo.name})

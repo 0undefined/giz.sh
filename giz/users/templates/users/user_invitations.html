@@ -14,7 +14,20 @@
   color: var(--black-light);
 }
 ul.referrals {
-  text-decoration: none;
+  list-style: none;
+  padding: 0;
+  border: var(--border);
+  border-radius: var(--padding);
+}
+ul.referrals > li {
+  border-bottom: var(--border);
+  padding: var(--padding);
+}
+ul.referrals > li:first-child {
+  border-radius: var(--padding) var(--padding) 0 0;
+}
+ul.referrals > li:last-child {
+  border-bottom: none;
 }
 </style>
 {% endblock %}
@@ -34,7 +47,7 @@ ul.referrals {
     {% if invite.used %}
     <li><tt class="key_used">{{ invite.key }}</tt> used by <a href="{% url 'users:profile' invite.user.username %}">{{ invite.user.username }}</a></li>
     {% else %}
-    <li><tt class="key">{{ invite.key }}</tt> <i class="notinuse">not in use</i></li>
+    <li><tt class="key">{{ invite.key }}</tt>&nbsp;<i class="notinuse">not in use</i></li>
     {% endif %}
     {% endfor %}
   </ul>

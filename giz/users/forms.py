@@ -14,30 +14,30 @@ class SignupForm(UserCreationForm):
     invitationkey = CharField(label='Invitation key', required=True)
 
     RESERVED_USERNAMES = [
-            'about', 'account', 'accounts', 'admin', 'alias', 'all', 'api', 'app',
-            'apple', 'authentication', 'career', 'cd', 'ci', 'client', 'data',
-            'database', 'db', 'default', 'delete', 'dev', 'dir', 'discover',
-            'doc', 'docs', 'donate', 'donation', 'donations', 'edit', 'email',
-            'empty', 'example', 'explore', 'file', 'files', 'first', 'follow',
-            'form', 'forum', 'get', 'git', 'gitolite', 'group', 'groups', 'help',
-            'host', 'hosting', 'hostname', 'howto', 'html', 'info', 'issue',
-            'issues', 'job', 'jobs', 'legal', 'linux', 'log', 'login', 'logout',
-            'logs', 'mac', 'mail', 'main', 'master', 'media', 'member',
-            'members', 'message', 'messages', 'mfa', 'microsoft', 'new', 'new',
-            'news', 'nick', 'nickname', 'notification', 'notifications',
-            'notify', 'oauth', 'oauth_client', 'oauth_clients', 'offer',
-            'offers', 'official', 'old', 'online', 'organization', 'overview',
-            'owner', 'owners', 'page', 'pages', 'password', 'password1',
-            'password2', 'pop', 'pop3', 'post', 'press', 'price', 'privacy',
-            'private', 'profile', 'project', 'projects', 'promo', 'pub',
-            'pullrequest', 'pullrequests', 'recent', 'register', 'release',
-            'robots_txt', 'root', 'save', 'search', 'security', 'security_txt',
-            'server', 'service', 'session', 'settings', 'shop', 'show', 'signup',
-            'source', 'spec', 'star', 'static', 'store', 'subscribe', 'system',
-            'team', 'teams', 'terms_of_service', 'terms_ofservice',
-            'termsof_service', 'termsofservice', 'todo', 'tos', 'tree',
-            'tutorial', 'update', 'upgrade', 'upload', 'user', 'username',
-            'users', 'web', 'wiki', 'windows', 'www',
+            'about', 'account', 'accounts', 'admin', 'alias', 'all', 'api',
+            'app', 'apple', 'authentication', 'career', 'cd', 'ci', 'client',
+            'data', 'database', 'db', 'default', 'delete', 'dev', 'dir',
+            'discover', 'doc', 'docs', 'donate', 'donation', 'donations', 'edit',
+            'email', 'empty', 'example', 'explore', 'file', 'files', 'first',
+            'follow', 'follows', 'form', 'forum', 'get', 'git', 'gitolite',
+            'group', 'groups', 'help', 'host', 'hosting', 'hostname', 'howto',
+            'html', 'info', 'issue', 'issues', 'job', 'jobs', 'legal', 'linux',
+            'log', 'login', 'logout', 'logs', 'mac', 'mail', 'main', 'master',
+            'media', 'member', 'members', 'message', 'messages', 'mfa',
+            'microsoft', 'new', 'new', 'news', 'nick', 'nickname',
+            'notification', 'notifications', 'notify', 'oauth', 'oauth_client',
+            'oauth_clients', 'offer', 'offers', 'official', 'old', 'online',
+            'organization', 'overview', 'owner', 'owners', 'page', 'pages',
+            'password', 'password1', 'password2', 'pop', 'pop3', 'post', 'press',
+            'price', 'privacy', 'private', 'profile', 'project', 'projects',
+            'promo', 'pub', 'pullrequest', 'pullrequests', 'recent', 'register',
+            'release', 'robots_txt', 'root', 'save', 'search', 'security',
+            'security_txt', 'server', 'service', 'session', 'settings', 'shop',
+            'show', 'signup', 'source', 'spec', 'star', 'static', 'store',
+            'subscribe', 'system', 'team', 'teams', 'terms_of_service',
+            'terms_ofservice', 'termsof_service', 'termsofservice', 'todo',
+            'tos', 'tree', 'tutorial', 'update', 'upgrade', 'upload', 'user',
+            'username', 'users', 'web', 'wiki', 'windows', 'www',
     ]
 
     class Meta:
@@ -77,8 +77,20 @@ class SignupForm(UserCreationForm):
         user = super().save(commit=False)
 
         if user.is_superuser:
-            user.initial_invitations = 5;
-            user.initial_numgroups = 15;
+            user.initial_invitations = 5
+            user.initial_numgroups = 15
+        else:
+            invite = self.cleaned_data['invitationkey']
+            num_invites = 5
+            while not invite.referer.is_superuser and num_invites > 0:
+                num_invites = num_invites - 1
+                invite = Invitation.objects.get(user=invite.referer)
+
+            user.initial_invitations = num_invites
+            if num_invites > 1:
+                user.initial_numgroups = 1
+            else:
+                user.initial_numgroups = 0
 
         if commit:
             invite = self.cleaned_data['invitationkey']

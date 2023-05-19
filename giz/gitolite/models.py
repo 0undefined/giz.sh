@@ -1,6 +1,7 @@
 from django.core.validators import RegexValidator
 from django.conf import settings
 from django.db import models
+from django.utils.timezone import now
 from users.models import User
 from gitolite.apps import git_update_userrepos
 import os
@@ -31,6 +32,8 @@ class Repository(models.Model):
             max_length=128,
             default='master', blank=False)
 
+    forked_from = models.ForeignKey('self', null=True, default=None, on_delete=models.SET_NULL, related_name='forks')
+
     class Meta:
         unique_together = ('owner', 'name')
 
@@ -58,7 +61,7 @@ class Repository(models.Model):
         # TODO: apply more repo-specific settings
         if self.visibility == Repository.Visibility.PUBLIC:
             conf +=  "\n\t" + Collaborator.Permissions.choices[Collaborator.Permissions.READ][1] + "\t=\t@all"
-        collabs = Collaborator.objects.filter(repo=self)
+        collabs = Collaborator.active.filter(repo=self)
         for c in collabs:
             conf += "\n\t" + c.permission_str() + "\t=\t" + c.user.username
 
@@ -75,8 +78,22 @@ class Repository(models.Model):
 
     def save(self, *args, **kwargs):
         repo = super(Repository, self).save(*args, **kwargs)
+        if self.forked_from is not None and self.forked_from.id == self.id:
+            raise Exception("Cannot be forked from oneself")
         git_update_userrepos(self.owner)
         return repo
+
+
+class CollaboratorManager(models.Manager):
+    use_in_migrations = True
+    def get_queryset(self):
+        return super().get_queryset().filter(accepted=True)
+
+class DefaultCollaboratorManager(models.Manager):
+    use_in_migrations = True
+    def get_queryset(self):
+        return super().get_queryset()
+
 
 class Collaborator(models.Model):
     class Permissions(models.IntegerChoices):
@@ -88,6 +105,11 @@ class Collaborator(models.Model):
     user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='collabs')
     repo = models.ForeignKey(Repository, null=False, on_delete=models.CASCADE, related_name='collabs')
     perm = models.IntegerField(choices=Permissions.choices, default=Permissions.NO_PERM)
+    accepted = models.BooleanField(default=False)
+    accepted_date = models.DateTimeField(auto_now_add=False, null=True, default=None)
+
+    objects = DefaultCollaboratorManager()
+    active = CollaboratorManager()  # Defaults to filtering out unaccepted ones
 
     # TODO: Add an _optional_ 'ref' field, s.t. we can create a config according
     # to the following gitolite config:
@@ -106,6 +128,12 @@ class Collaborator(models.Model):
 
     class Meta:
         unique_together = ('user', 'repo')
+
+    def accept(self, decline=False):
+        self.accepted = not decline
+        self.accepted_date = now()
+        self.save()
+        git_update_userrepos(self.repo.owner)
 
     def permission_str(self):
         return self.Permissions.choices[self.perm][1]
@@ -128,8 +156,34 @@ class Collaborator(models.Model):
         git_update_userrepos(self.repo.owner)
 
         return collab
-    # TODO: override save() to commit permissions to repository in gitolite beforehand
-    # TODO: override save() to check if collaboration permissions already exists
+
+    def delete(self):
+        owner = self.repo.owner
+        accepted = self.accepted
+
+        super(Collaborator, self).delete()
+
+        # Update the repo permissions when deleting collabs,
+        # if they have been accepted.
+        if accepted:
+            git_update_userrepos(owner)
+
+
+# SO-ME features
+class WatchRepository(models.Model):
+    user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='watching')
+    repo = models.ForeignKey(Repository, null=False, on_delete=models.CASCADE, related_name='watchers')
+
+    class Meta:
+        unique_together = ('user', 'repo')
+
+
+class Star(models.Model):
+    user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='stars')
+    repo = models.ForeignKey(Repository, null=False, on_delete=models.CASCADE, related_name='stars')
+
+    class Meta:
+        unique_together = ('user', 'repo')
 
 
 # TODO:

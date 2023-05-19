@@ -61,7 +61,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     def get_absolute_url(self):
-        return reverse('users:profile', kwargs={'user': self.username})
+        return reverse('users:profile', kwargs={'username': self.username})
 
     class Meta():
         db_table='auth_user'
@@ -170,3 +170,12 @@ class OrganizationTeamMember(models.Model):
 
     user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='teams')
     organization = models.ForeignKey(OrganizationTeam, null=False, on_delete=models.CASCADE, related_name='members')
+
+
+class UserFollower(models.Model):
+    follower = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='following')
+    following = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='followers')
+    since = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('follower', 'following')

@@ -1,16 +1,37 @@
 {% extends 'index/base.html' %}
+{% load static %}
 {% block TITLE %}{{ user }}{% endblock %}
 
 {% block STYLE %}
 <style>
-.visibility {
-  font-size: 9pt;
-  font-weight: 100;
-  color: var(--white);
-  float:right;
-  padding: var(--padding);
-  border: var(--border-sz) solid var(--white);
+div.leftcontent > div.card > div.userinfo-container {
+  display:flex;
+  flex-direction:row;
+  align-items:end;
+  gap:var(--padding);
+}
+div.leftcontent > div.card > div.userinfo-container > img.pp {
+  width: 8pc;
+  height: 8pc;
+  image-rendering: crisp-edges;
+  border: var(--border);
   border-radius: var(--padding);
+  display:inline;
+}
+div.leftcontent > div.card > div.userinfo-container > div.usernameinfo > span.name {
+  font-size: 16pt;
+}
+div.leftcontent > div.card > div.userinfo-container > div.usernameinfo > span.username {
+  font-size: 12pt;
+  color: var(--black-light);
+}
+div.leftcontent > div.card > div.userinfo-container > div.usernameinfo {
+  display:flex;
+  flex-direction:column;
+}
+div.leftcontent > div.card > form.form {
+  margin-top: var(--padding);
+  margin-bottom: var(--padding);
 }
 .repocontainer {
   display:flex;
@@ -35,31 +56,62 @@
 .language {
 }
 a.newrepo {
-  background-color: var(--green);
-  color: var(--color-bg);
-  border: var(--border-sz) solid var(--green-light);
-  border-radius: var(--padding);
   font-size: var(--font-sz-normal);
   font-weight: 400;
-
   float:right;
-  padding: var(--padding);
-  margin: var(--padding);
 }
 </style>
 {% endblock %}
 
 {% block CONTENT  %}
-<div class="leftcontent card">
-  [ProfilePic]
-  <h4>{{ user.username }}</h4>
-  {% if user.bio|length > 0 %}
-  <hr>
-  <p>{{ user.bio }}</p>
+<div class="leftcontent">
+  <div class="card">
+    <div class="userinfo-container">
+      <img class="pp" src="{% static 'users/box.png' %}">
+      <div class="usernameinfo">
+        {% if user.name %}
+        <span class="name">{{ user.name }}</span>
+        {% endif %}
+        <span class="username">@{{ user.username }}</span>
+      </div>
+    </div>
+    {% if request.user != user and request.user.is_authenticated %}
+    {# TODO: check if user already follows #}
+    <form action="{% url 'users:settings-follow' %}" method="post" class="form">{% csrf_token %}
+      <input type="hidden" class="hidden" name="user" value="{{ user }}">
+      {% if is_following %}
+      <input type="submit" name="unfollow" value="Unfollow">
+      {% else %}
+      <input type="submit" name="follow" value="Follow">
+      {% endif %}
+    </form>
+    {% endif %}
+    {% if user.bio|length > 0 %}
+    <hr>
+    <p>{{ user.bio }}</p>
+    {% endif %}
+  </div>
+  {% if followers  or following or organizations %}
+  <div class="card">
+    {% if followers or following %}
+    {{ followers }} Followers | {{ following }} Following<br>
+    {% endif %}
+    {% if organizations %}
+    Organizations<br>
+    {% for org in organizations %}
+    {{ org.displayname }}<br>
+    {% endfor %}
+    {% endif %}
+  </div>
+  {% endif %}
+  {% if request.user.is_authenticated and request.user == user %}
+  <div class="card">
+    <a href="{% url 'users:settings' %}">Settings</a>
+  </div>
   {% endif %}
 </div>
 <div class="maincontent card">
-  <h2>Repositories<a class="newrepo" href="{% url 'gitolite:repo_new' %}">New</a></h2>
+  <h2>Repositories<a class="newrepo btn-submit" href="{% url 'gitolite:repo_new' %}">New</a></h2>
   <hr>
   {% if repositories %}
   <div class="repocontainer">
@@ -76,8 +128,5 @@ a.newrepo {
   {% else %}
   No repositories yet
   {% endif %}
-</div>
-<div class="rightcontent card">
-  right content
 </div>
 {% endblock %}

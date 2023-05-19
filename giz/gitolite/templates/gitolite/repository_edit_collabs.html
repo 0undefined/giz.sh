@@ -14,23 +14,24 @@
   gap: var(--padding);
   align-items: center;
 
-  margin: var(--padding);
   padding: var(--padding);
 
-  border: var(--border);
+  /*border: var(--border);*/
+  background-color: var(--color-quinary);
   border-radius: var(--padding);
 }
 .permlist div a {
   flex-grow: 1;
 }
+/*
 .permlist div input {
   margin-right: var(--padding) !important;
 }
+*/
 .perms {
   padding: var(--padding);
   min-width: 4pc;
 
-  border: var(--border);
   border-radius: var(--padding);
   font-weight: 600;
 
@@ -48,6 +49,14 @@
 }
 .perms.readwriteplus {
   background-color: var(--yellow);
+}
+.pending {
+  color: var(--black-light);
+  font-style: italic;
+}
+.accepted_date {
+  color: var(--black-light);
+  font-size: var(--font-sz-small);
 }
 </style>
 {% endblock %}
@@ -67,7 +76,7 @@
       </div>
       {{ addform.perm.label }}
       {{ addform.perm }}
-      <input type="submit" value="Invite">
+      <input type="submit" class="btn-submit" value="Invite">
     </div>
   </form>
 
@@ -79,7 +88,9 @@
     <div>
       <span class="perms {{c.permission_str_long}}">{{c.permission_str}}</span>
       <a href="{% url 'users:profile' c.user.username %}">{{ c.user.username }}</a>
-      <input name="{{ c.id }}" type="submit" class="delete" value="Remove"/>
+      {% if not c.accepted %}<span class="pending">pending</span>
+      {% else %}<span class="accepted_date">{{ c.accepted_date|date:"Y-m-d G:i" }}</span>{% endif %}
+      <input name="{{ c.id }}" type="submit" class="btn-delete" value="Remove"/>
     </div>
     {% endfor %}
   </form>

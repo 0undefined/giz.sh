@@ -15,12 +15,12 @@ from django_ratelimit.decorators import ratelimit
 from django.utils.decorators import method_decorator
 
 
-from .models import RSA_Key, Invitation
+from .models import RSA_Key, Invitation, Organization, UserFollower
 from .forms import RSA_KeyForm
 from . import forms
 User = get_user_model()
 
-from gitolite.models import Repository
+from gitolite.models import Repository, Collaborator
 
 
 def Users(request):
@@ -38,6 +38,7 @@ class UserView(DetailView):
         repos = (
             # Get both own repos and collab repos
             Repository.objects.filter(owner=self.object) | Repository.objects.filter(collabs__user=self.object)
+        # TODO: Filter out unaccepted collabs
         ).prefetch_related('collabs').annotate(collab_count=Count('collabs'))
 
         # If this is not the owner, show only public & collaboration repos
@@ -51,8 +52,16 @@ class UserView(DetailView):
                 )
             )
 
+        organizations = Organization.objects.filter(members__user=self.object)
 
         context['repositories'] = repos.order_by('date_created')
+        context['organizations'] = organizations
+
+        follows = UserFollower.objects.filter(following=self.object) | UserFollower.objects.filter(follower=self.object)
+
+        context['followers'] = follows.filter(following=self.object).count()
+        context['following'] = follows.filter(follower=self.object).count()
+        context['is_following'] = follows.filter(follower=self.request.user).count() > 0
         return context
 
     def get_object(self):
@@ -155,3 +164,59 @@ def Signup(request):
                 'form': form,
             })
     return render(request, 'users/signup.html', context=context)
+
+
+@login_required
+def CollabResponse(request):
+    if request.method != 'POST':
+        return HttpResponseRedirect(reverse('index'))
+
+    userobj = get_object_or_404(User, id=request.user.id)
+    post = request.POST.copy()
+    collab_id = int(post.get('collab_id'))
+
+    collab = get_object_or_404(Collaborator, id=collab_id)
+    repo = collab.repo
+
+    accept = False
+    decline = False
+
+    for label,value in post.dict().items():
+        if label == 'accept' or value == 'accept':
+            accept = True
+        if label == 'decline' or value == 'decline':
+            decline = True
+
+    if accept == decline:
+        raise Exception("that does not make any sense")
+
+    if accept:
+        collab.accept()
+
+        return HttpResponseRedirect(repo.get_absolute_url())
+    else:
+        collab.delete()
+
+    return HttpResponseRedirect(reverse('index'))
+
+
+@login_required
+def Follow(request):
+    if request.method != 'POST':
+        return HttpResponseRedirect(reverse('index'))
+
+    follower = get_object_or_404(User, id=request.user.id)
+    post = request.POST.copy()
+
+    following = get_object_or_404(User, username=post.get('user', None))
+
+    if post.get('follow', False):
+        f = UserFollower(follower=follower, following=following)
+        f.save()
+    else:
+        f = get_object_or_404(UserFollower, follower=follower, following=following)
+        f.delete()
+
+    #raise Exception({'ff': f, 'post':post})
+
+    return HttpResponseRedirect(following.get_absolute_url())

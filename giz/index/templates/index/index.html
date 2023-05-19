@@ -1,46 +1,24 @@
 {% extends 'index/base.html' %}
+
 {% block STYLE %}
 <style>
-ul li {
-      list-style: none;
+.invitation_prompt {
+  list-style: none;
+  padding: 0;
 }
-a {
-  color: var(--color-fg);
-}
-.navcontainer a.nav-text-a {
-  padding: var(--padding);
-}
-form.reposearch input[type="text"] {
-  border: var(--border-sz) solid var(--white);
-  border-radius: var(--padding);
-  padding: var(--padding);
-  background-color: var(--black);
-  color: var(--white);
+.invitation_prompt > li > form.form > div.row > input {
+  flex-grow:1;
 }
 </style>
-{% endblock %}
-
-{% block EXTRANAV %}
-<a class="nav-text-a" href="{% url 'discover' %}">Discover</a>
-<a class="nav-text-a" href="#">Pull requests</a>
-<a class="nav-text-a" href="#">Issues</a>
 {% endblock %}
 
 {% block CONTENT %}
 {% if request.user.is_authenticated %}
 <div class="leftcontent card">
-      [ProfilePic]
-      <a href="{% url 'users:profile' request.user.username %}">
-        {% if request.user.is_superuser %}
-        <i class="is_admin fas fa-star"></i>
-        {% endif %}<span class="username">{{ request.user.get_username }}</span>
-      </a>
+      <h4>Quick Links</h4>
       <ul>
-        <li><a href="{% url 'users:settings' %}">Settings</a></li>
-        <li><a href="{% url 'users:profile' request.user.username %}">Repositories</a></li>
+        <li><a href="{% url 'users:profile' request.user.username %}">Profile</a></li>
         <li><a href="#">Bookmarks</a></li>
-        <li><a href="#">Documentation</a></li>
-        <li><a href="{% url 'users:logout' %}">Logout</a></li>
       </ul>
       {% if repositories %}
       <hr>
@@ -56,64 +34,62 @@ form.reposearch input[type="text"] {
 {% endif %}
 <div class="maincontent">
   <div class="card">
-    <h2>To do:</h2>
-
+    <h2>Features</h2>
     <ul>
-      <li><input type="checkbox" checked="" disabled="" /> Make markdown script for checkboxes in readmes</li>
-      <li><input type="checkbox" checked="" disabled="" /> Create DB entries for gitolite</li>
-      <li><input type="checkbox" checked="" disabled="" /> Reflect upon those entries</li>
-      <li><input type="checkbox" checked="" disabled="" /> Add key support</li>
-      <li><input type="checkbox" checked="" disabled="" /> Edit key-repository and commit and push</li>
-      <li><input type="checkbox" checked="" disabled="" /> Profile page</li>
-      <li><input type="checkbox" disabled="" /> Upload files, profile pictures, etc.</li>
-      <li><input type="checkbox" disabled="" /> Migrate from other platforms (fork, kind of)</li>
-      <li><input type="checkbox" disabled="" /> Loading DB from existing gitolite configuration</li>
-      <li><input type="checkbox" disabled="" /> Implement Search
-        <em>apparently it already works by adding GET parameters to the root url <code>/</code></em></li>
+      <li>Invite people to collaborate on your repositories</li>
+      <li>Show readmes from repositories on their index page</li>
+      <li>Repositories are private by default</li>
+      <li>Gitolite backend</li>
+      <li>No tacking or advertising</li>
+      <li>javascript is not needed any of the features</li>
+      <li>Lightweight <i>giz is just a web frontend for gitolite</i></li>
+      <li>Personalized user profiles (<i>needs rework</i>)</li>
     </ul>
+    <h2>Roadmap</h2>
+    <ul>
+      <li><b>Project management</b></li>
+      <ul>
+        <li>Issues<ul><li>Tags to organize said issues</li></ul></li>
+        <li>Pull requests</li>
+        <li>Automatically generate wikis from a repositoriys docs</li>
+        <li>Per-ref permissions</li>
+        <li>Code insights &amp; analytics</li>
+        <li>Per repo configurable number of required reviewers for pull requests</li>
+      </ul>
+      <li>Organizations
+        <ul>
+          <li>Subdivide organization members into teams</li>
+          <li>Manage per team-member permissions</li>
+          <li>Manage per org-member permissions</li>
+        </ul>
+      </li>
+      <li>Configurable notifications regarding activity</li>
+      <li>All features available from CLI</li>
+    </ul>
+    <h2>Getting access</h2>
+    Currently giz is in its early beta and is not open for registrations.<br>
+    Evidently, there's still a lot more to do <tt>:^)</tt>
   </div>
-<div class="card">
-  <h2>Activity</h2>
-  <h4>Todo</h4>
-
-  <i><b>Activity feed</b><br>
-  Briefly describe activity in {request.user}s repos, or collaborating repos</i>
-  <ul>
-    <li><input type="checkbox" disabled="" /> Update DB with activity from owned repositories (activity from users/bots)</li>
-    <li><input type="checkbox" disabled="" /> Update DB with activity from collaborating repositories</li>
-    <li><input type="checkbox" disabled="" /> Update DB with activity from followed users</li>
-    <li><input type="checkbox" disabled="" /> Update DB with activity from starred repositories</li>
-    <li><input type="checkbox" disabled="" /> Group activity by repo, collect commits, Issues, pull requests</li>
-    <li><input type="checkbox" disabled="" /> User defined filter, by repo, user, type ( (issue)|(pullrequest) )</li>
-  </ul>
-
 </div>
-<div class="card">
-  <h2>Lorem</h2>
-  <h3>Ipsum</h3>
-
-  <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Enim ut sem viverra aliquet eget sit amet tellus. Quam vulputate dignissim suspendisse in est ante in nibh mauris. Sit amet nisl suscipit adipiscing bibendum est ultricies integer. Purus in massa tempor nec feugiat nisl pretium fusce id. Sem viverra aliquet eget sit amet. Est velit egestas dui id ornare arcu. Varius sit amet mattis vulputate. Tincidunt praesent semper feugiat nibh. In metus vulputate eu scelerisque felis. Nisl purus in mollis nunc sed id semper risus. Lorem ipsum dolor sit amet consectetur adipiscing elit. Sed libero enim sed faucibus turpis in eu mi bibendum. Aenean euismod elementum nisi quis eleifend quam adipiscing. Lectus quam id leo in vitae turpis massa sed elementum. Sem viverra aliquet eget sit amet tellus cras. Consectetur adipiscing elit pellentesque habitant morbi tristique senectus et. Est sit amet facilisis magna etiam tempor orci. Leo duis ut diam quam nulla porttitor massa. Vitae sapien pellentesque habitant morbi tristique senectus et. </p>
-  <p> In eu mi bibendum neque egestas. A pellentesque sit amet porttitor eget dolor morbi non arcu. Ipsum a arcu cursus vitae. Dapibus ultrices in iaculis nunc. Porta nibh venenatis cras sed felis eget velit. Condimentum vitae sapien pellentesque habitant morbi tristique senectus et. Massa id neque aliquam vestibulum. Tincidunt ornare massa eget egestas purus viverra. Aliquet porttitor lacus luctus accumsan tortor posuere. Cursus euismod quis viverra nibh cras pulvinar mattis nunc sed. Convallis aenean et tortor at. Cras sed felis eget velit aliquet sagittis id consectetur purus. Eu feugiat pretium nibh ipsum consequat nisl vel pretium lectus. Nec feugiat in fermentum posuere. Volutpat sed cras ornare arcu dui vivamus arcu. Egestas pretium aenean pharetra magna ac placerat vestibulum lectus. Egestas dui id ornare arcu. Nunc eget lorem dolor sed viverra ipsum nunc aliquet. </p>
-  <p> Elit ullamcorper dignissim cras tincidunt lobortis. Pellentesque elit ullamcorper dignissim cras tincidunt lobortis feugiat. Pellentesque massa placerat duis ultricies lacus sed turpis tincidunt id. Amet facilisis magna etiam tempor orci eu lobortis elementum. Sagittis nisl rhoncus mattis rhoncus. Auctor urna nunc id cursus metus aliquam eleifend mi in. Tincidunt praesent semper feugiat nibh sed pulvinar. Ultrices tincidunt arcu non sodales neque sodales ut etiam. Augue mauris augue neque gravida in. Elementum nibh tellus molestie nunc. Rutrum tellus pellentesque eu tincidunt tortor aliquam nulla facilisi. Leo a diam sollicitudin tempor. Nisl pretium fusce id velit ut. Odio ut sem nulla pharetra diam sit amet nisl suscipit. Ipsum nunc aliquet bibendum enim. Enim lobortis scelerisque fermentum dui. </p>
-  <p> Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Suspendisse ultrices gravida dictum fusce ut placerat orci nulla. Sit amet mattis vulputate enim nulla aliquet porttitor lacus. Id diam vel quam elementum pulvinar etiam. Urna et pharetra pharetra massa massa ultricies mi. Sed tempus urna et pharetra pharetra massa massa ultricies. Vel quam elementum pulvinar etiam non quam lacus suspendisse faucibus. Amet porttitor eget dolor morbi non arcu. Magna sit amet purus gravida quis blandit turpis cursus in. Lacus vestibulum sed arcu non odio. Dignissim convallis aenean et tortor at risus viverra. Tincidunt tortor aliquam nulla facilisi cras fermentum. Congue mauris rhoncus aenean vel elit. Dui faucibus in ornare quam. Eget nullam non nisi est sit amet facilisis. Scelerisque fermentum dui faucibus in ornare quam. Cras ornare arcu dui vivamus arcu. </p>
-  <p> Risus feugiat in ante metus dictum at tempor commodo ullamcorper. Donec massa sapien faucibus et molestie ac feugiat. Amet consectetur adipiscing elit pellentesque habitant. Rhoncus urna neque viverra justo nec. Amet consectetur adipiscing elit ut aliquam purus sit amet. Egestas sed sed risus pretium quam vulputate dignissim. Facilisi etiam dignissim diam quis enim lobortis. Purus semper eget duis at tellus at urna condimentum. In hendrerit gravida rutrum quisque non tellus orci ac. Purus non enim praesent elementum facilisis leo vel fringilla. Nisi quis eleifend quam adipiscing vitae proin sagittis nisl rhoncus. Tempus iaculis urna id volutpat. Auctor urna nunc id cursus metus. Urna nunc id cursus metus aliquam eleifend mi. Euismod elementum nisi quis eleifend quam adipiscing vitae proin. Ultricies mi eget mauris pharetra et ultrices. Neque egestas congue quisque egestas diam in arcu cursus euismod. Sed odio morbi quis commodo odio. Venenatis a condimentum vitae sapien pellentesque. </p>
-  <p> Risus quis varius quam quisque id diam vel quam elementum. Aliquet porttitor lacus luctus accumsan. Sit amet mattis vulputate enim nulla aliquet porttitor lacus luctus. Tincidunt lobortis feugiat vivamus at augue eget arcu dictum varius. Bibendum at varius vel pharetra vel. Consectetur a erat nam at lectus urna duis. Orci a scelerisque purus semper eget duis at tellus at. Id interdum velit laoreet id donec. Leo vel orci porta non pulvinar neque laoreet. Tristique sollicitudin nibh sit amet commodo. Amet purus gravida quis blandit. </p>
-  <p> Scelerisque fermentum dui faucibus in ornare quam viverra. Id diam maecenas ultricies mi eget. Purus non enim praesent elementum facilisis leo vel fringilla. At auctor urna nunc id cursus metus aliquam. Gravida in fermentum et sollicitudin ac orci phasellus egestas tellus. Risus in hendrerit gravida rutrum quisque non tellus orci ac. Tortor dignissim convallis aenean et tortor at risus viverra. Lacus luctus accumsan tortor posuere ac ut consequat. Sit amet commodo nulla facilisi nullam vehicula ipsum a arcu. Dignissim convallis aenean et tortor at risus viverra adipiscing at. </p>
-  <p> Lectus urna duis convallis convallis tellus id interdum velit. Magna fringilla urna porttitor rhoncus. Sed risus ultricies tristique nulla aliquet enim tortor. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Id aliquet lectus proin nibh nisl condimentum id. Scelerisque viverra mauris in aliquam sem fringilla ut morbi tincidunt. Purus semper eget duis at. Dolor sit amet consectetur adipiscing elit pellentesque. Nunc mattis enim ut tellus elementum sagittis vitae et. Bibendum enim facilisis gravida neque. Adipiscing bibendum est ultricies integer. Lectus nulla at volutpat diam ut. Morbi non arcu risus quis varius quam quisque id diam. Bibendum arcu vitae elementum curabitur vitae nunc sed. Non quam lacus suspendisse faucibus interdum posuere. At auctor urna nunc id cursus metus aliquam eleifend mi. </p>
-  <p> Viverra suspendisse potenti nullam ac tortor vitae. Mauris pharetra et ultrices neque. Imperdiet massa tincidunt nunc pulvinar sapien et ligula ullamcorper malesuada. Placerat orci nulla pellentesque dignissim enim. In cursus turpis massa tincidunt dui ut ornare lectus. Natoque penatibus et magnis dis. Ut ornare lectus sit amet est placerat in egestas erat. Ullamcorper sit amet risus nullam eget felis eget nunc lobortis. Eleifend quam adipiscing vitae proin sagittis. Neque vitae tempus quam pellentesque nec. Dapibus ultrices in iaculis nunc sed augue lacus viverra vitae. Risus sed vulputate odio ut enim blandit volutpat maecenas volutpat. Hac habitasse platea dictumst quisque sagittis. Tincidunt praesent semper feugiat nibh sed. Nisi scelerisque eu ultrices vitae. </p>
-  <p> Proin nibh nisl condimentum id venenatis. Enim ut sem viverra aliquet eget sit amet tellus. Sed risus pretium quam vulputate dignissim suspendisse in est. Porttitor rhoncus dolor purus non enim praesent. Ullamcorper a lacus vestibulum sed arcu non odio euismod. Tincidunt lobortis feugiat vivamus at augue eget arcu. A scelerisque purus semper eget duis at tellus at. Nunc lobortis mattis aliquam faucibus purus in massa tempor nec. Aliquet risus feugiat in ante metus dictum at tempor commodo. Volutpat commodo sed egestas egestas fringilla phasellus faucibus scelerisque. Ac turpis egestas maecenas pharetra convallis posuere morbi leo urna. </p>
-  <p> Accumsan in nisl nisi scelerisque eu ultrices vitae. Blandit volutpat maecenas volutpat blandit aliquam. Vulputate odio ut enim blandit volutpat maecenas volutpat blandit. Proin fermentum leo vel orci porta. Enim facilisis gravida neque convallis a cras semper auctor neque. Et ligula ullamcorper malesuada proin libero nunc consequat interdum varius. Venenatis lectus magna fringilla urna porttitor rhoncus dolor purus. Tristique senectus et netus et malesuada fames ac. Urna condimentum mattis pellentesque id nibh. Ipsum dolor sit amet consectetur adipiscing elit duis tristique. Dictumst quisque sagittis purus sit. Quisque egestas diam in arcu cursus euismod quis. Nulla aliquet enim tortor at auctor. Pellentesque pulvinar pellentesque habitant morbi tristique senectus et. </p>
-  <p> Posuere urna nec tincidunt praesent semper feugiat nibh sed. Nibh nisl condimentum id venenatis a condimentum vitae sapien. In hac habitasse platea dictumst vestibulum. Tellus at urna condimentum mattis pellentesque id nibh. Purus in mollis nunc sed. Vitae elementum curabitur vitae nunc sed velit. Adipiscing commodo elit at imperdiet dui. Lorem dolor sed viverra ipsum nunc aliquet. Neque gravida in fermentum et sollicitudin ac orci. Luctus venenatis lectus magna fringilla urna. Molestie at elementum eu facilisis sed odio morbi quis commodo. </p>
-
-</div>
-</div>
+{% if request.user.is_authenticated %}
 <div class="rightcontent card">
   <h4>Notifications</h4>
-  <ul>
-    <li>Notification #1</li>
-    <li>Notification #2</li>
-    <li>Notification #3</li>
-    <li>Notification #4</li>
-  </ul>
+    {% if invites %}
+    <h5>Invitations to collaborate</h5>
+    <ul class="invitation_prompt">
+    {% for invite in invites %}
+    <li class="card">
+    <form action="{% url 'users:settings-collab' %}" method="post" class="form">{% csrf_token %}
+      <a href="{% url 'gitolite:repo' invite.repo.owner invite.repo.name %}">{{ invite.repo }}</a>
+      <div class="row">
+      <input name="collab_id" type="hidden" class="hidden" value="{{invite.id}}"/>
+      <input name="accept" type="submit" class="btn-submit" value="accept"/><input name="decline" type="submit" class="btn-delete" value="decline"/>
+      </div>
+    </form>
+    </li>
+    </ul>
+    {% endfor %}
+    {% endif %}
 </div>
+{% endif %}
 {% endblock %}
