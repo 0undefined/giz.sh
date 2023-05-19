@@ -31,57 +31,79 @@ div.maincontent > div.tabs > a.btn:hover {
   background-color: var(--color-second);
   transition: ease 0.25s;
 }
+div.maincontent > div.card > div.filelist {
+  display:flex;
+  flex-direction: column;
+  /*align-items: center;*/
+  gap: var(--padding);
+}
+div.maincontent > div.card > div.filelist > div {
+  display:flex;
+  flex-direction: row;
+  gap: var(--padding);
+  align-items:center;
+}
+div.maincontent > div.card > div.filelist > div > i {
+  width: 2pc;
+  text-align:right;
+}
+div.maincontent > div.card > div.filelist > div > span.filename {
+  flex-grow:1;
+}
 </style>
 {% endblock %}
 {% block CONTENT %}
 <div class="maincontent">
-  <div class="card">
-    <h3><a >{{ repository.owner }}</a>/<a >{{ repository.name }}</a></h3>
-    <span class="star"><i class="fas fa-star"></i>{{ repository.stars|length }}</span>
-    <span class="watch"><i class="fas fa-eye"></i>{{ repository.watchers|length }}</span>
-    <span class="forks"><i class="fas fa-code-branch"></i>{{ repository.forks|length }}</span>
-    <span class="visibility">{{ repository.visibility_str }}</span>
-  </div>
-  <div class="tabs">
-    <a class="btn card active-tab">Code</a>
-    <a class="btn card">Issues</a>
-    <a class="btn card">Pull requests</a>
-  </div>
-  <div class="card">
-    {% if collaborators_pending|length == 0 %}
-    {% if tree.files|length > 0 or tree.dirs|length > 0 %}
-    Files
-    <ul>
-      {% for dir in tree.dirs %}
-      {% if dir.path %}
-        {% if dir.object.type == 'tree' %}
-        <li>[d] {{ dir.path }}
-        {% elif dir.object.type == 'blob' %}
-        <li>[f] {{ dir.path }}
-        {% else %}{# This is just a Tree|Blob object #}
-        <li>[d] {{ dir.name }}
-        {% endif %}
-      {% else %}
-        <li>[d] -- {{ dir.name }}
+<div class="card">
+  <h3><a >{{ repository.owner }}</a>/<a >{{ repository.name }}</a></h3>
+  <span class="star"><i class="fas fa-star"></i>{{ repository.stars|length }}</span>
+  <span class="watch"><i class="fas fa-eye"></i>{{ repository.watchers|length }}</span>
+  <span class="forks"><i class="fas fa-code-branch"></i>{{ repository.forks|length }}</span>
+  <span class="visibility">{{ repository.visibility_str }}</span>
+</div>
+<div class="tabs">
+  <a class="btn card active-tab">Code</a>
+  <a class="btn card">Issues</a>
+  <a class="btn card">Pull requests</a>
+  <a class="btn card">Releases</a>
+  <a class="btn card">Analytics</a>
+</div>
+<div class="card">
+  {% if collaborators_pending|length == 0 %}
+  {% if tree.files|length > 0 or tree.dirs|length > 0 %}
+  <!--<a class="btn card">Revision</a><!--open branches / tags -->
+  <h4>Files</h4>
+  <div class="filelist">
+    {% for dir in tree.dirs %}
+    {% if dir.path %}
+      {% if dir.object.type == 'tree' %}
+      <div class="directory"><i class="fas fa-folder-plus"></i><span class="filename">{{ dir.path }}</span>
+      {% elif dir.object.type == 'blob' %}
+      <div class="directory"><i class="fas fa-file"></i><span class="filename">{{ dir.path }}</span>
+      {% else %}{# This is just a Tree|Blob object #}
+      <div class="directory"><i class="fas fa-folder"></i><span class="filename">{{ dir.name }}</span>
       {% endif %}
-      </li>
-      {% endfor %}
-      {% for file in tree.files %}
-      <li>[f] {{ file.name }}</li>
-      {% endfor %}
-    </ul>
-    {% else %}<i>Empty repository</i>{% endif %}
-    {% else %}<p><i class="fas fa-lock"></i> Locked content</p>{% endif %}
+    {% else %}
+      <div>[d] -- {{ dir.name }}
+    {% endif %}
+    </div>
+    {% endfor %}
+    {% for file in tree.files %}
+    <div class="file"><i class="fas fa-file"></i><span class="filename">{{ file.name }}</span></div>
+    {% endfor %}
   </div>
-  <div class="card">
-  {% if readme %}
-  <hr>
-  [...] README.md<br>
-  {{ readme|safe }}
-  {% else %}
-  No readme yet!
-  {% endif %}
-  </div>
+  {% else %}<i>Empty repository</i>{% endif %}
+  {% else %}<p><i class="fas fa-lock"></i> Locked content</p>{% endif %}
+</div>
+<div class="card">
+{% if readme %}
+<i class="fas fa-list-ul"></i> README.md
+<hr>
+{{ readme|safe }}
+{% else %}
+No readme yet!
+{% endif %}
+</div>
 </div>
 <div class="rightcontent">
   {% if collaborators_pending|length > 0 %}
@@ -104,18 +126,10 @@ div.maincontent > div.tabs > a.btn:hover {
 <p>{{ repository.description }}</p>
 {% endif %}
   <div class="remote">{{ repository.get_remote_url }}</div><br>
-  {% if repository.owner == request.user %}
-  <a href="{% url 'gitolite:repo-settings' repository.owner repository.name %}">Settings</a>
-  {% endif %}
-  {% if collaborators %}
+  <a href="#">Latest release</a><br>
+  {% if repository.owner == request.user %}<a href="{% url 'gitolite:repo-settings' repository.owner repository.name %}">Settings</a>{% endif %}
 </div>
-<div class="card">
-  <ul>
-    <li><a href="#">Code</a></li>
-    <li><a href="#">Issues</a></li>
-    <li><a href="#">Pull requests</a></li>
-  </ul>
-</div>
+{% if collaborators %}
 <div class="card">
   <h4>Collaborators:</h4>
   <ul>
@@ -123,7 +137,7 @@ div.maincontent > div.tabs > a.btn:hover {
     <li><a href="{% url 'users:profile' c.user.username %}">{{ c.user.username }}</a></li>
     {% endfor %}
   </ul>
-  {% endif %}
 </div>
+{% endif %}
 </div>
 {% endblock %}
