@@ -39,29 +39,37 @@ class UserView(DetailView):
             # Get both own repos and collab repos
             Repository.objects.filter(owner=self.object) | Repository.objects.filter(collabs__user=self.object)
         # TODO: Filter out unaccepted collabs
-        ).prefetch_related('collabs').annotate(collab_count=Count('collabs'))
+        ).prefetch_related('collabs').annotate(
+            collab_count=Count('collabs')
+        )
 
+
+        if not self.request.user.is_authenticated:
+            repos = repos.filter(visibility=Repository.Visibility.PUBLIC)
         # If this is not the owner, show only public & collaboration repos
-        if self.request.user != self.object:
-            repos = repos.filter(
-                visibility=Repository.Visibility.PUBLIC
-            ).union(
+        elif self.request.user != self.object:
+            repos = repos.filter(visibility=Repository.Visibility.PUBLIC).union(
                 repos.filter(
                     visibility=Repository.Visibility.PRIVATE,
                     collabs__user=self.request.user
                 )
             )
-
-        organizations = Organization.objects.filter(members__user=self.object)
+        elif self.request.user.is_authenticated and self.request.user == self.object:
+            pass
 
         context['repositories'] = repos.order_by('date_created')
-        context['organizations'] = organizations
 
-        follows = UserFollower.objects.filter(following=self.object) | UserFollower.objects.filter(follower=self.object)
+        if self.request.user.is_authenticated:
+            organizations = Organization.objects.filter(members__user=self.object)
 
-        context['followers'] = follows.filter(following=self.object).count()
-        context['following'] = follows.filter(follower=self.object).count()
-        context['is_following'] = follows.filter(follower=self.request.user).count() > 0
+            context['organizations'] = organizations
+
+            follows = UserFollower.objects.filter(following=self.object) | UserFollower.objects.filter(follower=self.object)
+
+            context['followers'] = follows.filter(following=self.object).count()
+            context['following'] = follows.filter(follower=self.object).count()
+            context['is_following'] = follows.filter(follower=self.request.user).count() > 0
+
         return context
 
     def get_object(self):

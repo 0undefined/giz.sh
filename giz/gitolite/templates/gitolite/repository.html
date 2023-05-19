@@ -5,7 +5,7 @@ div.maincontent > div.card:first-child {
   display:flex;
   flex-direction: row;
   align-items: center;
-  gap: var(--padding);
+  gap: calc(2*var(--padding));
 }
 div.maincontent > div.card:first-child > h3 {
   flex-grow: 1;
@@ -55,7 +55,7 @@ div.maincontent > div.card > div.filelist > div > span.filename {
 {% block CONTENT %}
 <div class="maincontent">
 <div class="card">
-  <h3><a >{{ repository.owner }}</a>/<a >{{ repository.name }}</a></h3>
+  <h3><a href="{% url 'users:profile' repository.owner %}">{{ repository.owner }}</a>/<a >{{ repository.name }}</a></h3>
   <span class="star"><i class="fas fa-star"></i>{{ repository.stars|length }}</span>
   <span class="watch"><i class="fas fa-eye"></i>{{ repository.watchers|length }}</span>
   <span class="forks"><i class="fas fa-code-branch"></i>{{ repository.forks|length }}</span>
