@@ -1,16 +1,53 @@
 {% extends 'index/base.html' %}
 {% block STYLE %}
 <style>
-
+div.maincontent > div.card:first-child {
+  display:flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--padding);
+}
+div.maincontent > div.card:first-child > h3 {
+  flex-grow: 1;
+}
+div.maincontent > div.tabs {
+  display: flex;
+  flex-direction: row;
+  gap: var(--padding);
+  padding: 0;
+}
+div.maincontent > div.tabs > a.btn {
+  background-color: var(--color-tertiary);
+  color: var(--color-fg);
+  font-weight: 400;
+  margin:0;
+  border: none;
+  transition: ease 0.25s;
+}
+div.maincontent > div.tabs > a.active-tab {
+  background-color: var(--color-primary);
+}
+div.maincontent > div.tabs > a.btn:hover {
+  background-color: var(--color-second);
+  transition: ease 0.25s;
+}
 </style>
 {% endblock %}
 {% block CONTENT %}
 <div class="maincontent">
   <div class="card">
-
-    <h3>{{ repository.name }}<span class="visibility">{{ repository.visibility_str }}</span></h3>
-
-    <hr>
+    <h3><a >{{ repository.owner }}</a>/<a >{{ repository.name }}</a></h3>
+    <span class="star"><i class="fas fa-star"></i>{{ repository.stars|length }}</span>
+    <span class="watch"><i class="fas fa-eye"></i>{{ repository.watchers|length }}</span>
+    <span class="forks"><i class="fas fa-code-branch"></i>{{ repository.forks|length }}</span>
+    <span class="visibility">{{ repository.visibility_str }}</span>
+  </div>
+  <div class="tabs">
+    <a class="btn card active-tab">Code</a>
+    <a class="btn card">Issues</a>
+    <a class="btn card">Pull requests</a>
+  </div>
+  <div class="card">
     {% if collaborators_pending|length == 0 %}
     {% if tree.files|length > 0 or tree.dirs|length > 0 %}
     Files
@@ -71,6 +108,15 @@
   <a href="{% url 'gitolite:repo-settings' repository.owner repository.name %}">Settings</a>
   {% endif %}
   {% if collaborators %}
+</div>
+<div class="card">
+  <ul>
+    <li><a href="#">Code</a></li>
+    <li><a href="#">Issues</a></li>
+    <li><a href="#">Pull requests</a></li>
+  </ul>
+</div>
+<div class="card">
   <h4>Collaborators:</h4>
   <ul>
     {% for c in collaborators %}
