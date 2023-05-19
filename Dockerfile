@@ -20,6 +20,7 @@ WORKDIR /usr/share/www
 COPY ./giz/ /usr/share/www
 RUN mkdir -p /root/.ssh
 COPY ssh /root/.ssh
+RUN chmod -R 0600 /root/.ssh
 COPY gitconfig /root/.gitconfig
 COPY ./conf/gunicorn/prod.py /usr/share/gunicorn-conf.py
 
