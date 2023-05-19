@@ -1,3 +1,6 @@
+"""
+Settings for Giz, a gitolite web service
+"""
 import os
 from os.path import dirname, realpath, join
 
@@ -16,10 +19,15 @@ os.path.join(BASE_DIR, APP_DIR)
 try:
     SECRET_KEY = os.environ['SECRET_KEY']
 except KeyError as e:
-    raise RuntimeError("Could not find $SECRET_KEY in environment")
+    raise RuntimeError("Could not find $SECRET_KEY in environment") from e
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", not os.getenv("PROD", True))
+DEBUG   = os.getenv("DEBUG", 'false').lower() == 'true'
+STAGING = os.getenv("STAGING", 'false').lower() == 'true'  # unused
+PROD    = os.getenv("PROD", 'false').lower() == 'true'
+
+if PROD and DEBUG:
+    DEBUG = False
 
 
 DEFAULT_DOMAIN = 'giz.sh'
@@ -176,7 +184,7 @@ SHARE_DIR = '/usr/share'
 GITOLITE_ADMIN_PATH = os.getenv("GITOLITE_ADMIN_PATH", os.path.join(SHARE_DIR, 'gitolite-admin'))
 GITOLITE_GIT_PATH = os.getenv("GITOLITE_ADMIN_PATH", os.path.join(SHARE_DIR, 'git', 'repositories'))
 GITOLITE_HOST = os.getenv("GITOLITE_HOST", 'gitolite')
-GITOLITE_PORT = int(os.getenv("GITOLITE_PORT", 22))
+GITOLITE_PORT = int(os.getenv("GITOLITE_PORT", '22'))
 GITOLITE_KEY = os.getenv("GITOLITE_KEY", os.environ['HOME'] + "/.ssh/id_rsa")
 
 # Used to calculate remote url

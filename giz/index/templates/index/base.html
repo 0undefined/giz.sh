@@ -282,13 +282,13 @@
       max-width: 12cm;
       */
     }
-.rightcontent.card,
-.rightcontent .card,
 .leftcontent.card,
-.leftcontent .card,
 .maincontent.card,
-.maincontent .card {
-  margin:0 !important;
+.rightcontent.card,
+.leftcontent > .card,
+.maincontent > .card,
+.rightcontent > .card {
+  margin:0;
 }
 
     /*****************************************
@@ -426,6 +426,27 @@ ul { padding-left: calc(4 *  var(--padding)); }
   padding: var(--padding);
   border: var(--border);
   border-radius: var(--padding);
+}
+
+.remote {
+  font-family: Courier New;
+  background-color: var(--color-hi-green);
+  color: var(--color-bg);
+  border: var(--border);
+  border-radius: var(--padding);
+  padding: var(--padding);
+  font-size: 9pt;
+}
+
+
+.invitation_prompt {
+  background-color: var(--color-quinary);
+  padding: var(--padding);
+  margin: var(--padding);
+}
+
+.invitation_prompt > form.form > div.row > input {
+  flex-grow:1;
 }
   </style>
   {% block STYLE %}{% endblock %}

@@ -46,7 +46,9 @@ class RepositoryView(DetailView):
         if user == owner:
             return repo
 
-        get_object_or_404_ext(Collaborator, exception404message, repo=repo, user=user, accepted=True)
+        # We allow users that has been invited to view some of the repo before
+        # deciding to accept it.
+        get_object_or_404_ext(Collaborator, exception404message, repo=repo, user=user)
 
         return repo
 
@@ -55,6 +57,7 @@ class RepositoryView(DetailView):
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
         context['collaborators'] = Collaborator.active.filter(repo=self.object)
+        context['collaborators_pending'] = Collaborator.objects.filter(repo=self.object, accepted=False, user=self.request.user)
         # Extend to /owner/repo/(blob|tree)/branch/filename url path (for files/dirs)
         # Extend to /owner/repo/(blob|tree)/branch url path (for branches)
         # Reminder: blob=file tree=dir
@@ -144,6 +147,7 @@ def RepositorySettingsCollab(request, owner, name):
 
 
 @login_required
+@ratelimit(key='header:x-real-ip', rate='30/h', method='POST', block=True)
 def AddCollaborator(request, owner, name):
     owner = get_object_or_404(User, username=owner)
     user = request.user

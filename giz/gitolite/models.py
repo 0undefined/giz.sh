@@ -89,6 +89,7 @@ class CollaboratorManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(accepted=True)
 
+
 class DefaultCollaboratorManager(models.Manager):
     use_in_migrations = True
     def get_queryset(self):

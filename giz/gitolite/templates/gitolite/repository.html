@@ -1,15 +1,7 @@
 {% extends 'index/base.html' %}
 {% block STYLE %}
 <style>
-.remote {
-  font-family: Courier New;
-  background-color: var(--color-hi-green);
-  color: var(--color-bg);
-  border: var(--border);
-  border-radius: var(--padding);
-  padding: var(--padding);
-  font-size: 9pt;
-}
+
 </style>
 {% endblock %}
 {% block CONTENT %}
@@ -19,6 +11,7 @@
     <h3>{{ repository.name }}<span class="visibility">{{ repository.visibility_str }}</span></h3>
 
     <hr>
+    {% if collaborators_pending|length == 0 %}
     {% if tree.files|length > 0 or tree.dirs|length > 0 %}
     Files
     <ul>
@@ -40,9 +33,8 @@
       <li>[f] {{ file.name }}</li>
       {% endfor %}
     </ul>
-    {% else %}
-    &nbsp;<i>Empty repository</i>
-    {% endif %}
+    {% else %}<i>Empty repository</i>{% endif %}
+    {% else %}<p><i class="fas fa-lock"></i> Locked content</p>{% endif %}
   </div>
   <div class="card">
   {% if readme %}
@@ -54,7 +46,22 @@
   {% endif %}
   </div>
 </div>
-<div class="rightcontent card">
+<div class="rightcontent">
+  {% if collaborators_pending|length > 0 %}
+<div class="card invitation_prompt">
+  <form action="{% url 'users:settings-collab' %}" method="post" class="form">{% csrf_token %}
+    <h4>Invitation to collaborate</h4>
+    <span>
+      Permissions: {{ collaborators_pending.first.permission_str }}
+    </span>
+    <div class="row">
+      <input name="collab_id" type="hidden" class="hidden" value="{{collaborators_pending.first.id}}"/>
+      <input name="accept" type="submit" class="btn-submit" value="accept"/><input name="decline" type="submit" class="btn-delete" value="decline"/>
+    </div>
+  </form>
+</div>
+{% endif %}
+<div class="card">
 {% if repository.description %}
 <h4>About</h4>
 <p>{{ repository.description }}</p>
@@ -71,5 +78,6 @@
     {% endfor %}
   </ul>
   {% endif %}
+</div>
 </div>
 {% endblock %}

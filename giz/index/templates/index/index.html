@@ -2,12 +2,10 @@
 
 {% block STYLE %}
 <style>
-.invitation_prompt {
+ul.invitationlist {
+  margin: 0;
   list-style: none;
   padding: 0;
-}
-.invitation_prompt > li > form.form > div.row > input {
-  flex-grow:1;
 }
 </style>
 {% endblock %}
@@ -76,9 +74,9 @@
   <h4>Notifications</h4>
     {% if invites %}
     <h5>Invitations to collaborate</h5>
-    <ul class="invitation_prompt">
+    <ul class="invitationlist">
     {% for invite in invites %}
-    <li class="card">
+    <li class="card invitation_prompt">
     <form action="{% url 'users:settings-collab' %}" method="post" class="form">{% csrf_token %}
       <a href="{% url 'gitolite:repo' invite.repo.owner invite.repo.name %}">{{ invite.repo }}</a>
       <div class="row">
@@ -87,8 +85,8 @@
       </div>
     </form>
     </li>
-    </ul>
     {% endfor %}
+    </ul>
     {% endif %}
 </div>
 {% endif %}
