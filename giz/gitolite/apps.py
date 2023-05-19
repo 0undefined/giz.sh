@@ -56,8 +56,8 @@ def git_init():
         if not (os.path.exists(userdir) and os.path.isdir(userdir)):
             os.makedirs(userdir)
 
-        if not (os.path.exists(organizatoindir) and os.path.isdir(organizatoindir)):
-            os.makedirs(organizatoindir)
+        if not (os.path.exists(organizationdir) and os.path.isdir(organizationdir)):
+            os.makedirs(organizationdir)
 
         # Check if they are included
         gitoliteconf = open(gitoliteconf_path , 'r')
@@ -92,8 +92,10 @@ def git_init():
         if not (includes_userconf and includes_orgconf):
             # Append the missing option(s)
             gitoliteconf = open(gitoliteconf_path , 'a')
+
             if not includes_userconf:
                 gitoliteconf.write('\ninclude "users/*.conf"\n')
+
             if not includes_orgconf:
                 gitoliteconf.write('\ninclude "orgs/*.conf"\n')
 
@@ -171,7 +173,7 @@ def git_update_userrepos(user):
     if not isinstance(user, User):
         raise TypeError("Expected User object in first argument, got %s" % (str(type(user))))
 
-    userconfpath = os.path.join(settings.GITOLITE_ADMIN_PATH, 'conf', user.username + '.conf')
+    userconfpath = os.path.join(settings.GITOLITE_ADMIN_PATH, 'conf', 'users', user.username + '.conf')
     repo = git_init()
 
     userrepos = Repository.objects.filter(owner=user)
@@ -212,7 +214,9 @@ def git_get_file_content(repo, filename):
 
 
 def git_get_readme_html(repo):
-    return markdown(git_get_file_content(repo, "README.md"))
+    return markdown(git_get_file_content(repo, "README.md")
+                    , unsafe=False
+                    , no_breaks=True)
 
 
 def convert_list(t):

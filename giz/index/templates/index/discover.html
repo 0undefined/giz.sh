@@ -1,15 +1,67 @@
 {% extends 'index/base.html' %}
-{% block CONTENT  %}
 
-Number of repositories {{ repositories.count }}<br>
-<table>
-{% for r in repositories %}
-<tr>
-  <td>{{ r.owner.username }}</td>
-  <td><a href="{{ r.get_absolute_url }}">{{ r.name }}</td>
-  <td>{{ r.description }}</td>
-</tr>
-{% endfor %}
-</table>
+{% block TITLE %}Discover{% endblock %}
+
+{% block STYLE %}
+<style>
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: var(--border);
+}
+tr, th {
+  text-align: left;
+}
+tr:nth-child(even) {
+}
+tr:nth-child(odd) {
+  background-color: var(--color-quinary);
+
+}
+</style>
+{% endblock %}
+
+{% block CONTENT  %}
+<div class="maincontent">
+  <div class="card">
+    <h1>Discover</h1>
+    <p>
+    Currently a bit unused, but here are some statistics of this current
+    instance:
+    </p>
+    <table>
+      <tr>
+        <th>Statistic</th>
+        <th>Description</th>
+        <th>Count</th>
+      </tr>
+      <tr>
+        <td>Repositories</td>
+        <td></td>
+        <td>{{ num_repo }}</td>
+      </tr>
+      <tr>
+        <td>Users</td>
+        <td></td>
+        <td>{{ user|length }}</td>
+      </tr>
+      <tr>
+        <td>Users with keys</td>
+        <td></td>
+        <td>{{ num_user }}</td>
+      </tr>
+      <tr>
+        <td>Collabs (all)</td>
+        <td></td>
+        <td>{{ num_collab }}</td>
+      </tr>
+      <tr>
+        <td>Collabs (RW or higher)</td>
+        <td></td>
+        <td>{{ num_collab_rw }}</td>
+      </tr>
+    </table>
+  </div>
+</div>
 
 {% endblock %}

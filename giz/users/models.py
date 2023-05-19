@@ -74,7 +74,7 @@ class RSA_Key(models.Model):
     sha = models.CharField(blank=False, max_length=64, unique=True)
 
     name = models.CharField(blank=False, max_length=128)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='keys')
 
     date_created = models.DateTimeField(auto_now_add=True)
     date_last_used = models.DateTimeField(null=True, default=None)
