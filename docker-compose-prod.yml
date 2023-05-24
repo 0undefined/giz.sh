@@ -15,8 +15,6 @@ services:
       - 443:443
   redis:
     image: redis:5
-    #ports:
-    #  - 6379:6379
   postgres:
     image: postgres:latest
     restart: always
