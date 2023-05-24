@@ -34,7 +34,6 @@ services:
       - 8000:8000
     volumes:
       - ./giz:/usr/share/www
-      - gitolite-sshkeys:/root/keys:ro
       - gitolite-git:/usr/share/git:ro
       - static:/usr/share/giz/static
 
