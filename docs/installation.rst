@@ -26,6 +26,15 @@ Steps
 2. run `docker-compose up`. This spins up a *DEVELOPMENT* instance, this is
    unsafe and should not be used in a production environment.
 3. now you can visit `localhost:8000` to see the index of the locally running instance.
+4. Create the database in postgres:
+   `docker-compose exec postgres psql -U postgres -c 'create database giz;'`
+5. Run migrations & copy over static files:
+   ```sh
+   docker-compose -f docker-compose-prod.yml exec giz python manage.py makemigrations --noinput
+   docker-compose -f docker-compose-prod.yml exec giz python manage.py migrate --noinput
+   docker-compose -f docker-compose-prod.yml exec giz python manage.py collectstatic --noinput
+   ```
+
 
 
 Creating local accounts
@@ -52,3 +61,7 @@ If you're running `giz` in a production environment, all `docker-compose`
 commands should have `-f docker-compose-prod.yml` before any other
 argument. Eg. say you want to spin up the containers in the background:
 `docker-compose -f docker-compose-prod.yml up -d`.
+
+getting a SSL certificate:
+```sh
+docker-compose exec nginx certbot --nginx -n --agree-tos -m 'YOUR.EMAIL@DOT.COM' --domains YOUR.DOMAIN
