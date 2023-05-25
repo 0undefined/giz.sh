@@ -7,6 +7,10 @@ ul.invitationlist {
   list-style: none;
   padding: 0;
 }
+.Q {color: var(--color-hi-red);}
+
+.A > ul {color: var(--color-hi-green);}
+.A {color: var(--color-hi-green);}
 </style>
 {% endblock %}
 
@@ -34,6 +38,41 @@ ul.invitationlist {
   <div class="card">
     {# TODO.md #}
 
+<h1>Giz</h1>
+<p class="Q">What is giz?</p>
+<p class="A">Giz is a web frontend for gitolite</p>
+<p class="Q">Why "giz"? that is an ugly name</p>
+<p class="A">Yes! but also,</p>
+<ul class="A">
+  <li>It's short,<br>∴ fast to type.</li>
+  <li>It is pronounced like plural of "git", ie. "gits",<br>∴ also easier to remember.</li>
+  <li>The domain was available</li>
+</ul>
+<p class="Q">Why make yet another git web service?</p>
+<p class="A">
+  I wanted a git service, with functionality of gitlab, but more similar in
+  terms of UX of github,
+  besides, since the MS acquisition of github, I feel like
+  they have strayed from their path, in terms of features and vision.<br>
+  And Yes, there are probably a lot of easier, prettier, and/or better, open
+  source, self-hostable alternatives; such as<br>
+    <a href="https://codeberg.org">codeberg</a>,
+    <a href="https://gitea.io">gitea</a>,
+    <a href="https://sr.ht">source hut</a>,
+    <a href="https://gogs.io/">Gogs</a>,
+    <a href="https://notabug.org/">Notabug</a> (which apparently is just gogs, but libre),
+    and
+    <a href="http://www.gitblit.com/">Gitblit</a>,
+  <br>
+  Besides that, I find it much easier to add features that I find usefull if it is code
+    that I've already worked with.
+</ul></p>
+<p class="Q">Why is this site so ugly?</p>
+<p class="A">I (the developer) don't know how to do frontend, i need help :(</p>
+<p class="Q">Why is this site so pretty?</p>
+<p class="A">I totally planned for that, you're welcome B)</p>
+<p class="Q">Why is foo not working?</p>
+<p class="A">I (the developer) don't know how to do bar, i need help :(</p>
 <h2>Features</h2>
 <ul>
 <li><input type="checkbox" checked="" disabled="" /> Invite people to collaborate on your repositories</li>
@@ -45,6 +84,7 @@ ul.invitationlist {
 <li><input type="checkbox" checked="" disabled="" /> Lightweight <em>giz is just a web front-end for gitolite</em></li>
 <li><input type="checkbox" checked="" disabled="" /> Personalized user profiles (<em>needs rework</em>)</li>
 </ul>
+
 <h2>Road map</h2>
 <ul>
 <li><strong>Project management</strong>

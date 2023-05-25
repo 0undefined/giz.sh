@@ -31,6 +31,12 @@ div.maincontent > div.tabs > a.btn:hover {
   background-color: var(--color-second);
   transition: ease 0.25s;
 }
+div.maincontent > div.tabs > details.revision {
+  background-color: var(--color-quaternary);
+  order:2;
+  margin: 0;
+  margin-left: auto;
+}
 div.maincontent > div.card > div.filelist {
   display:flex;
   flex-direction: column;
@@ -66,45 +72,57 @@ div.maincontent > div.card > div.filelist > div > span.filename {
   <a class="btn card">Issues</a>
   <a class="btn card">Pull requests</a>
   <a class="btn card">Releases</a>
+  <a class="btn card">Documentation</a>
   <a class="btn card">Analytics</a>
-</div>
-<div class="card">
-  {% if collaborators_pending|length == 0 %}
-  {% if tree.files|length > 0 or tree.dirs|length > 0 %}
-  <!--<a class="btn card">Revision</a><!--open branches / tags -->
-  <h4>Files</h4>
-  <div class="filelist">
-    {% for dir in tree.dirs %}
-    {% if dir.path %}
-      {% if dir.object.type == 'tree' %}
-      <div class="directory"><i class="fas fa-folder-plus"></i><span class="filename">{{ dir.path }}</span>
-      {% elif dir.object.type == 'blob' %}
-      <div class="directory"><i class="fas fa-file"></i><span class="filename">{{ dir.path }}</span>
-      {% else %}{# This is just a Tree|Blob object #}
-      <div class="directory"><i class="fas fa-folder"></i><span class="filename">{{ dir.name }}</span>
-      {% endif %}
-    {% else %}
-      <div>[d] -- {{ dir.name }}
-    {% endif %}
+  <details class="btn card revision popout"><summary>Revision</summary>
+    <div class="card popout_element revisioncontainer">
+      Branches and tags<br>
+      (placeholder)
+      {% for branch in branches %}
+      {{ branch }}<br>
+      {% endfor %}
+      {% for tag in tags %}
+      {{ tag }}<br>
+      {% endfor %}
     </div>
-    {% endfor %}
-    {% for file in tree.files %}
-    <div class="file"><i class="fas fa-file"></i><span class="filename">{{ file.name }}</span></div>
-    {% endfor %}
-  </div>
-  {% else %}<i>Empty repository</i>{% endif %}
-  {% else %}<p><i class="fas fa-lock"></i> Locked content</p>{% endif %}
+  </details>{# open branches / tags #}
 </div>
-<div class="card">
-{% if readme %}
-<i class="fas fa-list-ul"></i> README.md
-<hr>
-{{ readme|safe }}
+{% if collaborators_pending|length != 0 %}                 <div class="card"><p><i class="fas fa-lock"></i> Locked content</p></div>
+{% elif tree.files|length == 0 and tree.dirs|length == 0 %}<div class="card"><i>Empty repository</i></div>
 {% else %}
-No readme yet!
+<div class="card"><h4>Files</h4>
+
+  <div class="filelist">
+  {% for dir in tree.dirs %}
+     {% if dir.path %}
+        {% if dir.object.type == 'tree' %}
+        <div class="directory"><i class="fas fa-folder-plus"></i><span class="filename">{{ dir.path }}</span></div>
+        {% elif dir.object.type == 'blob' %}
+        <div class="directory"><i class="fas fa-file"></i><span class="filename">{{ dir.path }}</span></div>
+        {% else %}{# This is just a Tree|Blob object -- should never happen #}
+        <div class="directory"><i class="fas fa-folder"></i><span class="filename">{{ dir.name }}**</span></div>
+        {% endif %}
+     {% else %}
+        <div>[d] -- {{ dir.name }}</div>
+     {% endif %}
+  {% endfor %}
+  {% for file in tree.files %}
+     <div class="file"><i class="fas fa-file"></i><span class="filename">{{ file.name }}</span></div>
+  {% endfor %}
+  </div>
+</div>
+
+<div class="card">
+  {% if readme %}
+  <i class="fas fa-list-ul"></i> README.md
+  <hr>
+  {{ readme|safe }}
+  {% else %}No readme yet!
+  {% endif %}
+</div>
 {% endif %}
 </div>
-</div>
+
 <div class="rightcontent">
   {% if collaborators_pending|length > 0 %}
 <div class="card invitation_prompt">

@@ -81,6 +81,7 @@
       --color-lo-red: #e5486f;
 
       --border: var(--border-sz) solid var(--color-quinary);
+      --border-black: var(--border-sz) solid rgba(0,0,0,0.75);
     }
 
     body {
@@ -193,11 +194,13 @@
       float:left;
       color: var(--color-fg);
     }
+    /*
     .usersettings > ul {
       right: 1pc;
     }
+    */
     .user_options a.login {
-      border: var(--border);
+      border: var(--border-black);
       background-color: var(--color-second);
       transition: ease 0.25s;
     }
@@ -207,7 +210,8 @@
       transition: ease 0.25s;
     }
     .user_options a.signup {
-      border: var(--border);
+      /*box-shadow: 0 0 1pt var;*/
+      border: var(--border-black);
       color:rgba(0,0,0,0.75);
       background-color: var(--color-hi-green);
     }
@@ -458,6 +462,31 @@ ul { padding-left: calc(4 *  var(--padding)); }
 .invitation_prompt > form.form > div.row > input {
   flex-grow:1;
 }
+
+
+/* Popouts / open-close menus */
+details.popout > summary:hover { cursor:pointer; }
+details.popout > summary::-webkit-details-marker,
+details.popout > summary::marker {
+  display:none;
+  content:"";
+}
+details.popout > .popout_element {
+  {# Copied from index/templates/index/base.html // .user_options details ul #}
+  {# Maybe merge the two? #}
+
+  display: block;
+  position: fixed;
+  margin-top: 1em;;
+  margin-left: calc(-1 * var(--padding));
+
+  border-radius: var(--padding);
+  border: var(--border);
+  box-shadow: 0 0 var(--font-sz-normal) var(--black);
+}
+.nav-right-popout {
+  right: var(--padding);;
+}
   </style>
   {% block STYLE %}{% endblock %}
   <title>{% block TITLE %}index{% endblock %}</title>
@@ -485,9 +514,10 @@ ul { padding-left: calc(4 *  var(--padding)); }
     </span>
     {% if request.user.is_authenticated %}
     <span class="user_options">
-      <details class="useradd"><summary><i class="fas fa-plus-circle"></i></summary>
-        <ul>
+      <details class="popout"><summary><i class="fas fa-plus-circle"></i></summary>
+        <ul class="popout_element">
           <li><a href="{% url 'gitolite:repo_new' %}">new repo</a></li>
+          {# TODO check if user has any more groups to create #}
           <li><a href="">new group</a></li>
         </ul>
       </details>
@@ -497,9 +527,9 @@ ul { padding-left: calc(4 *  var(--padding)); }
         <i class="is_admin fas fa-star"></i>
         {% endif %}<span class="username">{{ request.user.get_username }}</span>
       </a>
-      <details class="usersettings">
+      <details class="popout">
         <summary><div class="fas fa-caret-down"></div></summary>
-        <ul>
+        <ul class="popout_element nav-right-popout">
           <li><a href="{% url 'users:settings' %}">Settings</a></li>
           <li><a href="{% url 'users:profile' request.user.username %}">Repositories</a></li>
           <li><a href="#">Bookmarks</a></li>
@@ -511,7 +541,7 @@ ul { padding-left: calc(4 *  var(--padding)); }
     {% else %}
     <span class="user_options">
     <a class="signup" href="{% url 'users:signup' %}">Sign up</a>
-    <a class="login" href="{% url 'users:login' %}">Sign in</a>
+    <a class="login" href="{% url 'users:login' %}">Log in</a>
     </span>
     {% endif %}
   </nav>
