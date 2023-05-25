@@ -188,3 +188,61 @@ class Star(models.Model):
 # TODO:
 # * issues
 # * pull requests
+
+
+class Issue(models.Model):
+    #issueid = models.AutoField(primary_key=False)
+    author = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='issues')
+    repo = models.ForeignKey(Repository, null=False, on_delete=models.CASCADE, related_name='issues')
+
+    title = models.CharField(
+        max_length=255,
+        blank=False
+    )
+    message = models.TextField(blank=False)
+
+    @staticmethod
+    def get_issue_id(repo : Repository) -> int:
+        return 0
+
+
+class IssueComment(models.Model):
+    # TODO: add some issue ID unique only for this repo
+    # The actual ID is something different
+    # Add constraint unique_together
+    author = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='issuecomments')
+    issue = models.ForeignKey(Issue, null=False, on_delete=models.CASCADE, related_name='issuecomments')
+
+    message = models.TextField(blank=False)
+
+    #class Meta:
+    #    unique_together = ('repo', 'issueid')
+
+
+class PullRequest(models.Model):
+    author = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='pull_requests')
+    repo = models.ForeignKey(Repository, null=False, on_delete=models.CASCADE, related_name='pull_requests')
+
+    title = models.CharField(
+        max_length=255,
+        blank=False
+    )
+    message = models.TextField(blank=False)
+
+    # Some git object
+    head = 0
+    target_branch = 0
+
+
+class PullRequestComment(models.Model):
+    author = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='pullrequestcomments')
+    issue = models.ForeignKey(PullRequest, null=False, on_delete=models.CASCADE, related_name='pullrequestcomments')
+
+    message = models.TextField(blank=False)
+
+
+class PullRequestComment(models.Model):
+    author = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='pullrequestcomments')
+    issue = models.ForeignKey(PullRequest, null=False, on_delete=models.CASCADE, related_name='pullrequestcomments')
+
+    message = models.TextField(blank=False)
