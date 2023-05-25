@@ -68,7 +68,7 @@ def git_init():
 
         for line in conf_lines:
             # Remove empty strings from split(' ')
-            cmd = filter(lambda x: len(x) > 0, line.split(' '))
+            cmd = list(filter(lambda x: len(x) > 0, line.split(' ')))
             if len(cmd) == 2 and cmd[0] == "include":
                 if cmd[1].find('users/*'):  # We dont really care if they use the correct suffix
                     if includes_userconf:
