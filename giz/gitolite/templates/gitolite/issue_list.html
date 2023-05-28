@@ -1,0 +1,13 @@
+{% extends 'gitolite/repository.html' %}
+{% block REPO_PAGE %}
+<div class="maincontent card">
+  {# this should inherit something from the default repo-view #}
+  List of issues:
+  <ul>
+    <li>Placeholder</li>
+    {% for issue in issues %}
+    {{ issue.title }}
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

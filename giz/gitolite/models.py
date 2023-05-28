@@ -185,11 +185,6 @@ class Star(models.Model):
         unique_together = ('user', 'repo')
 
 
-# TODO:
-# * issues
-# * pull requests
-
-
 class Issue(models.Model):
     #issueid = models.AutoField(primary_key=False)
     author = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='issues')
@@ -200,6 +195,9 @@ class Issue(models.Model):
         blank=False
     )
     message = models.TextField(blank=False)
+
+    #date_created = models.DateTimeField(auto_now_add=True)
+    #date_updated = models.DateTimeField(null=True, default=None)
 
     @staticmethod
     def get_issue_id(repo : Repository) -> int:

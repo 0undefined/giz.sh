@@ -61,7 +61,7 @@ div.maincontent > div.card > div.filelist > div > span.filename {
 {% block CONTENT %}
 <div class="maincontent">
 <div class="card">
-  <h3><a href="{% url 'users:profile' repository.owner %}">{{ repository.owner }}</a>/<a >{{ repository.name }}</a></h3>
+  <h3><a href="{{ repository.owner.get_absolute_url }}">{{ repository.owner }}</a>/<a >{{ repository.name }}</a></h3>
   <span class="star"><i class="fas fa-star"></i>{{ repository.stars|length }}</span>
   <span class="watch"><i class="fas fa-eye"></i>{{ repository.watchers|length }}</span>
   <span class="forks"><i class="fas fa-code-branch"></i>{{ repository.forks|length }}</span>
@@ -69,7 +69,7 @@ div.maincontent > div.card > div.filelist > div > span.filename {
 </div>
 <div class="tabs">
   <a class="btn card active-tab">Code</a>
-  <a class="btn card">Issues</a>
+  <a class="btn card" href="{% url 'gitolite:issue_list' repository.owner repository.name %}">Issues</a>
   <a class="btn card">Pull requests</a>
   <a class="btn card">Releases</a>
   <a class="btn card">Documentation</a>
@@ -87,6 +87,7 @@ div.maincontent > div.card > div.filelist > div > span.filename {
     </div>
   </details>{# open branches / tags #}
 </div>
+{% block REPO_PAGE %}
 {% if collaborators_pending|length != 0 %}                 <div class="card"><p><i class="fas fa-lock"></i> Locked content</p></div>
 {% elif tree.files|length == 0 and tree.dirs|length == 0 %}<div class="card"><i>Empty repository</i></div>
 {% else %}
@@ -97,10 +98,10 @@ div.maincontent > div.card > div.filelist > div > span.filename {
      {% if dir.path %}
         {% if dir.object.type == 'tree' %}
         <div class="directory"><i class="fas fa-folder-plus"></i><span class="filename">{{ dir.path }}</span></div>
-        {% elif dir.object.type == 'blob' %}
-        <div class="directory"><i class="fas fa-file"></i><span class="filename">{{ dir.path }}</span></div>
-        {% else %}{# This is just a Tree|Blob object -- should never happen #}
-        <div class="directory"><i class="fas fa-folder"></i><span class="filename">{{ dir.name }}**</span></div>
+        {% elif dir.object.type == 'blob' %}{# This is just a Tree|Blob object -- should never happen #}
+        <div class="directory"><i class="fas fa-file"></i><span class="filename">{{ dir.path }}**</span></div>
+        {% else %}
+        <div class="directory"><i class="fas fa-folder"></i><span class="filename">{{ dir.name }}</span></div>
         {% endif %}
      {% else %}
         <div>[d] -- {{ dir.name }}</div>
@@ -122,6 +123,7 @@ div.maincontent > div.card > div.filelist > div > span.filename {
 </div>
 {% endif %}
 </div>
+{% endblock %}
 
 <div class="rightcontent">
   {% if collaborators_pending|length > 0 %}

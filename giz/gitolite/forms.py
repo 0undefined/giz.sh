@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Collaborator, Repository
+from .models import Collaborator, Repository, Issue
 from users.models import User
 
 class Collaborator_form(ModelForm):
@@ -22,3 +22,9 @@ class RepositoryForm(ModelForm):
 
         # TODO: Add organizations/teams
         self.fields['owner'].queryset = User.objects.filter(id=user.id).order_by('username')
+
+
+class IssueForm(ModelForm):
+    class Meta:
+        model = Issue
+        fields = ['message', 'title']

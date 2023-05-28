@@ -1,0 +1,15 @@
+{% extends 'index/base.html' %}
+{% block CONTENT %}
+<div class="maincontent card">
+  {# this should inherit something from the default repo-view #}
+  <form action="/new" method="post" class="form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="row">
+      {{ form.title }}
+      <input type="submit" class="btn-submit" value="Create">
+    </div>
+      {{ form.message }}
+  </form>
+</div>
+{% endblock %}

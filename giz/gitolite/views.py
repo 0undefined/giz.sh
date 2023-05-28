@@ -6,14 +6,14 @@ from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.urls import reverse
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
 
 from users.models import User
-from .models import Repository, Collaborator
-from .forms import Collaborator_form, RepositoryForm
+from .models import Repository, Collaborator, Issue, Repository
+from .forms import Collaborator_form, RepositoryForm, IssueForm
 from .apps import git_get_readme_html, git_get_tree
 
 def get_object_or_404_ext(model, message, **kwargs):
@@ -23,37 +23,70 @@ def get_object_or_404_ext(model, message, **kwargs):
         raise Http404(message)
 
 
+# Raises 404 instead of permission denied
+def view_repo(user : User, owner : str, name : str):
+    # For "security by obscurity" reasons we need to return the same 404
+    # message whether the user does not have permissions to view the repo,
+    # or the repo simply does not exist
+    exception404message = "Repository not found"
+
+    owner = get_object_or_404_ext(User, exception404message, username=owner)
+    repo = get_object_or_404_ext(Repository, exception404message, owner=owner, name=name)
+
+    if repo.visibility == Repository.Visibility.PUBLIC:
+        return repo
+
+    if not user.is_authenticated:
+        raise Http404(exception404message)
+
+    if user == owner:
+        return repo
+
+    # We allow users that has been invited to view some of the repo before
+    # deciding to accept it.
+    get_object_or_404_ext(Collaborator, exception404message, repo=repo, user=user)
+
+    # Return repo if implicit test is passed above
+    return repo
+
+
+# Returns the repository if the user has access to its settings
+def user_has_settings_access(user : User, owner : str, reponame : str):
+    exception404message = "Repository not found"
+
+    # This results in a _lot_ of duplicate requests, but it is more readable
+    # (imo) and more "stable" in terms of changes.
+    repo = view_repo(user, owner, reponame)
+
+    owner = get_object_or_404_ext(User, exception404message, username=owner)
+
+    if user == owner:
+        return repo
+
+    # If the user has repo read perms, it is okay to return permission denied.
+    collab = Collaborator.active.filter(repo=repo, user=user)
+
+    if collab.count() > 1:
+        raise Exception('Confused, collaborator query returned more than 1 result.')
+
+    collab = collab.first()
+
+    if collab.perm == Collaborator.Permissions.READWRITEPLUS:
+        return repo
+
+    raise PermissionDenied('You do not have permissions to edit the settings of this repository.')
+
+
 class RepositoryView(DetailView):
     model = Repository
     template_name = "gitolite/repository.html"
     context_object_name = 'repository'
 
     def get_object(self):
-        owner = get_object_or_404(User, username=self.kwargs['owner'])
+        #owner = get_object_or_404(User, username=self.kwargs['owner'])
         reponame = self.kwargs['name']
 
-        # For "security by obscurity" reasons we need to return the same 404
-        # message whether the user does not have permissions to view the repo,
-        # or the repo simply does not exist
-        exception404message = "Repository not found"
-
-        repo = get_object_or_404_ext(Repository, exception404message, owner=owner, name=self.kwargs['name'])
-
-        if repo.visibility == Repository.Visibility.PUBLIC:
-            return repo
-
-        if not self.request.user.is_authenticated:
-            raise Http404(exception404message)
-
-        user = self.request.user
-        if user == owner:
-            return repo
-
-        # We allow users that has been invited to view some of the repo before
-        # deciding to accept it.
-        get_object_or_404_ext(Collaborator, exception404message, repo=repo, user=user)
-
-        return repo
+        return view_repo(self.request.user, self.kwargs['owner'], reponame)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -80,33 +113,6 @@ class RepositoryCreate(LoginRequiredMixin, CreateView):
         kwargs['user'] = self.request.user
         return kwargs
 
-# Returns the repository if the user has access to its settings
-def user_has_settings_access(owner, reponame, user):
-    # For "security by obscurity" reasons we need to return the same 404
-    # message whether the user does not have permissions to view the repo,
-    # or the repo simply does not exist
-    exception404message = "Repository not found."
-
-    repo = get_object_or_404_ext(Repository, exception404message, owner=owner, name=reponame)
-
-    if user == owner:
-        return repo
-
-    collab = Collaborator.active.filter(repo=repo, user=user)
-    # if private && !collab = 404
-    # if collab: repo
-    # else permissiondenied
-    if repo.visibility == Repository.Visibility.PRIVATE and collab.count() == 0:
-        raise Http404(exception404message)
-    if collab.count() > 1:
-        raise Exception('Confused, collaborator query return more than 1 result.')
-
-    collab = collab.first()
-
-    if collab.perm == Collaborator.Permissions.READWRITEPLUS:
-        return repo
-
-    raise PermissionDenied('You do not have permissions to edit the settings of this repository.')
 
 
 class RepositorySettings(LoginRequiredMixin, UpdateView):
@@ -115,13 +121,9 @@ class RepositorySettings(LoginRequiredMixin, UpdateView):
     context_object_name = 'repository'
 
     fields = ['name', 'visibility', 'description', 'default_branch']
+
     def get_object(self):
-        owner = get_object_or_404(User, username=self.kwargs['owner'])
-        reponame = self.kwargs['name']
-
-        return user_has_settings_access(owner, reponame, self.request.user)
-
-        raise PermissionDenied('You do not have permissions to edit the settings of this repository.')
+        return user_has_settings_access(self.request.user, self.kwargs['owner'], self.kwargs['name'])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -131,9 +133,9 @@ class RepositorySettings(LoginRequiredMixin, UpdateView):
 
 @login_required
 def RepositorySettingsCollab(request, owner, name):
-    owner = get_object_or_404(User, username=owner)
+    #owner = get_object_or_404(User, username=owner)
     user = request.user
-    repo = user_has_settings_access(owner, name, user)
+    repo = user_has_settings_access(user, owner, name)
 
     collabs = Collaborator.objects.filter(repo=repo)
 
@@ -153,9 +155,9 @@ def RepositorySettingsCollab(request, owner, name):
 @login_required
 @ratelimit(key='header:x-real-ip', rate='30/h', method='POST', block=True)
 def AddCollaborator(request, owner, name):
-    owner = get_object_or_404(User, username=owner)
+    #owner = get_object_or_404(User, username=owner)
     user = request.user
-    repo = user_has_settings_access(owner, name, user)
+    repo = user_has_settings_access(user, owner, name)
 
     post = request.POST.copy()
     post['repo'] = repo.id
@@ -165,20 +167,16 @@ def AddCollaborator(request, owner, name):
     if form.is_valid():
         form.save()
     else:
-        return HttpResponseRedirect(
-            reverse('gitolite:repo-settings-collabs', kwargs={'owner':owner.username, 'name': name})
-        )  #context={'error': form.errors}
+        return HttpResponseRedirect(repo.get_absolute_url())  #context={'error': form.errors}
 
-    return HttpResponseRedirect(reverse('gitolite:repo-settings-collabs',
-                                        kwargs={'owner':owner.username,
-                                                'name': name}))
+    return HttpResponseRedirect(repo.get_absolute_url())
 
 
 @login_required
 def RemoveCollaborator(request, owner, name):
-    owner = get_object_or_404(User, username=owner)
+    #owner = get_object_or_404(User, username=owner)
     user = request.user
-    repo = user_has_settings_access(owner, name, user)
+    repo = user_has_settings_access(user, owner, name)
 
     post = request.POST.copy()
 
@@ -188,10 +186,10 @@ def RemoveCollaborator(request, owner, name):
         if v == 'Remove':
             collab = get_object_or_404(Collaborator, repo=repo, id=k)
             collab.delete()
-            return HttpResponseRedirect(reverse('gitolite:repo-settings-collabs',
-                                        kwargs=args))
+            return HttpResponseRedirect(repo.get_absolute_url())
 
-    return HttpResponseRedirect(reverse('gitolite:repo-settings-collabs'), context={'error':"Key not found"}, kwargs=args)
+    # todo: return a "Error key not found"
+    return HttpResponseRedirect(repo.get_absolute_url())
 
 
 @login_required
@@ -203,4 +201,21 @@ def CollabResponse(request):
     user = request.user
     raise Exception(post)
 
-    return HttpResponseRedirect(reverse('gitolite:repo'), kwargs={'owner':repo.owner, 'name': repo.name})
+    return HttpResponseRedirect(repo.get_absolute_url())
+
+
+class IssueListView(ListView):
+    model = Issue
+    context_object_name = 'issues'
+
+    # TODO:
+    # Limit issues to repo-lreated ones.
+    def get_queryset(self):
+        queryset = Issue.objects.all()
+        return queryset
+
+
+@method_decorator(ratelimit(key='header:x-real-ip', rate='30/h', method='POST', block=True), name='post')
+class IssueCreate(LoginRequiredMixin, CreateView):
+    form_class = IssueForm
+    template_name = "gitolite/issue_form.html"
