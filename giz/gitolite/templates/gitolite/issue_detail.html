@@ -1,36 +1,11 @@
 {% extends 'gitolite/repository.html' %}
 
-{% block TITLE %}New issue{% endblock %}
+{% block TITLE %}#{{ issue.issueid }}: {{ issue.title }}{% endblock %}
 
 {% block REPO_PAGE %}
-{% if form.errors %}
-<div class="card error-box">
-  <ul>
-  {% for field in form %}
-    {% for error in field.errors %}
-    <li>{{ field.label }}: {{ error }}</li>
-    {% endfor %}
-  {% endfor %}
-    {% for error in field.non_field_errors %}
-    <li>{{ error }}</li>
-    {% endfor %}
-  </ul>
-</div>
-{% endif %}
 <div class="maincontent card">
-  {# this should inherit something from the default repo-view #}
-  <form action="" method="post" class="form">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-    <div class="row">
-      <div class="form-charfield">
-      {{ form.title }}
-      </div>
-      <input type="submit" class="btn-submit" value="Submit issue">
-    </div>
-    {{ form.message }}
-    <i class="fa-brands fa-markdown"></i>
-  </form>
+  <h2>{{ issue.title }}</h2>
+  {{ issue.message }}
 </div>
 {% endblock %}
 {% block REPO_RIGHT %}
@@ -57,3 +32,4 @@ Tags
 </div>
 </div>
 {% endblock %}
+

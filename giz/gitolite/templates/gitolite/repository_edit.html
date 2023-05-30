@@ -2,6 +2,7 @@
 {% block TITLE %}Settings for {{repository}}{% endblock %}
 {% block CONTENT %}
 <div class="leftcontent card">
+  <a href="{{ repository.get_absolute_url }}">{{repository}}</a>
   <h3>Settings</h3>
   <ul>
     <li><a href="{% url 'gitolite:repo-settings' repository.owner repository.name %}">General</a></li>

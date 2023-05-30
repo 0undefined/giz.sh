@@ -61,19 +61,19 @@ div.maincontent > div.card > div.filelist > div > span.filename {
 {% block CONTENT %}
 <div class="maincontent">
 <div class="card">
-  <h3><a href="{{ repository.owner.get_absolute_url }}">{{ repository.owner }}</a>/<a >{{ repository.name }}</a></h3>
+  <h3><a href="{{ repository.owner.get_absolute_url }}">{{ repository.owner }}</a>/<a href="{{ repository.get_absolute_url }}">{{ repository.name }}</a></h3>
   <span class="star"><i class="fas fa-star"></i>{{ repository.stars|length }}</span>
   <span class="watch"><i class="fas fa-eye"></i>{{ repository.watchers|length }}</span>
   <span class="forks"><i class="fas fa-code-branch"></i>{{ repository.forks|length }}</span>
   <span class="visibility">{{ repository.visibility_str }}</span>
 </div>
 <div class="tabs">
-  <a class="btn card active-tab">Code</a>
-  <a class="btn card" href="{% url 'gitolite:issue_list' repository.owner repository.name %}">Issues</a>
-  <a class="btn card">Pull requests</a>
-  <a class="btn card">Releases</a>
-  <a class="btn card">Documentation</a>
-  <a class="btn card">Analytics</a>
+  <a class="btn card{% if active == 'code' %} active-tab{% endif %}" href="{{ repository.get_absolute_url }}">Code</a>
+  <a class="btn card{% if active == 'issues' %} active-tab{% endif %}" href="{% url 'gitolite:issue_list' repository.owner repository.name %}">Issues</a>
+  <a class="btn card{% if active == 'pulls' %} active-tab{% endif %}" href="">Pull requests</a>
+  <a class="btn card{% if active == 'releases' %} active-tab{% endif %}" href="">Releases</a>
+  <a class="btn card{% if active == 'docs' %} active-tab{% endif %}" href="">Documentation</a>
+  <a class="btn card{% if active == 'anal' %} active-tab{% endif %}" href="">Analytics</a>
   <details class="btn card revision popout"><summary>Revision</summary>
     <div class="card popout_element revisioncontainer">
       Branches and tags<br>
@@ -122,9 +122,10 @@ div.maincontent > div.card > div.filelist > div > span.filename {
   {% endif %}
 </div>
 {% endif %}
-</div>
 {% endblock %}
+</div>
 
+{% block REPO_RIGHT %}
 <div class="rightcontent">
   {% if collaborators_pending|length > 0 %}
 <div class="card invitation_prompt">
@@ -160,4 +161,5 @@ div.maincontent > div.card > div.filelist > div > span.filename {
 </div>
 {% endif %}
 </div>
+{% endblock %}
 {% endblock %}

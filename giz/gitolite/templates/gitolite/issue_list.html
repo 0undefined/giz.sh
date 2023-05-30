@@ -1,13 +1,27 @@
 {% extends 'gitolite/repository.html' %}
 {% block REPO_PAGE %}
 <div class="maincontent card">
-  {# this should inherit something from the default repo-view #}
-  List of issues:
+  <form class="form">
+    <div class="row">
+      Filter <div class="form-charfield">
+        <input type="text" placeholder="placeholder"/>
+      </div>
+      <select name="tags">
+        <option value="placeholder">placeholder</option>
+        <option value="placeholder0">placeholder0</option>
+        <option value="placeholder1">placeholder1</option>
+        <option value="placeholder2">placeholder2</option>
+        <option value="placeholder3">placeholder3</option>
+      </select>
+      <a class="btn-submit" href="{% url 'gitolite:issue_new' repository.owner repository.name %}">New</a>
+    </div>
+  </form>
   <ul>
     <li>Placeholder</li>
     {% for issue in issues %}
-    {{ issue.title }}
+    <li><a href="{{ issue.get_absolute_url }}">{{ issue.title }}</a></li>
     {% endfor %}
   </ul>
 </div>
 {% endblock %}
+{% block REPO_RIGHT %}{% endblock %}
