@@ -8,15 +8,18 @@ div.maincontent > div.card:first-child {
   align-items: center;
   gap: calc(2*var(--padding));
 }
+
 div.maincontent > div.card:first-child > h3 {
   flex-grow: 1;
 }
+
 div.maincontent > div.tabs {
   display: flex;
   flex-direction: row;
   gap: var(--padding);
   padding: 0;
 }
+
 div.maincontent > div.tabs > a.btn {
   background-color: var(--color-tertiary);
   color: var(--color-fg);
@@ -25,35 +28,42 @@ div.maincontent > div.tabs > a.btn {
   border: none;
   transition: ease 0.25s;
 }
+
 div.maincontent > div.tabs > a.active-tab {
   background-color: var(--color-primary);
 }
+
 div.maincontent > div.tabs > a.btn:hover {
   background-color: var(--color-second);
   transition: ease 0.25s;
 }
+
 div.maincontent > div.tabs > details.revision {
   background-color: var(--color-quaternary);
   order:2;
   margin: 0;
   margin-left: auto;
 }
+
 div.maincontent > div.card > div.filelist {
   display:flex;
   flex-direction: column;
   /*align-items: center;*/
   gap: var(--padding);
 }
+
 div.maincontent > div.card > div.filelist > div {
   display:flex;
   flex-direction: row;
   gap: var(--padding);
   align-items:center;
 }
+
 div.maincontent > div.card > div.filelist > div > i {
   width: 2pc;
   text-align:right;
 }
+
 div.maincontent > div.card > div.filelist > div > span.filename {
   flex-grow:1;
 }
@@ -71,12 +81,15 @@ div.maincontent > div.card > div.filelist > div > span.filename {
   border-spacing: 0;
   width: 100%;
 }
+
 .readme > table tr:nth-child(odd) {
   background-color:var(--color-quinary);
 }
+
 .readme > table > thead > tr {
   background-color:unset !important;
 }
+
 .readme > table th {
   padding:var(--padding);
 }

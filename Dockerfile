@@ -1,7 +1,7 @@
 FROM alpine:latest
 
 RUN apk upgrade -U
-RUN apk add bash py3-pip git musl openssh
+RUN apk add bash python3-dev py3-pip git musl openssh build-base
 
 RUN pip install --upgrade pip && \
     pip install --no-input \
@@ -9,8 +9,9 @@ RUN pip install --upgrade pip && \
   "psycopg[binary]" \
   django-debug-toolbar ipython \
   gunicorn \
-  GitPython umarkdown paramiko tzdata \
-  "redis[hiredis]" hiredis
+  GitPython paramiko tzdata \
+  "redis[hiredis]" hiredis \
+  pycmarkgfm
 RUN rm -rf /var/cache/apk/*
 
 RUN adduser -D --shell /bin/bash django

@@ -3,7 +3,7 @@ from django.conf import settings
 from django.db import transaction
 from django.http import Http404
 from git import Repo, Tree, Blob
-from umarkdown import markdown
+import pycmarkgfm
 
 import logging
 import paramiko
@@ -214,9 +214,7 @@ def git_get_file_content(repo, filename):
 
 
 def git_get_readme_html(repo):
-    return markdown(git_get_file_content(repo, "README.md")
-                    , unsafe=False
-                    , no_breaks=True)
+    return git_get_file_content(repo, "README.md")
 
 
 def convert_list(t):
