@@ -196,12 +196,32 @@ class Issue(models.Model):
     )
     message = models.TextField(blank=False)
 
-    #date_created = models.DateTimeField(auto_now_add=True)
-    #date_updated = models.DateTimeField(null=True, default=None)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    issueid = models.IntegerField()
+
+    class Meta:
+        unique_together = ('repo', 'issueid')
 
     @staticmethod
     def get_issue_id(repo : Repository) -> int:
         return 0
+
+    def get_absolute_url(self):
+        return self.repo.get_absolute_url() + '/' + 'issues' + '/' + str(self.issueid)
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            # Create a new issueid for this issue.
+            # Get latest issue related to the repo
+            latest_issue = Issue.objects.filter(repo=self.repo).order_by('-id').first()
+            if latest_issue is None:
+                self.issueid = 1
+            else:
+                self.issueid = latest_issue.issueid + 1
+
+        return super(Issue, self).save(*args, **kwargs)
 
 
 class IssueComment(models.Model):

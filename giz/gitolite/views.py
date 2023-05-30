@@ -83,16 +83,14 @@ class RepositoryView(DetailView):
     context_object_name = 'repository'
 
     def get_object(self):
-        #owner = get_object_or_404(User, username=self.kwargs['owner'])
-        reponame = self.kwargs['name']
-
-        return view_repo(self.request.user, self.kwargs['owner'], reponame)
+        return view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
         context['collaborators'] = Collaborator.active.filter(repo=self.object)
+        context['active'] = "code"
         if self.request.user.is_authenticated:
             context['collaborators_pending'] = Collaborator.objects.filter(repo=self.object, accepted=False, user=self.request.user)
         # Extend to /owner/repo/(blob|tree)/branch/filename url path (for files/dirs)
@@ -167,9 +165,13 @@ def AddCollaborator(request, owner, name):
     if form.is_valid():
         form.save()
     else:
-        return HttpResponseRedirect(repo.get_absolute_url())  #context={'error': form.errors}
+        return HttpResponseRedirect(
+            reverse('gitolite:repo-settings-collabs', kwargs={'owner':repo.owner.username, 'name': name})
+        )  #context={'error': form.errors}
 
-    return HttpResponseRedirect(repo.get_absolute_url())
+    return HttpResponseRedirect(
+        reverse('gitolite:repo-settings-collabs', kwargs={'owner':repo.owner.username, 'name': name})
+    )
 
 
 @login_required
@@ -186,10 +188,14 @@ def RemoveCollaborator(request, owner, name):
         if v == 'Remove':
             collab = get_object_or_404(Collaborator, repo=repo, id=k)
             collab.delete()
-            return HttpResponseRedirect(repo.get_absolute_url())
+            return HttpResponseRedirect(
+                reverse('gitolite:repo-settings-collabs', kwargs={'owner':repo.owner.username, 'name': name})
+            )
 
     # todo: return a "Error key not found"
-    return HttpResponseRedirect(repo.get_absolute_url())
+    return HttpResponseRedirect(
+        reverse('gitolite:repo-settings-collabs', kwargs={'owner':repo.owner.username, 'name': name})
+    )
 
 
 @login_required
@@ -211,11 +217,59 @@ class IssueListView(ListView):
     # TODO:
     # Limit issues to repo-lreated ones.
     def get_queryset(self):
+        repo = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
+
         queryset = Issue.objects.all()
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['repository'] = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
+        context['active'] = "issues"
+        return context
 
 
 @method_decorator(ratelimit(key='header:x-real-ip', rate='30/h', method='POST', block=True), name='post')
 class IssueCreate(LoginRequiredMixin, CreateView):
-    form_class = IssueForm
+    #form_class = IssueForm
     template_name = "gitolite/issue_form.html"
+    model = Issue
+    fields = ['message', 'title']
+    #success_url = 'asd'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['repository'] = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
+        context['collaborators'] = Collaborator.active.filter(repo=context['repository'])
+        context['active'] = "issues"
+        return context
+
+
+    #def get_form_kwargs(self):
+    #    kwargs = super(IssueCreate, self).get_form_kwargs()
+    #    kwargs['author'] = self.request.user
+    #    return kwargs
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        #raise Exception(self.kwargs)
+        form.instance.repo = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
+        return super(IssueCreate, self).form_valid(form)
+
+
+
+class IssueView(DetailView):
+    model = Issue
+    #template_name = "gitolite/.html"
+    context_object_name = 'issue'
+
+    def get_object(self):
+        repo = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
+        return get_object_or_404(Issue, repo=repo, issueid=self.kwargs['issueid'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['repository'] = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
+        context['collaborators'] = Collaborator.active.filter(repo=context['repository'])
+        context['active'] = "issues"
+        return context
