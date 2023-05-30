@@ -27,7 +27,7 @@ class RepositoryForm(ModelForm):
 class IssueForm(ModelForm):
     class Meta:
         model = Issue
-        fields = ['author', 'message', 'title']
+        fields = ['message', 'title']
 
     def __init__(self, *args, **kwargs):
         author = kwargs.pop('author')
@@ -35,7 +35,6 @@ class IssueForm(ModelForm):
 
         self.fields['title'].widget.attrs['placeholder'] = 'Title'
         self.fields['message'].widget.attrs['placeholder'] = 'Description'
-        self.fields['author'].initial = author
 
     def form_valid(self, *args, **kwargs):
         return super(IssueForm, self).form_valid(*args, **kwargs)

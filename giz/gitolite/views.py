@@ -219,7 +219,7 @@ class IssueListView(ListView):
     def get_queryset(self):
         repo = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
 
-        queryset = Issue.objects.all()
+        queryset = Issue.objects.filter(repo=repo)
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -231,11 +231,13 @@ class IssueListView(ListView):
 
 @method_decorator(ratelimit(key='header:x-real-ip', rate='30/h', method='POST', block=True), name='post')
 class IssueCreate(LoginRequiredMixin, CreateView):
-    #form_class = IssueForm
+    form_class = IssueForm
     template_name = "gitolite/issue_form.html"
-    model = Issue
-    fields = ['message', 'title']
-    #success_url = 'asd'
+
+    def get_form_kwargs(self):
+        kwargs = super(IssueCreate, self).get_form_kwargs()
+        kwargs['author'] = self.request.user
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -244,15 +246,8 @@ class IssueCreate(LoginRequiredMixin, CreateView):
         context['active'] = "issues"
         return context
 
-
-    #def get_form_kwargs(self):
-    #    kwargs = super(IssueCreate, self).get_form_kwargs()
-    #    kwargs['author'] = self.request.user
-    #    return kwargs
-
     def form_valid(self, form):
         form.instance.author = self.request.user
-        #raise Exception(self.kwargs)
         form.instance.repo = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
         return super(IssueCreate, self).form_valid(form)
 
