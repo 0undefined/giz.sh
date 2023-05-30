@@ -16,22 +16,25 @@ ul.invitationlist {
 
 {% block CONTENT %}
 {% if request.user.is_authenticated %}
-<div class="leftcontent card">
-      <h4>Quick Links</h4>
-      <ul>
-        <li><a href="{% url 'users:profile' request.user.username %}">Profile</a></li>
-        <li><a href="#">Bookmarks</a></li>
-      </ul>
-      {% if repositories %}
-      <hr>
-      <h4>Top {{ repositories|length }} repos</h4>
-      <form post="/" class="form reposearch" name="reposearch"><input type="text" name="search" placeholder="Find repository"></input></form>
-      <ul>
-        {% for repo in repositories %}
-        <li><a href="{{ repo.get_absolute_url }}">{{ repo }}</a></li>
-        {% endfor %}
-      </ul>
-      {% endif %}
+<div class="leftcontent">
+<div class="card">
+  <h4>Quick Links</h4>
+  <ul>
+    <li><a href="{% url 'users:profile' request.user.username %}">Profile</a></li>
+    <li><a href="#">Bookmarks</a></li>
+  </ul>
+</div>
+{% if repositories %}
+<div class="card">
+  <h4>Top {{ repositories|length }} repos</h4>
+  <form post="/" class="form reposearch" name="reposearch"><input type="text" name="search" placeholder="Find repository"></input></form>
+  <ul>
+    {% for repo in repositories %}
+    <li><a href="{{ repo.get_absolute_url }}">{{ repo }}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
 </div>
 {% endif %}
 <div class="maincontent">

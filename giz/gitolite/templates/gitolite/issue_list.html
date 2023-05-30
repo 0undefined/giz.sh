@@ -16,12 +16,15 @@
       <a class="btn-submit" href="{% url 'gitolite:issue_new' repository.owner repository.name %}">New</a>
     </div>
   </form>
+  {% if issues %}
   <ul>
-    <li>Placeholder</li>
     {% for issue in issues %}
     <li><a href="{{ issue.get_absolute_url }}">{{ issue.title }}</a></li>
     {% endfor %}
   </ul>
+  {% else %}
+  <span class="msg"><i class="fa-solid fa-rocket"></i> No issues</span>
+  {% endif %}
 </div>
 {% endblock %}
 {% block REPO_RIGHT %}{% endblock %}

@@ -34,7 +34,7 @@
   <h5>Login error</h5>
 
   <ul>
-  {% for field in form.fields %}
+  {% for field in form %}
     {% for error in field.errors %}
     <li>{{ field.label }}: {{ error }}</li>
     {% endfor %}

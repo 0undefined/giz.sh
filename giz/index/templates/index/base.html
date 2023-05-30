@@ -73,9 +73,14 @@ body {
 }
 
 a {
-  color: var(--color-a);
+  color: var(--color-fg);
   text-decoration: none;
   font-weight: 600;
+  transition: ease 0.25s;
+}
+a:hover {
+  color: var(--color-a);
+  transition: ease 0.25s;
 }
 
 /* Navigation bar */
@@ -130,7 +135,6 @@ form.reposearch input[type="text"] {
 }
 
 .searchbar {
-  flex-shrink: 1;
   flex-grow: 1;
   -webkit-border-radius: var(--padding);
   -moz-border-radius: var(--padding);
@@ -226,20 +230,64 @@ form.reposearch input[type="text"] {
   border-radius: var(--padding);
 }
 
+/* Content display */
+/* * Content layout */
 .contentcontainer {
   display: flex;
-  flex-flow: row;
-  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: center;
   overflow: scroll;
-  max-width: 100vw;
-  min-width: 8cm;
   margin: 0 auto;
   padding: var(--padding);
   gap: var(--padding);
 }
 
+
+.contentcontainer .maincontent { flex-grow: 3; }
+
+.contentcontainer .leftcontent,
+.contentcontainer .rightcontent { flex-grow: 1; }
+
+.contentcontainer .leftcontent,
+.contentcontainer .maincontent,
+.contentcontainer .rightcontent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding);
+}
+
+@media screen and (max-width: 54pc) {
+  .contentcontainer {
+    flex-flow:column;
+  }
+  .contentcontainer .leftcontent,
+  .contentcontainer .maincontent,
+  .contentcontainer .rightcontent {width:100%;}
+  .contentcontainer .maincontent {order:-1;}
+  .navcontainer > a.link {
+    display:none;
+  }
+}
+
+@media screen and (min-width: 54pc) {
+  .contentcontainer {
+    flex-direction: row;
+  }
+  .contentcontainer .rightcontent,
+  .contentcontainer .leftcontent {min-width:14pc;max-width:24pc;}
+  .contentcontainer .maincontent {max-width:54pc;}
+}
+
+.leftcontent.card,
+.maincontent.card,
+.rightcontent.card,
+.leftcontent > .card,
+.maincontent > .card,
+.rightcontent > .card {
+  margin:0;
+}
+
+/* Common styling */
 .card {
   margin: var(--padding);
   padding: calc(2*var(--padding));
@@ -259,44 +307,9 @@ form.reposearch input[type="text"] {
   padding: var(--padding);
 }
 
-.contentcontainer .maincontent {
-  /*min-width: 12cm;*/
-  flex-shrink: 1;
-  flex-grow: 3;
-  flex-direction: column;
-  max-width: 24cm;
-  display:flex;
-  gap:var(--padding);
-}
-
-.contentcontainer .rightcontent,
-.contentcontainer .leftcontent {
-  flex-grow: 1;
-  flex-shrink: 1;
-  max-width: 8cm;
-  display: flex;
-  gap: var(--padding);
-  flex-direction: column;
-  /*
-  flex-shrink: 1;
-  flex-grow: 1;
-  min-width: 8cm;
-  max-width: 12cm;
-  */
-}
-
-.leftcontent.card,
-.maincontent.card,
-.rightcontent.card,
-.leftcontent > .card,
-.maincontent > .card,
-.rightcontent > .card {
-  margin:0;
-}
-
-/* Common styling */
 ul { padding-left: calc(4 *  var(--padding)); }
 
+/* Form styling */
 .form {
   display: flex;
   flex-flow:column;
@@ -472,6 +485,7 @@ details.popout > summary::marker {
   display:none;
   content:"";
 }
+
 details.popout > .popout_element {
   {# Copied from index/templates/index/base.html // .user_options details ul #}
   {# Maybe merge the two? #}
@@ -485,8 +499,17 @@ details.popout > .popout_element {
   border: var(--border);
   box-shadow: 0 0 var(--font-sz-normal) var(--black);
 }
+
 .nav-right-popout {
   right: var(--padding);;
+}
+
+.msg {
+  display:flex;
+  justify-content:center;
+  gap: var(--padding);
+  padding: calc(4*var(--padding));
+  font-size:var(--font-sz-big);
 }
   </style>
   {% block STYLE %}{% endblock %}

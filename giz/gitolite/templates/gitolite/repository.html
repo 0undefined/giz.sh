@@ -1,4 +1,5 @@
 {% extends 'index/base.html' %}
+{% load markdown %}
 {% block STYLE %}
 <style>
 div.maincontent > div.card:first-child {
@@ -56,12 +57,35 @@ div.maincontent > div.card > div.filelist > div > i {
 div.maincontent > div.card > div.filelist > div > span.filename {
   flex-grow:1;
 }
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap:var(--padding);
+}
+
+.list > * {}
+
+.readme > table {
+  border: var(--border);
+  border-spacing: 0;
+  width: 100%;
+}
+.readme > table tr:nth-child(odd) {
+  background-color:var(--color-quinary);
+}
+.readme > table > thead > tr {
+  background-color:unset !important;
+}
+.readme > table th {
+  padding:var(--padding);
+}
 </style>
 {% endblock %}
 {% block CONTENT %}
 <div class="maincontent">
 <div class="card">
-  <h3><a href="{{ repository.owner.get_absolute_url }}">{{ repository.owner }}</a>/<a href="{{ repository.get_absolute_url }}">{{ repository.name }}</a></h3>
+  <h3><i class="fa-solid fa-book-bookmark"></i> <a href="{{ repository.owner.get_absolute_url }}">{{ repository.owner }}</a>/<a href="{{ repository.get_absolute_url }}">{{ repository.name }}</a></h3>
   <span class="star"><i class="fas fa-star"></i>{{ repository.stars|length }}</span>
   <span class="watch"><i class="fas fa-eye"></i>{{ repository.watchers|length }}</span>
   <span class="forks"><i class="fas fa-code-branch"></i>{{ repository.forks|length }}</span>
@@ -92,7 +116,6 @@ div.maincontent > div.card > div.filelist > div > span.filename {
 {% elif tree.files|length == 0 and tree.dirs|length == 0 %}<div class="card"><i>Empty repository</i></div>
 {% else %}
 <div class="card"><h4>Files</h4>
-
   <div class="filelist">
   {% for dir in tree.dirs %}
      {% if dir.path %}
@@ -113,11 +136,11 @@ div.maincontent > div.card > div.filelist > div > span.filename {
   </div>
 </div>
 
-<div class="card">
+<div class="card readme">
   {% if readme %}
   <i class="fas fa-list-ul"></i> README.md
   <hr>
-  {{ readme|safe }}
+  {{ readme|markdown|safe }}
   {% else %}No readme yet!
   {% endif %}
 </div>
@@ -147,17 +170,24 @@ div.maincontent > div.card > div.filelist > div > span.filename {
 <p>{{ repository.description }}</p>
 {% endif %}
   <div class="remote">{{ repository.get_remote_url }}</div><br>
-  <a href="#">Latest release</a><br>
-  {% if repository.owner == request.user %}<a href="{% url 'gitolite:repo-settings' repository.owner repository.name %}">Settings</a>{% endif %}
+  <div class="list">
+    <span>
+      <i class="fa-solid fa-cube"></i> <a href="#">Latest release</a>
+    </span>
+    {% if repository.owner == request.user %}
+    <span>
+      <i class="fa-solid fa-gear"></i> <a href="{% url 'gitolite:repo-settings' repository.owner repository.name %}">Settings</a>{% endif %}
+    </span>
+  </div>
 </div>
 {% if collaborators %}
 <div class="card">
   <h4>Collaborators:</h4>
-  <ul>
+  <div class="list">
     {% for c in collaborators %}
-    <li><a href="{% url 'users:profile' c.user.username %}">{{ c.user.username }}</a></li>
+    <span><i class="fa-solid fa-user"></i> <a href="{% url 'users:profile' c.user.username %}">{{ c.user.username }}</a></span>
     {% endfor %}
-  </ul>
+  </div>
 </div>
 {% endif %}
 </div>
