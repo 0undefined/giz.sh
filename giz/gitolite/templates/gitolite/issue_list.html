@@ -1,4 +1,5 @@
 {% extends 'gitolite/repository.html' %}
+{% load markdown %}
 {% block REPO_PAGE %}
 <div class="maincontent card">
   <form class="form">
@@ -17,14 +18,60 @@
     </div>
   </form>
   {% if issues %}
-  <ul>
+  <hr>
+  <div class="list">
     {% for issue in issues %}
-    <li><a href="{{ issue.get_absolute_url }}">{{ issue.title }}</a></li>
+    <div class="issue-item">
+      <div class="issue_title">
+        <a href="{{ issue.get_absolute_url }}">
+          #{{ issue.issueid }} {{ issue.title|truncatechars:46 }}
+        </a>
+        {{ issue|status_icon|safe }}
+      </div>
+      <div class="meta">
+        <tt class="timestamp">Updated {{ issue.date_updated|timesince|upto:',' }} ago</tt>
+        {% if issue.issuecomments.count > 0 %}
+        <span><i class="fa-solid fa-comment"></i> {{ issue.issuecomments.count }}</span>
+        {% endif %}
+        <span class="tags">
+          <span class="float">
+            example tag
+          </span>
+          <span class="float">
+            placeholder
+          </span>
+          <span class="float">
+            bug
+          </span>
+        </span>
+      </div>
+    </div>
     {% endfor %}
-  </ul>
+  </div>
   {% else %}
   <span class="msg"><i class="fa-solid fa-rocket"></i> No issues</span>
   {% endif %}
 </div>
+
+{% if page_obj.has_previous or page_obj.has_next %}
+<div class="float pagination">
+  <span class="flip-l">
+    {% if page_obj.has_previous %}
+    <a href="?page=1"><i class="fa-solid fa-backward"></i></a>
+    <a href="?page={{ page_obj.previous_page_number }}"><i class="fa-solid fa-caret-left"></i></a>
+    {% endif %}
+  </span>
+
+  <span class="card current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+  <span class="flip-r">
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}"><i class="fa-solid fa-caret-right"></i></a>
+    <a href="?page={{ page_obj.paginator.num_pages }}"><i class="fa-solid fa-forward"></i></a>
+    {% endif %}
+  </span>
+</div>
+{% endif %}
+
 {% endblock %}
 {% block REPO_RIGHT %}{% endblock %}

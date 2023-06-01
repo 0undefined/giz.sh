@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 from django.forms import ModelChoiceField
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
@@ -13,8 +14,22 @@ from django_ratelimit.decorators import ratelimit
 
 from users.models import User
 from .models import Repository, Collaborator, Issue, Repository
-from .forms import Collaborator_form, RepositoryForm, IssueForm
+from .forms import (
+    Collaborator_form,
+    RepositoryForm,
+    IssueForm,
+    RepositoryDocumentationGenerationForm,
+    RepositoryReleaseGenerationForm,
+    IssueCommentForm,
+)
 from .apps import git_get_readme_html, git_get_tree
+
+
+# TODO:
+# Create some base classes for viewing and accessing settings respectively.
+# Each of the views in this source file can benefit from it, so that I don't
+# need to write `get_context` for every bloody view.
+# Also get_object is getting kinda tedious.
 
 def get_object_or_404_ext(model, message, **kwargs):
     try:
@@ -30,8 +45,8 @@ def view_repo(user : User, owner : str, name : str):
     # or the repo simply does not exist
     exception404message = "Repository not found"
 
-    owner = get_object_or_404_ext(User, exception404message, username=owner)
-    repo = get_object_or_404_ext(Repository, exception404message, owner=owner, name=name)
+    #owner = get_object_or_404_ext(User, exception404message, username=owner)
+    repo = get_object_or_404_ext(Repository, exception404message, owner__username=owner, name=name)
 
     if repo.visibility == Repository.Visibility.PUBLIC:
         return repo
@@ -39,7 +54,7 @@ def view_repo(user : User, owner : str, name : str):
     if not user.is_authenticated:
         raise Http404(exception404message)
 
-    if user == owner:
+    if user.username == owner:
         return repo
 
     # We allow users that has been invited to view some of the repo before
@@ -58,9 +73,9 @@ def user_has_settings_access(user : User, owner : str, reponame : str):
     # (imo) and more "stable" in terms of changes.
     repo = view_repo(user, owner, reponame)
 
-    owner = get_object_or_404_ext(User, exception404message, username=owner)
+    #owner = get_object_or_404_ext(User, exception404message, username=owner)
 
-    if user == owner:
+    if user.username == owner:
         return repo
 
     # If the user has repo read perms, it is okay to return permission denied.
@@ -77,6 +92,32 @@ def user_has_settings_access(user : User, owner : str, reponame : str):
     raise PermissionDenied('You do not have permissions to edit the settings of this repository.')
 
 
+def get_repository_tabs(repository : Repository):
+    ret = []
+
+    if repository.issue_permissions != Repository.IssuePermissions.DISABLED:
+        ret.append({'name': "issues", 'icon': "fa-circle-dot", 'displayname': "Issues",
+                    'url': reverse('gitolite:issue_list', kwargs={'owner':repository.owner.username, 'name': repository.name})})
+
+    if repository.pullrequest_permissions != Repository.PullRequestPermissions.DISABLED:
+        ret.append({'name': "pulls",  'icon': "fa-code-pull-request", 'displayname': "Pull requests"})
+
+    if repository.documentation_generation != Repository.DocumentationGeneration.DISABLED:
+        ret.append({'name': "docs", 'icon': "fa-book", 'displayname': "Documentation"})
+
+    if repository.release_generation != Repository.ReleaseGeneration.DISABLED:
+        ret.append({'name': "releases", 'icon': "fa-cube", 'displayname': "Releases"})
+
+    if repository.analytics != Repository.AnalyticsOptions.DISABLED:
+        ret.append({'name': "anal", 'icon': "fa-chart-line", 'displayname': "Analytics"})
+
+    if len(ret) > 0:
+        ret.insert(0, {'name': "code", 'icon': "fa-code", 'displayname': "Code",
+                       'url': repository.get_absolute_url()})
+
+    return ret
+
+
 class RepositoryView(DetailView):
     model = Repository
     template_name = "gitolite/repository.html"
@@ -86,18 +127,20 @@ class RepositoryView(DetailView):
         return view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
 
     def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
-        # Add in a QuerySet of all the books
-        context['collaborators'] = Collaborator.active.filter(repo=self.object)
+        context['tabs'] = get_repository_tabs(self.object)
+        context['collaborators'] = self.object.collabs.filter(accepted=True).prefetch_related('user').annotate(count=Count('user')) #Collaborator.active.filter(repo=self.object)
         context['active'] = "code"
+
         if self.request.user.is_authenticated:
-            context['collaborators_pending'] = Collaborator.objects.filter(repo=self.object, accepted=False, user=self.request.user)
+            context['collaborators_pending'] = self.object.collabs.filter(accepted=False, user=self.request.user)
+
         # Extend to /owner/repo/(blob|tree)/branch/filename url path (for files/dirs)
         # Extend to /owner/repo/(blob|tree)/branch url path (for branches)
         # Reminder: blob=file tree=dir
         context['readme'] = git_get_readme_html(self.object)
         context['tree'] = git_get_tree(self.object)
+
         return context
 
 
@@ -112,16 +155,17 @@ class RepositoryCreate(LoginRequiredMixin, CreateView):
         return kwargs
 
 
+class RepositorySettingsBase(LoginRequiredMixin):
+    def get_object(self):
+        return user_has_settings_access(self.request.user, self.kwargs['owner'], self.kwargs['name'])
 
-class RepositorySettings(LoginRequiredMixin, UpdateView):
+
+class RepositorySettings(RepositorySettingsBase, UpdateView):
     model = Repository
     template_name = "gitolite/repository_edit.html"
     context_object_name = 'repository'
 
     fields = ['name', 'visibility', 'description', 'default_branch']
-
-    def get_object(self):
-        return user_has_settings_access(self.request.user, self.kwargs['owner'], self.kwargs['name'])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -129,6 +173,19 @@ class RepositorySettings(LoginRequiredMixin, UpdateView):
         return context
 
 
+class RepositorySettingsDocumentation(RepositorySettingsBase, UpdateView):
+    form_class = RepositoryDocumentationGenerationForm
+    template_name = "gitolite/repository_edit_documentation.html"
+    context_object_name = 'repository'
+
+
+class RepositorySettingsReleases(RepositorySettingsBase, UpdateView):
+    form_class = RepositoryReleaseGenerationForm
+    template_name = "gitolite/repository_edit_releases.html"
+    context_object_name = 'repository'
+
+
+# TODO: Fix this mess (merge with updateview)
 @login_required
 def RepositorySettingsCollab(request, owner, name):
     #owner = get_object_or_404(User, username=owner)
@@ -148,7 +205,6 @@ def RepositorySettingsCollab(request, owner, name):
         'addform': addform,
     }
     return render(request, 'gitolite/repository_edit_collabs.html', context=context)
-
 
 @login_required
 @ratelimit(key='header:x-real-ip', rate='30/h', method='POST', block=True)
@@ -211,12 +267,15 @@ def CollabResponse(request):
 
 
 class IssueListView(ListView):
+    paginate_by = 10
     model = Issue
     context_object_name = 'issues'
 
     # TODO:
     # Limit issues to repo-lreated ones.
     def get_queryset(self):
+        # Check if theres a search term or something
+        #raise Exception(self.request.GET.copy())
         repo = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
 
         queryset = Issue.objects.filter(repo=repo)
@@ -226,6 +285,7 @@ class IssueListView(ListView):
         context = super().get_context_data(**kwargs)
         context['repository'] = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
         context['active'] = "issues"
+        context['tabs'] = get_repository_tabs(context['repository'])
         return context
 
 
@@ -244,6 +304,7 @@ class IssueCreate(LoginRequiredMixin, CreateView):
         context['repository'] = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
         context['collaborators'] = Collaborator.active.filter(repo=context['repository'])
         context['active'] = "issues"
+        context['tabs'] = get_repository_tabs(context['repository'])
         return context
 
     def form_valid(self, form):
@@ -252,19 +313,34 @@ class IssueCreate(LoginRequiredMixin, CreateView):
         return super(IssueCreate, self).form_valid(form)
 
 
-
-class IssueView(DetailView):
-    model = Issue
-    #template_name = "gitolite/.html"
-    context_object_name = 'issue'
-
-    def get_object(self):
-        repo = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
-        return get_object_or_404(Issue, repo=repo, issueid=self.kwargs['issueid'])
+@method_decorator(ratelimit(key='header:x-real-ip', rate='30/h', method='POST', block=True), name='post')
+class IssueView(CreateView):
+    form_class = IssueCommentForm
+    #model = Issue
+    template_name = "gitolite/issue_detail.html"
+    #context_object_name = 'issue'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['repository'] = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
         context['collaborators'] = Collaborator.active.filter(repo=context['repository'])
         context['active'] = "issues"
+        context['tabs'] = get_repository_tabs(context['repository'])
+
+        repo = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
+        context['issue'] = get_object_or_404(Issue, repo=repo, issueid=self.kwargs['issueid'])
+
         return context
+
+
+    def form_valid(self, form):
+        if not self.request.user.is_authenticated:
+            raise PermissionDenied("You do not have the privileges to perform this action")
+
+        # Check permissions for logged in user
+        form.instance.author = self.request.user
+        repo = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
+
+        form.instance.issue = get_object_or_404(Issue, repo=repo, issueid=self.kwargs['issueid'])
+
+        return super(IssueView, self).form_valid(form)

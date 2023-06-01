@@ -64,6 +64,8 @@
   --border-black: var(--border-sz) solid rgba(0,0,0,0.75);
 }
 
+* { box-sizing: border-box; }
+
 body {
   padding: 0;
   margin: 0;
@@ -223,11 +225,16 @@ form.reposearch input[type="text"] {
   padding-right: calc(2 * var(--padding));
 }
 
+img.pp {
+  image-rendering: crisp-edges;
+  border-radius: var(--padding);
+  width: 2pc;
+  height: 2pc;
+}
+
 .user_options > img.pp {
   width: 2pc;
   height: 2pc;
-  image-rendering: crisp-edges;
-  border-radius: var(--padding);
 }
 
 /* Content display */
@@ -263,7 +270,7 @@ form.reposearch input[type="text"] {
   .contentcontainer .leftcontent,
   .contentcontainer .maincontent,
   .contentcontainer .rightcontent {width:100%;}
-  .contentcontainer .maincontent {order:-1;}
+  /*.contentcontainer .maincontent {order:-1;}*/
   .navcontainer > a.link {
     display:none;
   }
@@ -275,37 +282,41 @@ form.reposearch input[type="text"] {
   }
   .contentcontainer .rightcontent,
   .contentcontainer .leftcontent {min-width:14pc;max-width:24pc;}
-  .contentcontainer .maincontent {max-width:54pc;}
+  /*.contentcontainer .maincontent {max-width:80pc;}*/
+  .contentcontainer {max-width:80pc;}
 }
 
-.leftcontent.card,
-.maincontent.card,
-.rightcontent.card,
-.leftcontent > .card,
-.maincontent > .card,
-.rightcontent > .card {
+/*
+.leftcontent.float,    .maincontent.float,    .rightcontent.float,
+.leftcontent > .float, .maincontent > .float, .rightcontent > .float,
+.leftcontent.card,    .maincontent.card,    .rightcontent.card,
+.leftcontent > .card, .maincontent > .card, .rightcontent > .card {
   margin:0;
 }
+*/
 
 /* Common styling */
-.card {
-  margin: var(--padding);
+.card,
+.float {
+	margin: 0;
   padding: calc(2*var(--padding));
+}
+
+/* Card and float are both a container class', but the card adds a border and background. */
+.card {
   border: var(--border);
   border-radius: var(--padding);
   background: var(--color-content-bg);
 }
 
+.float > h1:first-child, .float > h2:first-child, .float > h3:first-child,
+.float > h4:first-child, .float > h5:first-child, .float > h6:first-child,
 .card > h1:first-child, .card > h2:first-child, .card > h3:first-child,
 .card > h4:first-child, .card > h5:first-child, .card > h6:first-child {
   margin-top: var(--padding);
   margin-bottom: var(--padding);
 }
 
-.float {
-  margin: var(--padding);
-  padding: var(--padding);
-}
 
 ul { padding-left: calc(4 *  var(--padding)); }
 
@@ -446,6 +457,8 @@ ul { padding-left: calc(4 *  var(--padding)); }
 }
 
 /* Repository stuffs */
+.tags > .float,
+.status,
 .visibility { /* Repo visibility */
   font-size: 9pt;
   font-weight: 100;

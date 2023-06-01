@@ -1,0 +1,25 @@
+{% extends 'gitolite/repository_edit.html' %}
+{% block TITLE %}Change how documentation is stored{% endblock %}
+{% block STYLE %}
+<style>
+.radio {
+  display:flex;
+  flex-direction:column;
+  gap:var(--padding);
+}
+</style>
+{% endblock %}
+{% block SETTINGS %}
+<div class="card">
+  <h2>Documentation settings</h2>
+  <form method="post" class="form">{% csrf_token %}
+  {{ form.documentation_generation.label }}
+  <div class="radio">
+  {% for f in form.documentation_generation %}
+  {{ f }}
+  {% endfor %}
+  </div>
+  <input class="btn-submit" type="submit" value="Save">
+  </form>
+</div>
+{% endblock %}

@@ -1,11 +1,57 @@
 {% extends 'gitolite/repository.html' %}
+{% load static %}
+{% load markdown %}
 
 {% block TITLE %}#{{ issue.issueid }}: {{ issue.title }}{% endblock %}
 
 {% block REPO_PAGE %}
-<div class="maincontent card">
-  <h2>{{ issue.title }}</h2>
-  {{ issue.message }}
+<div class="maincontent">
+  <div class="card">
+    <h3>{{ issue.title }}</h3>
+      <tt class="timestamp">Created {{ issue.date_created|date:"Y-m-d G:i" }} </tt>
+      <i class="fa-solid fa-comment"></i> {{ issue.issuecomments.count }}
+      {{ issue|status_icon|safe }}
+  </div>
+  <div class="issuecomment">
+    <div class="card">
+      <span class="comment_meta">
+        <img class="pp" src="{% static 'users/box.png' %}">
+        {{ issue.author }} <tt class="timestamp">{{ issue.date_created|timesince|upto:',' }} ago</tt></i>
+      </span>
+      <hr>
+      <div class="comment">
+        {{ issue.message|markdown|safe }}
+      </div>
+    </div>
+  </div>
+  {% for comment in issue.issuecomments.all %}
+  <div class="issuecomment">
+    <div class="card">
+      <span class="comment_meta">
+        <img class="pp" src="{% static 'users/box.png' %}">
+        {{ comment.author }} <tt class="timestamp">{{ comment.date_created|timesince|upto:',' }} ago</tt></i>
+      </span>
+      <hr>
+      <div class="comment">
+        {{ comment.message|markdown|safe }}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {# Check permissions #}
+  <form class="form card" method="post" action="">{% csrf_token %}
+    {{ form.message }}
+    <div class="row">
+      <i class="fa-brands fa-markdown"></i>
+      {# Check for permissions #}
+      {% if issue.status == issue.IssueStatusOptions.OPEN or issue.status == issue.IssueStatusOptions.REOPENED %}
+      open
+      {% else %}
+      closed
+      {% endif %}
+      <input class="btn-submit" type="submit" value="Comment">
+    </div>
+  </form>
 </div>
 {% endblock %}
 {% block REPO_RIGHT %}

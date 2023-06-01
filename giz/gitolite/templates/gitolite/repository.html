@@ -21,20 +21,22 @@ div.maincontent > div.tabs {
 }
 
 div.maincontent > div.tabs > a.btn {
-  background-color: var(--color-tertiary);
+  /*background-color: var(--color-tertiary);*/
+  background-color: unset;
   color: var(--color-fg);
   font-weight: 400;
   margin:0;
   border: none;
   transition: ease 0.25s;
+  flex-grow:1;
 }
 
 div.maincontent > div.tabs > a.active-tab {
-  background-color: var(--color-primary);
+  background-color: var(--color-tertiary);
 }
 
 div.maincontent > div.tabs > a.btn:hover {
-  background-color: var(--color-second);
+  background-color: var(--color-tertiary);
   transition: ease 0.25s;
 }
 
@@ -76,82 +78,141 @@ div.maincontent > div.card > div.filelist > div > span.filename {
 
 .list > * {}
 
+
+.issuecomment .comment > table,
 .readme > table {
   border: var(--border);
   border-spacing: 0;
   width: 100%;
 }
 
+.issuecomment .comment > table tr:nth-child(odd),
 .readme > table tr:nth-child(odd) {
   background-color:var(--color-quinary);
 }
 
+.issuecomment .comment > table > thead > tr,
 .readme > table > thead > tr {
   background-color:unset !important;
 }
 
+.issuecomment .comment > table th,
 .readme > table th {
   padding:var(--padding);
 }
+
+.comment_meta {
+  display:flex;
+  gap:var(--padding);
+  align-items:center;
+  flex-direction:row;
+}
+
+.status_open      {color: var(--green);}  .status_open::before      {content: "\f192";}
+.status_closed    {color: var(--black);}  .status_closed::before    {content: "\f058";}
+.status_reopened  {color: var(--yellow);} .status_reopened::before  {content: "\f06a";}
+.status_wontfix   {color: var(--red);}    .status_wontfix::before   {content: "\f057";}
+.status_duplicate {color: var(--purple);} .status_duplicate::before {content: "\f0c5";}
+
+.list > .issue-item {
+  display:flex;
+  gap:var(--padding);
+  align-items:stretch;
+	flex-direction:column;
+  border-bottom: var(--border);
+  padding-bottom: var(--padding);
+}
+.list > .issue-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.list > .issue-item > .meta > span.tags,
+.list > .issue-item > .issue_title,
+.list > .issue-item > .meta {
+  display:flex;
+  gap:var(--padding);
+  align-items:center;
+	flex-direction:row;
+	flex-wrap: wrap;
+}
+.list > .issue-item > .meta > span.tags { justify-content:flex-end; }
+.list > .issue-item > .meta > span.tags,
+.list > .issue-item > .issue_title > a {
+  flex-grow:1;
+}
+.card > hr {width:100%;}
+.timestamp {font-size: var(--font-sz-small);color:var(--color-tertiary);}
+
+h1,h2,h3,
+h4,h5,h6 {overflow-wrap:anywhere;}
+
+.pagination {
+	display: flex;
+  flex-direction:row;
+  gap: calc(var(--padding) * 2);
+  align-items:center;
+  justify-content:center;
+	padding: 0;
+}
+.pagination > span.flip-l,
+.pagination > span.flip-r {
+	min-width: 3pc;
+}
+.pagination > span.flip-l {text-align:right;}
+.pagination > span.flip-r {text-align:left;}
+
 </style>
 {% endblock %}
 {% block CONTENT %}
 <div class="maincontent">
 <div class="card">
   <h3><i class="fa-solid fa-book-bookmark"></i> <a href="{{ repository.owner.get_absolute_url }}">{{ repository.owner }}</a>/<a href="{{ repository.get_absolute_url }}">{{ repository.name }}</a></h3>
-  <span class="star"><i class="fas fa-star"></i>{{ repository.stars|length }}</span>
-  <span class="watch"><i class="fas fa-eye"></i>{{ repository.watchers|length }}</span>
-  <span class="forks"><i class="fas fa-code-branch"></i>{{ repository.forks|length }}</span>
+  <span class="star"><i class="fa-solid fa-star"></i>{{ repository.stars|length }}</span>
+  <span class="watch"><i class="fa-solid fa-eye"></i>{{ repository.watchers|length }}</span>
+  <span class="forks"><i class="fa-solid fa-code-branch"></i>{{ repository.forks|length }}</span>
   <span class="visibility">{{ repository.visibility_str }}</span>
 </div>
-<div class="tabs">
-  <a class="btn card{% if active == 'code' %} active-tab{% endif %}" href="{{ repository.get_absolute_url }}">Code</a>
-  <a class="btn card{% if active == 'issues' %} active-tab{% endif %}" href="{% url 'gitolite:issue_list' repository.owner repository.name %}">Issues</a>
-  <a class="btn card{% if active == 'pulls' %} active-tab{% endif %}" href="">Pull requests</a>
-  <a class="btn card{% if active == 'releases' %} active-tab{% endif %}" href="">Releases</a>
-  <a class="btn card{% if active == 'docs' %} active-tab{% endif %}" href="">Documentation</a>
-  <a class="btn card{% if active == 'anal' %} active-tab{% endif %}" href="">Analytics</a>
-  <details class="btn card revision popout"><summary>Revision</summary>
-    <div class="card popout_element revisioncontainer">
-      Branches and tags<br>
-      (placeholder)
-      {% for branch in branches %}
-      {{ branch }}<br>
-      {% endfor %}
-      {% for tag in tags %}
-      {{ tag }}<br>
-      {% endfor %}
-    </div>
-  </details>{# open branches / tags #}
+{% if tabs %}
+<div class="tabs float">
+  {% for tab in tabs %}
+  <a class="btn card{% if active == tab.name %} active-tab{% endif %}" href="{{ tab.url }}"><i class="fa-solid {{ tab.icon }}"></i> {{ tab.displayname }}</a>
+  {% endfor %}
 </div>
+{% endif %}
 {% block REPO_PAGE %}
-{% if collaborators_pending|length != 0 %}                 <div class="card"><p><i class="fas fa-lock"></i> Locked content</p></div>
+{% if collaborators_pending|length != 0 %}                 <div class="card"><p><i class="fa-solid fa-lock"></i> Locked content</p></div>
 {% elif tree.files|length == 0 and tree.dirs|length == 0 %}<div class="card"><i>Empty repository</i></div>
 {% else %}
+<div class="card">
+  <i class="fa-solid fa-tags"></i> tags
+  <i class="fa-solid fa-code-branch"></i> branches
+  <i class="fa-solid fa-code-commit"></i> commits
+</div>
 <div class="card"><h4>Files</h4>
   <div class="filelist">
   {% for dir in tree.dirs %}
      {% if dir.path %}
         {% if dir.object.type == 'tree' %}
-        <div class="directory"><i class="fas fa-folder-plus"></i><span class="filename">{{ dir.path }}</span></div>
+        <div class="directory"><i class="fa-solid fa-folder-plus"></i><span class="filename">{{ dir.path }}</span></div>
         {% elif dir.object.type == 'blob' %}{# This is just a Tree|Blob object -- should never happen #}
-        <div class="directory"><i class="fas fa-file"></i><span class="filename">{{ dir.path }}**</span></div>
+        <div class="directory"><i class="fa-solid fa-file"></i><span class="filename">{{ dir.path }}**</span></div>
         {% else %}
-        <div class="directory"><i class="fas fa-folder"></i><span class="filename">{{ dir.name }}</span></div>
+        <div class="directory"><i class="fa-solid fa-folder"></i><span class="filename">{{ dir.name }}</span></div>
         {% endif %}
      {% else %}
         <div>[d] -- {{ dir.name }}</div>
      {% endif %}
   {% endfor %}
   {% for file in tree.files %}
-     <div class="file"><i class="fas fa-file"></i><span class="filename">{{ file.name }}</span></div>
+     <div class="file"><i class="fa-solid fa-file"></i><span class="filename">{{ file.name }}</span></div>
   {% endfor %}
   </div>
 </div>
 
 <div class="card readme">
   {% if readme %}
-  <i class="fas fa-list-ul"></i> README.md
+  <i class="fa-solid fa-list-ul"></i> README.md
   <hr>
   {{ readme|markdown|safe }}
   {% else %}No readme yet!
@@ -193,11 +254,11 @@ div.maincontent > div.card > div.filelist > div > span.filename {
     </span>
   </div>
 </div>
-{% if collaborators %}
+{% if collaborators.count > 0 %}
 <div class="card">
   <h4>Collaborators:</h4>
   <div class="list">
-    {% for c in collaborators %}
+    {% for c in collaborators.all %}
     <span><i class="fa-solid fa-user"></i> <a href="{% url 'users:profile' c.user.username %}">{{ c.user.username }}</a></span>
     {% endfor %}
   </div>

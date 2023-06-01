@@ -8,6 +8,8 @@
     <li><a href="{% url 'gitolite:repo-settings' repository.owner repository.name %}">General</a></li>
     <li><a href="{% url 'gitolite:repo-settings-collabs' repository.owner repository.name %}">Collaborators</a></li>
     <li><a href="{% url 'gitolite:repo-settings-branches' repository.owner repository.name %}">Branches</a></li>
+    <li><a href="{% url 'gitolite:repo-settings-releases' repository.owner repository.name %}">Releases</a></li>
+    <li><a href="{% url 'gitolite:repo-settings-documentation' repository.owner repository.name %}">Documentation</a></li>
     <li><a href="{% url 'gitolite:repo-settings-issues_and_prs' repository.owner repository.name %}">Miscellaneous</a></li>
   </ul>
 </div>

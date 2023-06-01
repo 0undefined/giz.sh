@@ -154,7 +154,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'index'
 
-#APPEND_SLASH = True
+APPEND_SLASH = True
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
