@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import RegexValidator
 from django.conf import settings
 from django.db import models
@@ -320,3 +322,13 @@ class PullRequestComment(models.Model):
     issue = models.ForeignKey(PullRequest, null=False, on_delete=models.CASCADE, related_name='pullrequestcomments')
 
     message = models.TextField(blank=False)
+
+
+class BranchPermission(models.Model):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    # For referencing either User, or User, Organization, and OrganizationTeam,
+    # if the repo is a organization repo.
+    content_object = GenericForeignKey()
+
+    permission = models.IntegerField(choices=Collaborator.Permissions.choices, default=Collaborator.Permissions.NO_PERM)
