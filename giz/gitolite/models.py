@@ -20,27 +20,27 @@ class Repository(models.Model):
     #                folders and their text or markdown formatted documents.
     # SEPERATE_REPO: Hosted in a repository, by the same owner, with the same
     #                name, with a `-docs` suffix.
+    class PermissionChoices(models.IntegerChoices):
+        DISABLED    = 0, "Disabled"
+        CONTRIB_ALL = 1, "All Contributors"
+        CONTRIB_RW  = 2, "Contributors with write access"
+        CONTRIB_RWP = 3, "Contributors with write+ access"
+        OPEN        = 50, "Open"
+
+
     class DocumentationGeneration(models.IntegerChoices):
         DISABLED = 0, "Disabled"
-        HOSTED = 1, "Hosted on site"
-        IN_SOURCE = 2, "In source"
-        SEPERATE_REPO = 3, "Seperate repository"
+        IN_SOURCE = 1, "In source"
+        SEPERATE_REPO = 2, "Seperate repository"
 
     class ReleaseGeneration(models.IntegerChoices):
         DISABLED = 0, "Disabled"
         MANUAL = 1, "Manual"
         AUTOMATIC = 2, "Automatic"
 
-    class IssuePermissions(models.IntegerChoices):
-        DISABLED = 0, "Disabled"
-        CONTRIB = 1, "Contributors only"
-        OPEN = 2, "Open"
-
     class AnalyticsOptions(models.IntegerChoices):
         DISABLED = 0, "Disabled"
         ENABLED = 1, "Enabled"
-
-    PullRequestPermissions = IssuePermissions
 
     name = models.CharField(
             max_length=48,
@@ -58,18 +58,19 @@ class Repository(models.Model):
     date_last_updated = models.DateTimeField(null=True, default=None)
 
     # Should render as a choice option
-    default_branch = models.CharField( max_length=128, default='master', blank=False)
+    default_branch = models.CharField(max_length=128, default='master', blank=False)
 
     forked_from = models.ForeignKey('self', null=True, default=None, on_delete=models.SET_NULL, related_name='forks')
 
     # TODO: Make it work.
-    documentation_generation = models.IntegerField(choices=DocumentationGeneration.choices, default=DocumentationGeneration.DISABLED)
+    docs_generation = models.IntegerField(choices=DocumentationGeneration.choices, default=DocumentationGeneration.DISABLED)
 
     release_generation = models.IntegerField(choices=ReleaseGeneration.choices, default=ReleaseGeneration.DISABLED)
     release_pattern = models.CharField(max_length=128, default="", blank=True, null=False)
 
-    issue_permissions = models.IntegerField(choices=IssuePermissions.choices, default=IssuePermissions.DISABLED)
-    pullrequest_permissions = models.IntegerField(choices=PullRequestPermissions.choices, default=PullRequestPermissions.DISABLED)
+    issue_permission = models.IntegerField(choices=PermissionChoices.choices, default=PermissionChoices.DISABLED)
+    pullrequest_permission = models.IntegerField(choices=PermissionChoices.choices, default=PermissionChoices.DISABLED)
+
     analytics = models.IntegerField(choices=AnalyticsOptions.choices, default=AnalyticsOptions.DISABLED)
 
     class Meta:
@@ -297,7 +298,8 @@ class IssueComment(models.Model):
 
 class PullRequest(models.Model):
     author = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='pull_requests')
-    repo = models.ForeignKey(Repository, null=False, on_delete=models.CASCADE, related_name='pull_requests')
+    target_repo = models.ForeignKey(Repository, null=False, on_delete=models.CASCADE, related_name='pull_requests')
+    source_repo = models.ForeignKey(Repository, null=True, on_delete=models.SET_NULL)
 
     title = models.CharField(
         max_length=255,
@@ -306,8 +308,8 @@ class PullRequest(models.Model):
     message = models.TextField(blank=False)
 
     # Some git object
-    head = 0
-    target_branch = 0
+    source_ref = 0
+    target_ref = 0
 
 
 class PullRequestComment(models.Model):
