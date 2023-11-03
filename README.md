@@ -1,12 +1,15 @@
-# Tonic
+# Giz
 
-A containerized gitolite server with a django frontend.
+A containerized [gitolite](https://gitolite.com/gitolite/index.html) server with
+a [django](https://www.djangoproject.com/) frontend.
 
-Tonic attempts to build on the following design:
+Giz attempts to build on the following design:
 0. The webserver dictates the state of the gitolite server.
 1. The gitolite server operates independently of the webserver.
 2. Everything triggered through the webserver, can also be triggered through
    gitolite.
+
+The name is pronounced like "gits", like "git" in plural.
 
 
 ## TODO
@@ -27,6 +30,6 @@ Tonic attempts to build on the following design:
    * [x] Also in docker
 7. [ ] Setup gitolite hooks to invalidate redis cache on push
 8. [x] Buy domain
-?. [ ] Update documentation
+9. [ ] Update documentation
 
 For a list of features that are planned, see [TODO.md](giz/TODO.md)
