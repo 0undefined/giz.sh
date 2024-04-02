@@ -319,13 +319,6 @@ class PullRequestComment(models.Model):
     message = models.TextField(blank=False)
 
 
-class PullRequestComment(models.Model):
-    author = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='pullrequestcomments')
-    issue = models.ForeignKey(PullRequest, null=False, on_delete=models.CASCADE, related_name='pullrequestcomments')
-
-    message = models.TextField(blank=False)
-
-
 class BranchPermission(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
