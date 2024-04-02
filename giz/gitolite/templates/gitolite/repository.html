@@ -118,7 +118,7 @@ div.maincontent > div.card > div.filelist > div > span.filename {
   display:flex;
   gap:var(--padding);
   align-items:stretch;
-	flex-direction:column;
+  flex-direction:column;
   border-bottom: var(--border);
   padding-bottom: var(--padding);
 }
@@ -133,8 +133,8 @@ div.maincontent > div.card > div.filelist > div > span.filename {
   display:flex;
   gap:var(--padding);
   align-items:center;
-	flex-direction:row;
-	flex-wrap: wrap;
+  flex-direction:row;
+  flex-wrap: wrap;
 }
 .list > .issue-item > .meta > span.tags { justify-content:flex-end; }
 .list > .issue-item > .meta > span.tags,
@@ -142,22 +142,22 @@ div.maincontent > div.card > div.filelist > div > span.filename {
   flex-grow:1;
 }
 .card > hr {width:100%;}
-.timestamp {font-size: var(--font-sz-small);color:var(--color-tertiary);}
+.timestamp {font-size: var(--font-sz-small);color:var(--color-fg);}
 
 h1,h2,h3,
 h4,h5,h6 {overflow-wrap:anywhere;}
 
 .pagination {
-	display: flex;
+  display: flex;
   flex-direction:row;
   gap: calc(var(--padding) * 2);
   align-items:center;
   justify-content:center;
-	padding: 0;
+  padding: 0;
 }
 .pagination > span.flip-l,
 .pagination > span.flip-r {
-	min-width: 3pc;
+  min-width: 3pc;
 }
 .pagination > span.flip-l {text-align:right;}
 .pagination > span.flip-r {text-align:left;}
@@ -258,6 +258,7 @@ h4,h5,h6 {overflow-wrap:anywhere;}
 <div class="card">
   <h4>Collaborators:</h4>
   <div class="list">
+    <span><i class="fa-solid fa-user"></i> <a href="{% url 'users:profile' repository.owner.username %}">{{ repository.owner.username }}</a> (owner)</span>
     {% for c in collaborators.all %}
     <span><i class="fa-solid fa-user"></i> <a href="{% url 'users:profile' c.user.username %}">{{ c.user.username }}</a></span>
     {% endfor %}

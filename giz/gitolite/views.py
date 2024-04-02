@@ -21,6 +21,7 @@ from .forms import (
     RepositoryDocumentationGenerationForm,
     RepositoryReleaseGenerationForm,
     IssueCommentForm,
+    RepositoryBranchPermForm,
 )
 from .apps import git_get_readme_html, git_get_tree
 
@@ -95,14 +96,14 @@ def user_has_settings_access(user : User, owner : str, reponame : str):
 def get_repository_tabs(repository : Repository):
     ret = []
 
-    if repository.issue_permissions != Repository.IssuePermissions.DISABLED:
+    if repository.issue_permission != Repository.PermissionChoices.DISABLED:
         ret.append({'name': "issues", 'icon': "fa-circle-dot", 'displayname': "Issues",
                     'url': reverse('gitolite:issue_list', kwargs={'owner':repository.owner.username, 'name': repository.name})})
 
-    if repository.pullrequest_permissions != Repository.PullRequestPermissions.DISABLED:
+    if repository.pullrequest_permission != Repository.PermissionChoices.DISABLED:
         ret.append({'name': "pulls",  'icon': "fa-code-pull-request", 'displayname': "Pull requests"})
 
-    if repository.documentation_generation != Repository.DocumentationGeneration.DISABLED:
+    if repository.docs_generation != Repository.DocumentationGeneration.DISABLED:
         ret.append({'name': "docs", 'icon': "fa-book", 'displayname': "Documentation"})
 
     if repository.release_generation != Repository.ReleaseGeneration.DISABLED:
@@ -116,6 +117,82 @@ def get_repository_tabs(repository : Repository):
                        'url': repository.get_absolute_url()})
 
     return ret
+
+
+def query_string(query: str, repo=None):
+    # is:open
+    #   matches either status that is open, ie. open and reopened.
+    # is:closed
+    #   matches any status that is closed, ie. closed, wontfix, and duplicate.
+    # status:<STATUS>
+    #   matches all issues with status=<STATUS>
+    # @<usrname>
+    #   matches all issues where @username occurs
+    # author:username
+    #   matches all issues that @username authored
+
+    #return Issue.objects.filter(repo=repo)
+    query = query.split()
+    queryset = Issue.objects.all()
+
+    if not repo is None:
+        queryset.filter(repo=repo)
+
+    #raise Exception(queryset.all())
+
+    queryset.prefetch_related('issuecomments')
+
+    if len(query) == 0:
+        return queryset
+
+    filters = []
+
+    for term in query:
+        tt = term.split(':', maxsplit=1)
+
+        if len(tt) == 1:
+            filters.append(
+                       queryset.filter(message__contains=tt[0])
+                     | queryset.filter(title__contains=tt[0])
+                     | queryset.filter(issuecomments__message__contains=tt[0])
+                     )
+
+
+        elif tt[0] == "is":
+            if tt[1] == "open":
+                filters.append(
+                           queryset.filter(status=Issue.IssueStatusOptions.OPEN)
+                         | queryset.filter(status=Issue.IssueStatusOptions.REOPENED)
+                         )
+
+            elif tt[1] == "closed":
+                filters.append(
+                           queryset.filter(status=Issue.IssueStatusOptions.CLOSED)
+                         | queryset.filter(status=Issue.IssueStatusOptions.WONTFIX)
+                         | queryset.filter(status=Issue.IssueStatusOptions.DUPLICATE)
+                         )
+
+
+        elif tt[0] == "status":
+            t = tt[1].lower().strip()
+            status = 0
+
+            try:
+                status = list(filter(lambda s: s.name.lower() == t, list(Issue.IssueStatusOptions)))[0]
+            except:
+                raise Exception("Invalid status '{}'".format(t))
+
+            filters.append(queryset.filter(status=status))
+
+
+        elif tt[0] == "author":
+            filters.append(queryset.filter(author__username=tt[1]))
+
+
+    for f in filters:
+        queryset = queryset.intersection(f)
+
+    return queryset
 
 
 class RepositoryView(DetailView):
@@ -188,7 +265,6 @@ class RepositorySettingsReleases(RepositorySettingsBase, UpdateView):
 # TODO: Fix this mess (merge with updateview)
 @login_required
 def RepositorySettingsCollab(request, owner, name):
-    #owner = get_object_or_404(User, username=owner)
     user = request.user
     repo = user_has_settings_access(user, owner, name)
 
@@ -271,6 +347,8 @@ class IssueListView(ListView):
     model = Issue
     context_object_name = 'issues'
 
+    DEFAULT_QUERY = 'is:open'
+
     # TODO:
     # Limit issues to repo-lreated ones.
     def get_queryset(self):
@@ -278,14 +356,25 @@ class IssueListView(ListView):
         #raise Exception(self.request.GET.copy())
         repo = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
 
-        queryset = Issue.objects.filter(repo=repo)
+        get = self.request.GET.copy()
+        search_term = get.pop('search', ['is:open'])[0]
+
+        queryset = query_string(search_term, repo=repo)
+        # TODO: Sorting from GET params
+        queryset = queryset.order_by('-date_updated')
+
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        get = self.request.GET.copy()
+        search_term = get.pop('search', [None])[0]
+
         context['repository'] = view_repo(self.request.user, self.kwargs['owner'], self.kwargs['name'])
         context['active'] = "issues"
         context['tabs'] = get_repository_tabs(context['repository'])
+        context['search_term'] = 'is:open' if search_term is None else search_term
         return context
 
 
@@ -344,3 +433,13 @@ class IssueView(CreateView):
         form.instance.issue = get_object_or_404(Issue, repo=repo, issueid=self.kwargs['issueid'])
 
         return super(IssueView, self).form_valid(form)
+
+
+@method_decorator(ratelimit(key='header:x-real-ip', rate='30/h', method='POST', block=True), name='post')
+class BranchPermissionView(RepositorySettingsBase, UpdateView):
+    form_class = RepositoryBranchPermForm
+    template_name = "gitolite/repository_edit_branches.html"
+    context_object_name = 'repository'
+
+    def get_queryset(self):
+        return []

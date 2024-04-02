@@ -23,6 +23,13 @@ def index(request):
     return render(request, 'index/index.html', context=context)
 
 
+def test(request):
+    context = {}
+
+
+    return HttpResponse("raw?", content_type='text/plain; charset=utf-8')
+
+
 class UserView(ListView):
     model = User
     template_name = "index/user.html"

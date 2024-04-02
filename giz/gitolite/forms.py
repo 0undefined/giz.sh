@@ -1,5 +1,5 @@
 from django.forms import ModelForm, RadioSelect, TextInput
-from .models import Collaborator, Repository, Issue, IssueComment
+from .models import Collaborator, Repository, Issue, IssueComment, BranchPermission
 from users.models import User
 
 class Collaborator_form(ModelForm):
@@ -27,9 +27,9 @@ class RepositoryForm(ModelForm):
 class RepositoryDocumentationGenerationForm(ModelForm):
     class Meta:
         model = Repository
-        fields = ['documentation_generation']
+        fields = ['docs_generation']
         widgets = {
-            'documentation_generation': RadioSelect()
+            'docs_generation': RadioSelect(),
         }
 
 
@@ -41,6 +41,15 @@ class RepositoryReleaseGenerationForm(ModelForm):
             'release_generation': RadioSelect(),
             'release_pattern': TextInput(attrs={'placeholder': "Tag pattern, eg. v[0-9]+\.[0-9]+"}),
         }
+
+
+class RepositoryBranchPermForm(ModelForm):
+    # TODO: Validate the ref_pattern input
+    # https://git-scm.com/docs/git-check-ref-format
+
+    class Meta:
+        model = BranchPermission
+        fields = ['permission', 'ref_pattern'] #  , 'user_or_group']
 
 
 class IssueForm(ModelForm):

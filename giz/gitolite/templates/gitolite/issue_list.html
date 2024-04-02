@@ -2,11 +2,12 @@
 {% load markdown %}
 {% block REPO_PAGE %}
 <div class="maincontent card">
-  <form class="form">
+  <form class="form" method="get" action="?" name="search">
     <div class="row">
       Filter <div class="form-charfield">
-        <input type="text" placeholder="placeholder"/>
+        <input type="text" name="search" placeholder="Search" value="{{ search_term }}"/>
       </div>
+      <!--
       <select name="tags">
         <option value="placeholder">placeholder</option>
         <option value="placeholder0">placeholder0</option>
@@ -14,6 +15,7 @@
         <option value="placeholder2">placeholder2</option>
         <option value="placeholder3">placeholder3</option>
       </select>
+      -->
       <a class="btn-submit" href="{% url 'gitolite:issue_new' repository.owner repository.name %}">New</a>
     </div>
   </form>
@@ -34,15 +36,9 @@
         <span><i class="fa-solid fa-comment"></i> {{ issue.issuecomments.count }}</span>
         {% endif %}
         <span class="tags">
-          <span class="float">
-            example tag
-          </span>
-          <span class="float">
-            placeholder
-          </span>
-          <span class="float">
-            bug
-          </span>
+          <span class="float">example tag</span>
+          <span class="float">placeholder</span>
+          <span class="float">bug</span>
         </span>
       </div>
     </div>

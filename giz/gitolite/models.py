@@ -331,6 +331,11 @@ class BranchPermission(models.Model):
     object_id = models.PositiveIntegerField()
     # For referencing either User, or User, Organization, and OrganizationTeam,
     # if the repo is a organization repo.
-    content_object = GenericForeignKey()
+    user_or_group = GenericForeignKey()
 
+    repo = models.ForeignKey(Repository, null=False, on_delete=models.CASCADE)
+    # Even though git itself does not enforce a length on ref names, we do.
+    # that is 128 characters, which I think should be sufficient.
+    # See https://git-scm.com/docs/git-check-ref-format for ref validation
+    ref_pattern = models.CharField(max_length=128, blank=False, null=False)
     permission = models.IntegerField(choices=Collaborator.Permissions.choices, default=Collaborator.Permissions.NO_PERM)

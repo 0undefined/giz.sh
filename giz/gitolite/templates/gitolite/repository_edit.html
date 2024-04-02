@@ -2,16 +2,19 @@
 {% block TITLE %}Settings for {{repository}}{% endblock %}
 {% block CONTENT %}
 <div class="leftcontent card">
-  <a href="{{ repository.get_absolute_url }}">{{repository}}</a>
+  <a href="{{ repository.get_absolute_url }}"><i class="fa-solid fa-circle-chevron-left"></i> {{repository}}</a>
   <h3>Settings</h3>
-  <ul>
-    <li><a href="{% url 'gitolite:repo-settings' repository.owner repository.name %}">General</a></li>
-    <li><a href="{% url 'gitolite:repo-settings-collabs' repository.owner repository.name %}">Collaborators</a></li>
-    <li><a href="{% url 'gitolite:repo-settings-branches' repository.owner repository.name %}">Branches</a></li>
-    <li><a href="{% url 'gitolite:repo-settings-releases' repository.owner repository.name %}">Releases</a></li>
-    <li><a href="{% url 'gitolite:repo-settings-documentation' repository.owner repository.name %}">Documentation</a></li>
-    <li><a href="{% url 'gitolite:repo-settings-issues_and_prs' repository.owner repository.name %}">Miscellaneous</a></li>
-  </ul>
+  <div class="list">
+    <a href="{% url 'gitolite:repo-settings' repository.owner repository.name %}"><i class="fa-solid fa-gear"></i> General</a>
+    <a href="{% url 'gitolite:repo-settings-collabs' repository.owner repository.name %}"><i class="fa-solid fa-user-group"></i> Collaborators</a>
+    <a href="{% url 'gitolite:repo-settings-branches' repository.owner repository.name %}"><i class="fa-solid fa-code-branch"></i> Branches</a>
+    <a href="{% url 'gitolite:repo-settings-branches' repository.owner repository.name %}"><i class="fa-solid fa-circle-dot"></i> Issues</a>
+    <a href="{% url 'gitolite:repo-settings-branches' repository.owner repository.name %}"><i class="fa-solid fa-code-pull-request"></i> Pull requests</a>
+    <a href="{% url 'gitolite:repo-settings-documentation' repository.owner repository.name %}"><i class="fa-solid fa-book"></i> Documentation</a>
+    <a href="{% url 'gitolite:repo-settings-releases' repository.owner repository.name %}"><i class="fa-solid fa-cube"></i> Releases</a>
+    <a href="{% url 'gitolite:repo-settings-branches' repository.owner repository.name %}"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+    <a href="{% url 'gitolite:repo-settings-issues_and_prs' repository.owner repository.name %}"><i class="fa-solid fa-bacon"></i> Miscellaneous</a>
+  </div>
 </div>
 <div class="maincontent">
   {% block SETTINGS %}
@@ -40,10 +43,8 @@
         {{ form.default_branch }}
       </div>
     </div>
-    <div>
       {{ form.description.label }}
       {{ form.description }}
-    </div>
   </form>
   </div>
   {% endblock %}

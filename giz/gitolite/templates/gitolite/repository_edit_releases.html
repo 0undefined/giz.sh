@@ -1,5 +1,5 @@
 {% extends 'gitolite/repository_edit.html' %}
-{% block TITLE %}Change how documentation is stored{% endblock %}
+{% block TITLE %}Change how releases are created{% endblock %}
 {% block STYLE %}
 <style>
 .radio {
@@ -16,22 +16,15 @@
 {% endblock %}
 {% block SETTINGS %}
 <div class="card">
-  <h2>Documentation settings</h2>
+  <h2>Releases settings</h2>
+  Choose how and when releases are generated.
   <form method="post" class="form">{% csrf_token %}
-  {{ form.release_generation.label }}
   <div class="radio">
   {% for f in form.release_generation %}
   {{ f }}
   {% endfor %}
   </div>
   {{ form.release_pattern }}
-  <!--
-  <div class="radio">
-  <label for="id_release_generation_0"><input type="radio" name="release_generation" value="0" id="id_release_generation_0" required="" checked="">Disabled</label>
-  <label for="id_release_generation_1"><input type="radio" name="release_generation" value="1" id="id_release_generation_1" required="">Manual</label>
-  <label for="id_release_generation_2"><input type="radio" name="release_generation" value="2" id="id_release_generation_2" required="">Automatic{{ form.release_pattern }}</label>
-  </div>
-  -->
   <input class="btn-submit" type="submit" value="Save">
   </form>
 </div>
