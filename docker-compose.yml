@@ -13,6 +13,9 @@ services:
     restart: always
     environment:
       - POSTGRES_PASSWORD
+      - POSTGRES_DB=giz
+    volumes:
+      - db:/var/lib/postgresql/data
   giz:
     build: .
     logging:
@@ -42,3 +45,4 @@ volumes:
   gitolite-sshkeys:
   gitolite-git:
   static:
+  db:

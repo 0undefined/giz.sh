@@ -19,6 +19,7 @@ services:
     restart: always
     environment:
       - POSTGRES_PASSWORD
+      - POSTGRES_DB: giz
     volumes:
       - /root/data:/var/lib/postgresql/data
   redis:
