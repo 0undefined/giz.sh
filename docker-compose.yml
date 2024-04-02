@@ -1,9 +1,4 @@
 services:
-  postgres:
-    image: postgres:latest
-    restart: always
-    environment:
-      - POSTGRES_PASSWORD
   gitolite:
     image: jgiannuzzi/gitolite
     ports:
@@ -13,6 +8,11 @@ services:
       - gitolite-git:/var/lib/git
     environment:
       - SSH_KEY
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD
   giz:
     build: .
     logging:
