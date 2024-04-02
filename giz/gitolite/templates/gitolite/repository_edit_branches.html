@@ -1,0 +1,22 @@
+{% extends 'gitolite/repository_edit.html' %}
+{% block TITLE %}Change branch settings{% endblock %}
+{% block STYLE %}
+<style>
+.radio {
+  display:flex;
+  flex-direction:column;
+  gap:var(--padding);
+}
+.radio > label {
+  display:flex;
+  flex-direction:row;
+  gap:var(--padding);
+}
+</style>
+{% endblock %}
+{% block SETTINGS %}
+<div class="card">
+  <h2>Branches</h2>
+  This feature intentionally postponed.
+</div>
+{% endblock %}
