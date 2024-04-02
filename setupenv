@@ -1,30 +1,96 @@
 #!/usr/bin/env sh
 
-if ! [ -e ~/.ssh/id_rsa.pub ]; then
-  if [ -e ~/.ssh/id_rsa ]; then
-    print "You seem to have a private key but no public key!"
-    print "This setup is confusing, exiting..."
-    exit 1
+# Use ./dev/ for files for local development
+CONFIG_DIR=${1-.dev}
+# Set debugging if not $PROD is set to true
+! [ "$(echo "${PROD}" | tr '[:upper:]' '[:lower:]')" = "true" ] && DEBUGGING=true
+
+create_config_dir() {
+  if ! [ -d "${CONFIG_DIR}" ]; then
+    if ! [ -e "${CONFIG_DIR}" ]; then
+      echo "Creating configuration directory \"${CONFIG_DIR}\""
+      mkdir -p "${CONFIG_DIR}"
+    else
+      echo "${CONFIG_DIR} exists but is not a directory!"
+      echo 'Please change CONFIG_DIR to something else, or delete the file.'
+      echo 'Exiting...'
+      exit 1
+    fi
   fi
-  ssh-keygen -t rsa -b 4096 -N '' -f ~/.ssh/id_rsa
-fi
+}
 
-! [ -e ~/.secrets ] && mkdir ~/.secrets
+generate_keypair() {
+  if ! [ -e "${CONFIG_DIR}/id_rsa.pub" ]; then
+    if [ -e "${CONFIG_DIR}/id_rsa" ]; then
+      echo "You seem to have a private key but no public key!"
+      echo "Exiting..."
+      exit 1
+    fi
+    echo "Generating ssh key in \"${CONFIG_DIR}/id_rsa{,.pub}\""
+    ssh-keygen -q -t rsa -b 1024 -N '' -f "${CONFIG_DIR}/id_rsa"
+  fi
+  SSH_KEY="$(cat "${CONFIG_DIR}/id_rsa.pub")"
+}
 
-if ! [ -e ~/.secrets/django_key ]; then
-  strings /dev/random \
-    | grep -Eo '[a-zA-Z0-9@_-]' \
-    | head -64 \
-    | tr -d '\n' > .secrets/django_key
-fi
+generate_django_key() {
+  DJANGO_KEYFILE="${CONFIG_DIR}/django"
 
-if ! [ -e ~/.secrets/postgres_pswd ]; then
-  strings /dev/random \
-    | grep -Eo '[a-zA-Z0-9@_-]' \
-    | head -64 \
-    | tr -d '\n' > .secrets/postgres_pswd
-fi
+  # Immediately return if key exists
+  if [ -e "${DJANGO_KEYFILE}" ]; then
+    SECRET_KEY="$(cat "${DJANGO_KEYFILE}")"
+    return
+  fi
 
-export SSH_KEY="$(cat ~/.ssh/id_rsa.pub)"
-export SECRET_KEY="$(cat ~/.secrets/django_key)"
-export POSTGRES_PASSWORD="$(cat ~/.secrets/postgres_pswd)"
+  if [ "${DEBUGGING}" = "true" ]; then
+    echo "(development environment) Creating \"insecure\" django password in \"${DJANGO_KEYFILE}\""
+    echo "insecure" | tr -d '\n' > "${DJANGO_KEYFILE}"
+  else
+    echo "(!!PRODUCTION!!) Generating django password, located in \"${DJANGO_KEYFILE}\""
+    strings /dev/random \
+      | grep -Eo '[a-zA-Z0-9@_-]' \
+      | head -64 \
+      | tr -d '\n' > "${DJANGO_KEYFILE}"
+  fi
+
+  SECRET_KEY="$(cat "${DJANGO_KEYFILE}")"
+}
+
+generate_postgres_key() {
+  POSTGRES_PASSWORDFILE="${CONFIG_DIR}/postgres"
+
+  # Immediately return if postgress password exists
+  if [ -e "${POSTGRES_PASSWORDFILE}"  ]; then
+    POSTGRES_PASSWORD="$(cat "${CONFIG_DIR}/postgres")"
+    return
+  fi
+
+  if [ "${DEBUGGING}" = "true" ]; then
+    echo "(development environment) Creating \"insecure\" postgres password in \"${POSTGRES_PASSWORDFILE}\""
+      echo "insecure" | tr -d '\n' > "${POSTGRES_PASSWORDFILE}"
+  else
+    echo "(!!PRODUCTION!!) Generating postgres password, located in \"${POSTGRES_PASSWORDFILE}\""
+    strings /dev/random \
+      | grep -Eo '[a-zA-Z0-9@_-]' \
+      | head -64 \
+      | tr -d '\n' > "${POSTGRES_PASSWORDFILE}"
+  fi
+  POSTGRES_PASSWORD="$(cat "${CONFIG_DIR}/postgres")"
+}
+
+# Create credential files
+create_config_dir
+[ -z "${SSH_KEY}" ] && generate_keypair
+[ -z "${SECRET_KEY}" ] && generate_django_key
+[ -z "${POSTGRES_PASSWORD}" ] && generate_postgres_key
+
+# Export environment
+
+export SSH_KEY="$SSH_KEY"
+export SECRET_KEY="$SECRET_KEY"
+export POSTGRES_PASSWORD="$POSTGRES_PASSWORD"
+export CONFIG_DIR="$CONFIG_DIR"
+
+echo "SSH_KEY=\"$SSH_KEY\""
+echo "SECRET_KEY=\"$SECRET_KEY\""
+echo "POSTGRES_PASSWORD=\"$POSTGRES_PASSWORD\""
+echo "CONFIG_DIR=\"$CONFIG_DIR\""
