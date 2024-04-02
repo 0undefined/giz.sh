@@ -1,0 +1,14 @@
+GitPython
+django
+django-csp
+django-debug-toolbar
+django-extensions
+django-ratelimit
+gunicorn
+hiredis
+ipython
+paramiko
+psycopg[binary]
+pycmarkgfm
+redis[hiredis]
+tzdata
